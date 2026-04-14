@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Goethe A1 Flashcards</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Cards Screen (default, shown first) -->
+        <div id="cards-screen" class="screen active">
+            <header class="screen-header">
+                <h1>Flashcards</h1>
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                    <!-- populated by JS -->
+                </select>
+            </header>
+            <div class="cards-content">
+                <div class="session-info">
+                    <span id="card-counter">1 / 20</span>
+                    <div class="session-progress-bar">
+                        <div id="session-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="card-container">
+                    <div class="flashcard" id="flashcard" onclick="flipCard()">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-type-badge" id="card-type"></div>
+                                <div class="card-word" id="card-front-word"></div>
+                                <div class="card-hint" id="card-hint">Tap to flip</div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-translation" id="card-translation"></div>
+                                <div class="card-example" id="card-example-de"></div>
+                                <div class="card-example-en" id="card-example-en"></div>
+                                <div class="card-details" id="card-details"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-learning" onclick="markLearning()">Still Learning</button>
+                    <button class="btn btn-known" onclick="markKnown()">Got It ✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Words Screen -->
+        <div id="words-screen" class="screen">
+            <header class="screen-header">
+                <h1>Word List</h1>
+                <div class="progress-summary">
+                    <span id="words-learned">0</span> / <span id="words-total">643</span> learned
+                </div>
+            </header>
+            <div class="progress-bar-container">
+                <div id="words-progress" class="progress-fill"></div>
+            </div>
+            <div class="words-content" id="word-list">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- Grammar Screen -->
+        <div id="grammar-screen" class="screen">
+            <header class="screen-header">
+                <h1>A1 Grammar</h1>
+            </header>
+            <div class="grammar-content" id="grammar-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="tab-bar">
+            <button class="tab active" data-tab="cards" onclick="switchTab('cards')">
+                <span class="tab-icon">🃏</span>
+                <span class="tab-label">Cards</span>
+            </button>
+            <button class="tab" data-tab="words" onclick="switchTab('words')">
+                <span class="tab-icon">📖</span>
+                <span class="tab-label">Words</span>
+            </button>
+            <button class="tab" data-tab="grammar" onclick="switchTab('grammar')">
+                <span class="tab-icon">📐</span>
+                <span class="tab-label">Grammar</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="words.js"></script>
+    <script src="grammar.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
