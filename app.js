@@ -708,10 +708,10 @@ function renderComics() {
         var body = document.createElement('div');
         body.className = 'comic-body';
 
-        // SVG illustration
+        // SVG illustration (composed from character helpers + scene background)
         var illustration = document.createElement('div');
         illustration.className = 'comic-illustration';
-        illustration.innerHTML = comic.svg;
+        illustration.innerHTML = buildComicSvg(comic);
         body.appendChild(illustration);
 
         // Speech bubbles
