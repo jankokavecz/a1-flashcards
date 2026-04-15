@@ -848,14 +848,151 @@ select#category-filter {
   color: #a78bfa;
 }
 
-/* When there are 5 tabs, make icons/labels slightly smaller */
+/* 6 tabs — smaller icons and labels */
 .tab-icon {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 1px;
 }
 
 .tab-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
+}
+
+/* --- Comics Screen --- */
+.comics-content {
+  padding: 16px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.comic-card {
+  background: #16213e;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.comic-header {
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.comic-title {
+  font-weight: 600;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.comic-title-de {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.comic-chevron {
+  color: #666;
+  transition: transform 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.comic-card.open .comic-chevron {
+  transform: rotate(90deg);
+}
+
+.comic-body {
+  display: none;
+  padding: 0 16px 16px;
+}
+
+.comic-card.open .comic-body {
+  display: block;
+}
+
+.comic-illustration {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 2px solid #333;
+}
+
+.comic-illustration svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.comic-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comic-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.comic-bubble.bubble-cat {
+  background: #FF8C0020;
+  border: 1px solid #FF8C00;
+  border-radius: 12px 12px 12px 2px;
+  margin-right: 40px;
+}
+
+.comic-bubble.bubble-dog {
+  background: #8B691420;
+  border: 1px solid #8B6914;
+  border-radius: 12px 12px 2px 12px;
+  margin-left: 40px;
+}
+
+.bubble-speaker {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.bubble-cat .bubble-speaker {
+  color: #FF8C00;
+}
+
+.bubble-dog .bubble-speaker {
+  color: #C8A92E;
+}
+
+.bubble-de {
+  color: white;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.bubble-en {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: none;
+}
+
+.comic-bubble.show-translation .bubble-en {
+  display: block;
+}
+
+.comic-hint {
+  text-align: center;
+  color: #555;
+  font-size: 0.75rem;
+  margin-top: 8px;
+  font-style: italic;
 }
 
 /* --- Utilities --- */

@@ -3,7 +3,7 @@
 
 // Spaced repetition intervals in days per level
 var SRS_INTERVALS = [0, 1, 3, 7, 14, 30];
-var LEARNED_THRESHOLD = 3; // level >= 3 counts as "learned"
+var LEARNED_THRESHOLD = 1; // level >= 1 counts as "learned" (seen at least once)
 
 var wordProgress = {}; // { wordId: { level: 0, nextReview: timestamp } }
 var currentDeck = [];
@@ -20,6 +20,7 @@ function init() {
     renderWordList();
     renderGrammar();
     renderScenes();
+    renderComics();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
@@ -680,6 +681,69 @@ function renderGrammar() {
 
         sec.appendChild(body);
         container.appendChild(sec);
+    });
+}
+
+// ── Comics Screen ──────────────────────────────────────────────
+
+function renderComics() {
+    var container = document.getElementById('comics-content');
+    container.innerHTML = '';
+
+    COMICS.forEach(function(comic) {
+        var card = document.createElement('div');
+        card.className = 'comic-card';
+
+        var header = document.createElement('div');
+        header.className = 'comic-header';
+        header.innerHTML =
+            '<div><div class="comic-title">' + comic.title + '</div>' +
+            '<div class="comic-title-de">' + comic.titleDe + '</div></div>' +
+            '<span class="comic-chevron">&#9654;</span>';
+        header.addEventListener('click', function() {
+            card.classList.toggle('open');
+        });
+        card.appendChild(header);
+
+        var body = document.createElement('div');
+        body.className = 'comic-body';
+
+        // SVG illustration
+        var illustration = document.createElement('div');
+        illustration.className = 'comic-illustration';
+        illustration.innerHTML = comic.svg;
+        body.appendChild(illustration);
+
+        // Speech bubbles
+        var bubblesContainer = document.createElement('div');
+        bubblesContainer.className = 'comic-bubbles';
+
+        comic.bubbles.forEach(function(bubble) {
+            var bubbleEl = document.createElement('div');
+            bubbleEl.className = 'comic-bubble ' + (bubble.speaker === 'cat' ? 'bubble-cat' : 'bubble-dog');
+
+            var speakerLabel = bubble.speaker === 'cat' ? 'Katze' : 'Hund';
+            bubbleEl.innerHTML =
+                '<div class="bubble-speaker">' + speakerLabel + '</div>' +
+                '<div class="bubble-de">' + bubble.de + '</div>' +
+                '<div class="bubble-en">' + bubble.en + '</div>';
+
+            bubbleEl.addEventListener('click', function() {
+                bubbleEl.classList.toggle('show-translation');
+            });
+
+            bubblesContainer.appendChild(bubbleEl);
+        });
+
+        body.appendChild(bubblesContainer);
+
+        var hint = document.createElement('div');
+        hint.className = 'comic-hint';
+        hint.textContent = 'Tap bubbles to reveal English';
+        body.appendChild(hint);
+
+        card.appendChild(body);
+        container.appendChild(card);
     });
 }
 

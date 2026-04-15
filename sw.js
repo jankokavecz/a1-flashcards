@@ -1,4 +1,4 @@
-var CACHE = 'a1-flashcards-v3';
+var CACHE = 'a1-flashcards-v4';
 var FILES = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ var FILES = [
   './words.js',
   './grammar.js',
   './scenarios.js',
+  './comics.js',
   './icon-192.png',
   './icon-512.png'
 ];
