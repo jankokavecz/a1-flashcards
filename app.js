@@ -1,7 +1,11 @@
 // Goethe A1 Flashcard App — Core Logic
 // Depends on globals from words.js (WORDS, CATEGORIES) and grammar.js (GRAMMAR_SECTIONS)
 
-var knownWords = new Set();
+// Spaced repetition intervals in days per level
+var SRS_INTERVALS = [0, 1, 3, 7, 14, 30];
+var LEARNED_THRESHOLD = 3; // level >= 3 counts as "learned"
+
+var wordProgress = {}; // { wordId: { level: 0, nextReview: timestamp } }
 var currentDeck = [];
 var currentIndex = 0;
 var isFlipped = false;
@@ -64,9 +68,42 @@ function startSession(category) {
     } else {
         words = WORDS.filter(function(w) { return w.category === category; });
     }
-    currentDeck = shuffle(words);
+
+    var now = Date.now();
+
+    // Split into due (overdue) and new cards
+    var due = [];
+    var newCards = [];
+    words.forEach(function(w) {
+        var prog = wordProgress[w.id];
+        if (!prog) {
+            newCards.push(w);
+        } else if (prog.nextReview <= now) {
+            due.push(w);
+        }
+        // Skip cards not yet due
+    });
+
+    // Sort due cards: most overdue first
+    due.sort(function(a, b) {
+        return (wordProgress[a.id].nextReview || 0) - (wordProgress[b.id].nextReview || 0);
+    });
+
+    // Combine: due cards first, then shuffled new cards
+    currentDeck = due.concat(shuffle(newCards));
     currentIndex = 0;
     isFlipped = false;
+
+    // Update session info
+    var counterEl = document.getElementById('card-counter');
+    if (currentDeck.length === 0) {
+        counterEl.textContent = 'All reviewed!';
+    } else {
+        var dueCount = due.length;
+        var newCount = newCards.length;
+        counterEl.textContent = dueCount + ' due, ' + newCount + ' new';
+    }
+
     showCurrentCard();
 }
 
@@ -83,18 +120,22 @@ function shuffle(arr) {
 
 function showCurrentCard() {
     if (currentDeck.length === 0) {
-        document.getElementById('card-front-word').textContent = 'No cards!';
-        document.getElementById('card-hint').textContent = 'Select a category';
-        document.getElementById('card-counter').textContent = '0 / 0';
+        document.getElementById('card-front-word').textContent = 'All caught up!';
+        document.getElementById('card-hint').textContent = 'No cards due. Come back later!';
+        document.getElementById('card-counter').textContent = 'Nothing due';
         document.getElementById('session-progress').style.width = '0%';
+        var cardFront = document.getElementById('flashcard').querySelector('.card-front');
+        cardFront.classList.remove('gender-m', 'gender-f', 'gender-n');
         return;
     }
 
     if (currentIndex >= currentDeck.length) {
         document.getElementById('card-front-word').textContent = '\uD83C\uDF89 Done!';
-        document.getElementById('card-hint').textContent = 'All cards reviewed! Tap to restart.';
-        document.getElementById('card-counter').textContent = currentDeck.length + ' / ' + currentDeck.length;
+        document.getElementById('card-hint').textContent = 'Session complete! Tap to restart.';
+        document.getElementById('card-counter').textContent = 'Session done';
         document.getElementById('session-progress').style.width = '100%';
+        var cardFront2 = document.getElementById('flashcard').querySelector('.card-front');
+        cardFront2.classList.remove('gender-m', 'gender-f', 'gender-n');
         document.getElementById('flashcard').onclick = function() {
             document.getElementById('flashcard').onclick = flipCard;
             startSession(document.getElementById('category-filter').value);
@@ -119,6 +160,20 @@ function showCurrentCard() {
     document.getElementById('card-type').textContent = word.type;
     document.getElementById('card-type').className = 'card-type-badge type-' + word.type;
     document.getElementById('card-front-word').textContent = word.de;
+
+    // Level indicator
+    var prog = wordProgress[word.id];
+    var level = prog ? prog.level : 0;
+    var levelEl = document.getElementById('card-level');
+    if (levelEl) {
+        var dots = '';
+        for (var i = 0; i < 5; i++) {
+            dots += i < level ? '●' : '○';
+        }
+        levelEl.textContent = dots;
+        levelEl.className = 'card-level level-' + level;
+    }
+
     document.getElementById('card-hint').textContent = 'Tap to flip';
 
     // Back side
@@ -137,8 +192,7 @@ function showCurrentCard() {
     }
     document.getElementById('card-details').textContent = details;
 
-    // Counter and progress bar
-    document.getElementById('card-counter').textContent = (currentIndex + 1) + ' / ' + currentDeck.length;
+    // Progress bar (counter is set by startSession)
     document.getElementById('session-progress').style.width = ((currentIndex + 1) / currentDeck.length * 100) + '%';
 }
 
@@ -150,7 +204,14 @@ function flipCard() {
 function markKnown() {
     if (currentDeck.length === 0 || currentIndex >= currentDeck.length) return;
     var word = currentDeck[currentIndex];
-    knownWords.add(word.id);
+
+    // Increase SRS level
+    var prog = wordProgress[word.id] || { level: 0, nextReview: 0 };
+    prog.level = Math.min(prog.level + 1, 5);
+    var intervalDays = SRS_INTERVALS[prog.level];
+    prog.nextReview = Date.now() + intervalDays * 24 * 60 * 60 * 1000;
+    wordProgress[word.id] = prog;
+
     saveProgress();
     currentIndex++;
     showCurrentCard();
@@ -159,6 +220,12 @@ function markKnown() {
 function markLearning() {
     if (currentDeck.length === 0 || currentIndex >= currentDeck.length) return;
     var word = currentDeck[currentIndex];
+
+    // Reset SRS level to 0
+    wordProgress[word.id] = { level: 0, nextReview: 0 };
+    saveProgress();
+
+    // Re-insert card later in deck
     currentDeck.splice(currentIndex, 1);
     var insertAt = currentIndex + Math.floor(Math.random() * Math.max(1, currentDeck.length - currentIndex)) + 1;
     if (insertAt > currentDeck.length) insertAt = currentDeck.length;
@@ -173,9 +240,10 @@ function renderWordList() {
     container.innerHTML = '';
 
     // Update progress stats
-    document.getElementById('words-learned').textContent = knownWords.size;
+    var learnedTotal = getLearnedCount();
+    document.getElementById('words-learned').textContent = learnedTotal;
     document.getElementById('words-total').textContent = WORDS.length;
-    document.getElementById('words-progress').style.width = (knownWords.size / WORDS.length * 100) + '%';
+    document.getElementById('words-progress').style.width = (learnedTotal / WORDS.length * 100) + '%';
 
     // Group by category, sorted alphabetically
     var catIds = Object.keys(CATEGORIES).sort(function(a, b) {
@@ -189,7 +257,7 @@ function renderWordList() {
         var group = document.createElement('div');
         group.className = 'category-group';
 
-        var learnedCount = catWords.filter(function(w) { return knownWords.has(w.id); }).length;
+        var learnedCount = catWords.filter(function(w) { return isWordLearned(w.id); }).length;
 
         var header = document.createElement('div');
         header.className = 'category-header';
@@ -199,7 +267,7 @@ function renderWordList() {
 
         catWords.forEach(function(word) {
             var item = document.createElement('div');
-            item.className = 'word-item' + (knownWords.has(word.id) ? ' learned' : '');
+            item.className = 'word-item' + (isWordLearned(word.id) ? ' learned' : '');
 
             var main = document.createElement('div');
             main.className = 'word-main';
@@ -400,6 +468,70 @@ function showTestResult() {
 
 // ── Scenes Screen ──────────────────────────────────────────────
 
+var currentSpeechCard = null; // track which card is currently playing
+
+function playConversation(scenario, btn, card) {
+    // If already playing this one, stop
+    if (currentSpeechCard === card) {
+        window.speechSynthesis.cancel();
+        currentSpeechCard = null;
+        btn.textContent = '\uD83D\uDD0A Play Conversation';
+        btn.classList.remove('playing');
+        return;
+    }
+
+    // Stop any other playing
+    if (currentSpeechCard) {
+        window.speechSynthesis.cancel();
+        var oldBtn = currentSpeechCard.querySelector('.scene-play-btn');
+        if (oldBtn) {
+            oldBtn.textContent = '\uD83D\uDD0A Play Conversation';
+            oldBtn.classList.remove('playing');
+        }
+    }
+
+    currentSpeechCard = card;
+    btn.textContent = '\u23F9 Stop';
+    btn.classList.add('playing');
+
+    var lines = scenario.lines.slice();
+    var lineIndex = 0;
+
+    function speakNext() {
+        if (lineIndex >= lines.length || currentSpeechCard !== card) {
+            currentSpeechCard = null;
+            btn.textContent = '\uD83D\uDD0A Play Conversation';
+            btn.classList.remove('playing');
+            return;
+        }
+
+        var utterance = new SpeechSynthesisUtterance(lines[lineIndex].de);
+        utterance.lang = 'de-DE';
+        utterance.rate = 0.9;
+
+        utterance.onend = function() {
+            lineIndex++;
+            if (lineIndex < lines.length && currentSpeechCard === card) {
+                setTimeout(speakNext, 1000);
+            } else {
+                currentSpeechCard = null;
+                btn.textContent = '\uD83D\uDD0A Play Conversation';
+                btn.classList.remove('playing');
+            }
+        };
+
+        utterance.onerror = function() {
+            currentSpeechCard = null;
+            btn.textContent = '\uD83D\uDD0A Play Conversation';
+            btn.classList.remove('playing');
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    speakNext();
+}
+
 function renderScenes() {
     var container = document.getElementById('scenes-content');
     container.innerHTML = '';
@@ -445,6 +577,19 @@ function renderScenes() {
                     '<div class="scene-en">' + line.en + '</div>';
                 body.appendChild(lineEl);
             });
+
+            // Play conversation button
+            if ('speechSynthesis' in window) {
+                var playBtn = document.createElement('button');
+                playBtn.className = 'scene-play-btn';
+                playBtn.textContent = '\uD83D\uDD0A Play Conversation';
+                (function(sc, pb, cd) {
+                    playBtn.addEventListener('click', function() {
+                        playConversation(sc, pb, cd);
+                    });
+                })(scenario, playBtn, card);
+                body.appendChild(playBtn);
+            }
 
             var toggleBtn = document.createElement('button');
             toggleBtn.className = 'scene-toggle-translation';
@@ -542,24 +687,48 @@ function renderGrammar() {
 
 function loadProgress() {
     try {
-        var saved = localStorage.getItem('a1-known-words');
+        var saved = localStorage.getItem('a1-word-progress');
         if (saved) {
-            knownWords = new Set(JSON.parse(saved));
+            wordProgress = JSON.parse(saved);
+        } else {
+            // Migrate from old knownWords format
+            var oldSaved = localStorage.getItem('a1-known-words');
+            if (oldSaved) {
+                var oldIds = JSON.parse(oldSaved);
+                oldIds.forEach(function(id) {
+                    wordProgress[id] = { level: 3, nextReview: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+                });
+                saveProgress();
+                localStorage.removeItem('a1-known-words');
+            }
         }
     } catch (e) {
-        knownWords = new Set();
+        wordProgress = {};
     }
 }
 
 function saveProgress() {
     try {
-        localStorage.setItem('a1-known-words', JSON.stringify(Array.from(knownWords)));
+        localStorage.setItem('a1-word-progress', JSON.stringify(wordProgress));
     } catch (e) {}
+}
+
+function isWordLearned(wordId) {
+    var prog = wordProgress[wordId];
+    return prog && prog.level >= LEARNED_THRESHOLD;
+}
+
+function getLearnedCount() {
+    var count = 0;
+    for (var id in wordProgress) {
+        if (wordProgress[id].level >= LEARNED_THRESHOLD) count++;
+    }
+    return count;
 }
 
 function resetProgress() {
     if (confirm('Reset all progress? This cannot be undone.')) {
-        knownWords = new Set();
+        wordProgress = {};
         saveProgress();
         renderWordList();
         startSession(document.getElementById('category-filter').value);

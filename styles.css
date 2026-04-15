@@ -178,6 +178,24 @@ select#category-filter {
   color: #888;
 }
 
+/* --- SRS Level Indicator --- */
+.card-level {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: #555;
+}
+
+.card-level.level-1 { color: #666; }
+.card-level.level-2 { color: #888; }
+.card-level.level-3 { color: #a78bfa; }
+.card-level.level-4 { color: #8b5cf6; }
+.card-level.level-5 { color: #10b981; }
+
 .card-type-badge {
   position: absolute;
   top: 16px;
@@ -638,6 +656,27 @@ select#category-filter {
 
 .scene-card.show-translation .scene-en {
   display: block;
+}
+
+.scene-play-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: #6366f122;
+  border: 1px solid #6366f1;
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scene-play-btn.playing {
+  background: #ef444422;
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .scene-toggle-translation {
