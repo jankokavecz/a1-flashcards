@@ -267,14 +267,62 @@ function renderWordList() {
         group.appendChild(header);
 
         catWords.forEach(function(word) {
+            var learned = isWordLearned(word.id);
             var item = document.createElement('div');
-            item.className = 'word-item' + (isWordLearned(word.id) ? ' learned' : '');
+            item.className = 'word-item' + (learned ? ' learned' : '');
+
+            // Gender class for nouns
+            if (word.type === 'noun' && word.gender) {
+                item.classList.add('word-gender-' + word.gender);
+            }
+
+            var row = document.createElement('div');
+            row.className = 'word-row';
+
+            // Checkbox
+            var checkbox = document.createElement('div');
+            checkbox.className = 'word-checkbox' + (learned ? ' checked' : '');
+            checkbox.innerHTML = learned ? '&#10003;' : '';
+            (function(w, cb, it) {
+                cb.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var isLearned = isWordLearned(w.id);
+                    if (isLearned) {
+                        // Unmark: reset to level 0
+                        wordProgress[w.id] = { level: 0, nextReview: 0 };
+                        cb.classList.remove('checked');
+                        cb.innerHTML = '';
+                        it.classList.remove('learned');
+                    } else {
+                        // Mark as learned: set level 1
+                        wordProgress[w.id] = { level: 1, nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000 };
+                        cb.classList.add('checked');
+                        cb.innerHTML = '&#10003;';
+                        it.classList.add('learned');
+                    }
+                    saveProgress();
+                    // Update counters
+                    var newLearnedTotal = getLearnedCount();
+                    document.getElementById('words-learned').textContent = newLearnedTotal;
+                    document.getElementById('words-progress').style.width = (newLearnedTotal / WORDS.length * 100) + '%';
+                    var catLearned = catWords.filter(function(cw) { return isWordLearned(cw.id); }).length;
+                    header.innerHTML = '<span>' + CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name +
+                        '</span><span class="category-count">' + catLearned + '/' + catWords.length + '</span>';
+                });
+            })(word, checkbox, item);
+            row.appendChild(checkbox);
 
             var main = document.createElement('div');
             main.className = 'word-main';
-            main.innerHTML = '<div><span class="word-de">' + word.de +
+            // Add gender color to noun text
+            var deClass = 'word-de';
+            if (word.type === 'noun' && word.gender) {
+                deClass += ' word-de-gender-' + word.gender;
+            }
+            main.innerHTML = '<div><span class="' + deClass + '">' + word.de +
                 '</span> <span class="word-type-badge type-' + word.type + '">' + word.type +
                 '</span></div><span class="word-en">' + word.en + '</span>';
+            row.appendChild(main);
 
             var expanded = document.createElement('div');
             expanded.className = 'word-expanded';
@@ -292,10 +340,11 @@ function renderWordList() {
             }
             expanded.innerHTML = expandedHtml;
 
-            item.appendChild(main);
+            item.appendChild(row);
             item.appendChild(expanded);
 
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function(e) {
+                if (e.target.closest && e.target.closest('.word-checkbox')) return;
                 item.classList.toggle('expanded');
             });
 
