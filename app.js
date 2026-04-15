@@ -11,9 +11,11 @@ var isFlipped = false;
 function init() {
     loadProgress();
     populateCategoryFilter();
+    populateTestCategoryFilter();
     startSession('all');
     renderWordList();
     renderGrammar();
+    renderScenes();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
@@ -36,6 +38,7 @@ function switchTab(tabName) {
     document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
 
     if (tabName === 'words') renderWordList();
+    if (tabName === 'test' && testQuestions.length === 0) startTest();
 }
 
 // ── Cards Logic ─────────────────────────────────────────────────
@@ -104,6 +107,13 @@ function showCurrentCard() {
     // Reset flip state
     isFlipped = false;
     document.getElementById('flashcard').classList.remove('flipped');
+
+    // Gender coloring for nouns
+    var cardFront = document.getElementById('flashcard').querySelector('.card-front');
+    cardFront.classList.remove('gender-m', 'gender-f', 'gender-n');
+    if (word.type === 'noun' && word.gender) {
+        cardFront.classList.add('gender-' + word.gender);
+    }
 
     // Front side
     document.getElementById('card-type').textContent = word.type;
@@ -221,6 +231,234 @@ function renderWordList() {
             });
 
             group.appendChild(item);
+        });
+
+        container.appendChild(group);
+    });
+}
+
+// ── Test Screen ────────────────────────────────────────────────
+
+var testQuestions = [];
+var testCurrentIndex = 0;
+var testCorrectCount = 0;
+var testTotalQuestions = 10;
+
+function populateTestCategoryFilter() {
+    var select = document.getElementById('test-category-filter');
+    var cats = Object.keys(CATEGORIES).sort();
+    cats.forEach(function(catId) {
+        var opt = document.createElement('option');
+        opt.value = catId;
+        opt.textContent = CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name;
+        select.appendChild(opt);
+    });
+    select.addEventListener('change', function() {
+        startTest();
+    });
+}
+
+function startTest() {
+    var category = document.getElementById('test-category-filter').value;
+    var pool;
+    if (category === 'all') {
+        pool = WORDS.slice();
+    } else {
+        pool = WORDS.filter(function(w) { return w.category === category; });
+    }
+
+    if (pool.length < 4) {
+        document.getElementById('test-prompt').textContent = 'Not enough words in this category';
+        document.getElementById('test-options').innerHTML = '';
+        return;
+    }
+
+    testQuestions = generateQuestions(pool, Math.min(testTotalQuestions, pool.length));
+    testCurrentIndex = 0;
+    testCorrectCount = 0;
+
+    document.getElementById('test-question').style.display = 'flex';
+    document.getElementById('test-result').style.display = 'none';
+
+    updateTestScore();
+    showTestQuestion();
+}
+
+function generateQuestions(pool, count) {
+    var shuffled = shuffle(pool);
+    var questions = [];
+
+    for (var i = 0; i < count; i++) {
+        var word = shuffled[i];
+        // Randomly choose direction: de->en or en->de
+        var direction = Math.random() < 0.5 ? 'de_to_en' : 'en_to_de';
+
+        // Get distractors from same category
+        var sameCategory = pool.filter(function(w) { return w.id !== word.id && w.category === word.category; });
+        if (sameCategory.length < 3) {
+            // Fall back to random if category too small
+            sameCategory = pool.filter(function(w) { return w.id !== word.id; });
+        }
+        var distractors = shuffle(sameCategory).slice(0, 3);
+
+        var options;
+        if (direction === 'de_to_en') {
+            options = distractors.map(function(d) { return { text: d.en, correct: false }; });
+            options.push({ text: word.en, correct: true });
+        } else {
+            options = distractors.map(function(d) { return { text: d.de, correct: false }; });
+            options.push({ text: word.de, correct: true });
+        }
+        options = shuffle(options);
+
+        questions.push({
+            word: word,
+            direction: direction,
+            prompt: direction === 'de_to_en' ? word.de : word.en,
+            directionLabel: direction === 'de_to_en' ? 'What does this mean in English?' : 'How do you say this in German?',
+            options: options
+        });
+    }
+
+    return questions;
+}
+
+function showTestQuestion() {
+    if (testCurrentIndex >= testQuestions.length) {
+        showTestResult();
+        return;
+    }
+
+    var q = testQuestions[testCurrentIndex];
+    document.getElementById('test-prompt').innerHTML =
+        '<span class="test-direction">' + q.directionLabel + '</span>' + q.prompt;
+
+    var optionsContainer = document.getElementById('test-options');
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach(function(opt, idx) {
+        var btn = document.createElement('button');
+        btn.className = 'test-option';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', function() {
+            handleTestAnswer(opt.correct, btn, optionsContainer);
+        });
+        optionsContainer.appendChild(btn);
+    });
+
+    updateTestScore();
+}
+
+function handleTestAnswer(isCorrect, clickedBtn, container) {
+    // Disable all options
+    var allBtns = container.querySelectorAll('.test-option');
+    allBtns.forEach(function(b) { b.classList.add('disabled'); });
+
+    if (isCorrect) {
+        testCorrectCount++;
+        clickedBtn.classList.add('correct');
+    } else {
+        clickedBtn.classList.add('wrong');
+        // Highlight the correct answer
+        var q = testQuestions[testCurrentIndex];
+        allBtns.forEach(function(b, idx) {
+            if (q.options[idx].correct) b.classList.add('correct');
+        });
+    }
+
+    updateTestScore();
+
+    // Auto-advance after delay
+    setTimeout(function() {
+        testCurrentIndex++;
+        showTestQuestion();
+    }, 1200);
+}
+
+function updateTestScore() {
+    document.getElementById('test-correct').textContent = testCorrectCount;
+    document.getElementById('test-total').textContent = testQuestions.length;
+    document.getElementById('test-progress').style.width =
+        ((testCurrentIndex) / testQuestions.length * 100) + '%';
+}
+
+function showTestResult() {
+    document.getElementById('test-question').style.display = 'none';
+    document.getElementById('test-result').style.display = 'flex';
+
+    var pct = Math.round(testCorrectCount / testQuestions.length * 100);
+    var icon, message;
+    if (pct >= 90) { icon = '\uD83C\uDF1F'; message = 'Excellent! Ausgezeichnet!'; }
+    else if (pct >= 70) { icon = '\uD83D\uDC4D'; message = 'Good job! Gut gemacht!'; }
+    else if (pct >= 50) { icon = '\uD83D\uDCAA'; message = 'Keep practicing! Weiter so!'; }
+    else { icon = '\uD83D\uDCDA'; message = 'Keep studying! Weiter lernen!'; }
+
+    document.getElementById('test-result-icon').textContent = icon;
+    document.getElementById('test-result-score').textContent = testCorrectCount + ' / ' + testQuestions.length + ' (' + pct + '%)';
+    document.getElementById('test-result-message').textContent = message;
+}
+
+// ── Scenes Screen ──────────────────────────────────────────────
+
+function renderScenes() {
+    var container = document.getElementById('scenes-content');
+    container.innerHTML = '';
+
+    var themeIds = Object.keys(SCENARIO_THEMES);
+
+    themeIds.forEach(function(themeId) {
+        var themeScenarios = SCENARIOS.filter(function(s) { return s.theme === themeId; });
+        if (themeScenarios.length === 0) return;
+
+        var group = document.createElement('div');
+        group.className = 'scene-theme-group';
+
+        var header = document.createElement('div');
+        header.className = 'scene-theme-header';
+        header.textContent = SCENARIO_THEMES[themeId].emoji + ' ' + SCENARIO_THEMES[themeId].name;
+        group.appendChild(header);
+
+        themeScenarios.forEach(function(scenario) {
+            var card = document.createElement('div');
+            card.className = 'scene-card';
+
+            var cardHeader = document.createElement('div');
+            cardHeader.className = 'scene-header';
+            cardHeader.innerHTML =
+                '<div><div class="scene-title">' + scenario.title + '</div>' +
+                '<div class="scene-title-de">' + scenario.titleDe + '</div></div>' +
+                '<span class="scene-chevron">\u25B6</span>';
+            cardHeader.addEventListener('click', function() {
+                card.classList.toggle('open');
+            });
+            card.appendChild(cardHeader);
+
+            var body = document.createElement('div');
+            body.className = 'scene-body';
+
+            scenario.lines.forEach(function(line) {
+                var lineEl = document.createElement('div');
+                lineEl.className = 'scene-line';
+                lineEl.innerHTML =
+                    '<div class="scene-speaker">' + line.speaker + '</div>' +
+                    '<div class="scene-de">' + line.de + '</div>' +
+                    '<div class="scene-en">' + line.en + '</div>';
+                body.appendChild(lineEl);
+            });
+
+            var toggleBtn = document.createElement('button');
+            toggleBtn.className = 'scene-toggle-translation';
+            toggleBtn.textContent = 'Show English Translation';
+            toggleBtn.addEventListener('click', function() {
+                card.classList.toggle('show-translation');
+                toggleBtn.textContent = card.classList.contains('show-translation')
+                    ? 'Hide English Translation'
+                    : 'Show English Translation';
+            });
+            body.appendChild(toggleBtn);
+
+            card.appendChild(body);
+            group.appendChild(card);
         });
 
         container.appendChild(group);

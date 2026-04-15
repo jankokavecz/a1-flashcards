@@ -69,6 +69,44 @@
             </div>
         </div>
 
+        <!-- Test Screen -->
+        <div id="test-screen" class="screen">
+            <header class="screen-header">
+                <h1>Test</h1>
+                <select id="test-category-filter">
+                    <option value="all">All Categories</option>
+                </select>
+            </header>
+            <div class="test-content">
+                <div class="test-score" id="test-score">
+                    <span id="test-correct">0</span> / <span id="test-total">10</span> correct
+                </div>
+                <div class="test-progress-bar">
+                    <div id="test-progress" class="progress-fill"></div>
+                </div>
+                <div class="test-question" id="test-question">
+                    <div class="test-prompt" id="test-prompt"></div>
+                    <div class="test-options" id="test-options"></div>
+                </div>
+                <div class="test-result" id="test-result" style="display:none">
+                    <div class="test-result-icon" id="test-result-icon"></div>
+                    <div class="test-result-score" id="test-result-score"></div>
+                    <div class="test-result-message" id="test-result-message"></div>
+                    <button class="btn btn-primary" onclick="startTest()">Try Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenes Screen -->
+        <div id="scenes-screen" class="screen">
+            <header class="screen-header">
+                <h1>Scenes</h1>
+            </header>
+            <div class="scenes-content" id="scenes-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- Grammar Screen -->
         <div id="grammar-screen" class="screen">
             <header class="screen-header">
@@ -89,6 +127,14 @@
                 <span class="tab-icon">📖</span>
                 <span class="tab-label">Words</span>
             </button>
+            <button class="tab" data-tab="test" onclick="switchTab('test')">
+                <span class="tab-icon">✅</span>
+                <span class="tab-label">Test</span>
+            </button>
+            <button class="tab" data-tab="scenes" onclick="switchTab('scenes')">
+                <span class="tab-icon">💬</span>
+                <span class="tab-label">Scenes</span>
+            </button>
             <button class="tab" data-tab="grammar" onclick="switchTab('grammar')">
                 <span class="tab-icon">📐</span>
                 <span class="tab-label">Grammar</span>
@@ -98,6 +144,7 @@
 
     <script src="words.js"></script>
     <script src="grammar.js"></script>
+    <script src="scenarios.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
