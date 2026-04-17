@@ -597,8 +597,13 @@ function speakText(text, lang, onDone) {
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 0.9;
-    utterance.onend = onDone || null;
-    utterance.onerror = onDone || null;
+
+    var fired = false;
+    var done = function() { if (!fired) { fired = true; if (onDone) onDone(); } };
+    utterance.onend = done;
+    utterance.onerror = done;
+    setTimeout(done, Math.max(2000, text.length * 75 + 800));
+
     window.speechSynthesis.speak(utterance);
 }
 
@@ -622,22 +627,35 @@ function speakQuestion(q, onDone) {
         utterances.push(u);
     });
 
-    // Chain via onend
-    utterances.forEach(function(u, i) {
-        u.onend = function() {
-            if (i + 1 < utterances.length) {
-                window.speechSynthesis.speak(utterances[i + 1]);
-            } else {
-                if (onDone) onDone();
+    // Chain via onend with per-utterance timeout fallback (iOS onend unreliable)
+    var currentIdx = 0;
+    var chainFired = false;
+
+    function speakNext() {
+        if (chainFired) return;
+        if (currentIdx >= utterances.length) {
+            chainFired = true;
+            if (onDone) onDone();
+            return;
+        }
+        var u = utterances[currentIdx];
+        var uFired = false;
+        var uDone = function() {
+            if (!uFired) {
+                uFired = true;
+                currentIdx++;
+                speakNext();
             }
         };
-        u.onerror = function() {
-            if (onDone) onDone();
-        };
-    });
+        u.onend = uDone;
+        u.onerror = uDone;
+        var ms = Math.max(1500, u.text.length * 75 + 600);
+        setTimeout(uDone, ms);
+        window.speechSynthesis.speak(u);
+    }
 
     window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterances[0]);
+    speakNext();
 }
 
 // Speech recognition helpers
