@@ -139,6 +139,16 @@
             </div>
         </div>
 
+        <!-- Calls Screen -->
+        <div id="calls-screen" class="screen">
+            <header class="screen-header">
+                <h1>🗣️ Speak</h1>
+            </header>
+            <div class="calls-content" id="calls-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- Bottom Tab Bar -->
         <nav class="tab-bar">
             <button class="tab active" data-tab="cards" onclick="switchTab('cards')">
@@ -165,6 +175,10 @@
                 <span class="tab-icon">💥</span>
                 <span class="tab-label">Comics</span>
             </button>
+            <button class="tab" data-tab="calls" onclick="switchTab('calls')">
+                <span class="tab-icon">🗣️</span>
+                <span class="tab-label">Speak</span>
+            </button>
         </nav>
     </div>
 
@@ -172,6 +186,7 @@
     <script src="grammar.js"></script>
     <script src="scenarios.js"></script>
     <script src="comics.js"></script>
+    <script src="calls.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
