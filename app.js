@@ -21,6 +21,7 @@ function init() {
     renderGrammar();
     renderScenes();
     renderComics();
+    initHandsFree();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
@@ -32,6 +33,12 @@ document.addEventListener('DOMContentLoaded', init);
 // ── Navigation ──────────────────────────────────────────────────
 
 function switchTab(tabName) {
+    // Stop hands-free when leaving test tab
+    if (tabName !== 'test') {
+        window.speechSynthesis.cancel();
+        stopHFListening();
+    }
+
     document.querySelectorAll('.screen').forEach(function(s) {
         s.classList.remove('active');
     });
@@ -362,6 +369,13 @@ var testCurrentIndex = 0;
 var testCorrectCount = 0;
 var testTotalQuestions = 10;
 
+// ── Hands-Free State ───────────────────────────────────────────
+var handsFreeModeActive = false;  // toggled before test starts
+var hfRecognition = null;         // single SpeechRecognition instance
+var hfListenTimer = null;         // timeout for no-speech
+var hfRetryCount = 0;             // retries per question (max 2)
+var hfSpeechSupported = false;
+
 function populateTestCategoryFilter() {
     var select = document.getElementById('test-category-filter');
     var cats = Object.keys(CATEGORIES).sort();
@@ -394,9 +408,23 @@ function startTest() {
     testQuestions = generateQuestions(pool, Math.min(testTotalQuestions, pool.length));
     testCurrentIndex = 0;
     testCorrectCount = 0;
+    hfRetryCount = 0;
+
+    // Sync hands-free state from toggle at test start
+    if (hfSpeechSupported) {
+        var toggle = document.getElementById('hands-free-toggle');
+        handsFreeModeActive = toggle.checked;
+    }
 
     document.getElementById('test-question').style.display = 'flex';
     document.getElementById('test-result').style.display = 'none';
+
+    var testContent = document.querySelector('.test-content');
+    if (handsFreeModeActive) {
+        testContent.classList.add('hands-free-active');
+    } else {
+        testContent.classList.remove('hands-free-active');
+    }
 
     updateTestScore();
     showTestQuestion();
@@ -443,6 +471,7 @@ function generateQuestions(pool, count) {
 
 function showTestQuestion() {
     if (testCurrentIndex >= testQuestions.length) {
+        stopHFListening();
         showTestResult();
         return;
     }
@@ -459,12 +488,20 @@ function showTestQuestion() {
         btn.className = 'test-option';
         btn.textContent = opt.text;
         btn.addEventListener('click', function() {
+            if (handsFreeModeActive) stopHFListening();
             handleTestAnswer(opt.correct, btn, optionsContainer);
         });
         optionsContainer.appendChild(btn);
     });
 
     updateTestScore();
+
+    if (handsFreeModeActive) {
+        hfRetryCount = 0;
+        speakQuestion(q, function() {
+            startHFListening();
+        });
+    }
 }
 
 function handleTestAnswer(isCorrect, clickedBtn, container) {
@@ -514,6 +551,175 @@ function showTestResult() {
     document.getElementById('test-result-icon').textContent = icon;
     document.getElementById('test-result-score').textContent = testCorrectCount + ' / ' + testQuestions.length + ' (' + pct + '%)';
     document.getElementById('test-result-message').textContent = message;
+}
+
+// ── Hands-Free Mode ────────────────────────────────────────────
+
+function initHandsFree() {
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    hfSpeechSupported = true;
+    var bar = document.getElementById('hands-free-bar');
+    bar.classList.remove('hidden');
+
+    var toggle = document.getElementById('hands-free-toggle');
+    toggle.addEventListener('change', function() {
+        handsFreeModeActive = toggle.checked;
+    });
+
+    hfRecognition = new SpeechRecognition();
+    hfRecognition.continuous = false;
+    hfRecognition.interimResults = false;
+
+    hfRecognition.onresult = function(event) {
+        clearTimeout(hfListenTimer);
+        var transcript = event.results[0][0].transcript;
+        hfProcessVoiceInput(transcript);
+    };
+
+    hfRecognition.onerror = function(event) {
+        if (event.error === 'no-speech' || event.error === 'aborted') return;
+        clearTimeout(hfListenTimer);
+        hfHandleNoMatch();
+    };
+
+    hfRecognition.onend = function() {
+        // handled via onresult or timeout
+    };
+}
+
+// TTS helpers
+
+function speakText(text, lang, onDone) {
+    window.speechSynthesis.cancel();
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.9;
+    utterance.onend = onDone || null;
+    utterance.onerror = onDone || null;
+    window.speechSynthesis.speak(utterance);
+}
+
+function speakQuestion(q, onDone) {
+    var promptLang = q.direction === 'de_to_en' ? 'de-DE' : 'en-US';
+    var optLang    = q.direction === 'de_to_en' ? 'en-US' : 'de-DE';
+
+    // Build chain: prompt → option A → option B → option C → option D → onDone
+    var utterances = [];
+
+    var promptU = new SpeechSynthesisUtterance(q.prompt);
+    promptU.lang = promptLang;
+    promptU.rate = 0.9;
+    utterances.push(promptU);
+
+    q.options.forEach(function(opt, idx) {
+        var labels = ['Option A', 'Option B', 'Option C', 'Option D'];
+        var u = new SpeechSynthesisUtterance(labels[idx] + ': ' + opt.text);
+        u.lang = optLang;
+        u.rate = 0.9;
+        utterances.push(u);
+    });
+
+    // Chain via onend
+    utterances.forEach(function(u, i) {
+        u.onend = function() {
+            if (i + 1 < utterances.length) {
+                window.speechSynthesis.speak(utterances[i + 1]);
+            } else {
+                if (onDone) onDone();
+            }
+        };
+        u.onerror = function() {
+            if (onDone) onDone();
+        };
+    });
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterances[0]);
+}
+
+// Speech recognition helpers
+
+function hfNormalize(str) {
+    return str.toLowerCase().trim().replace(/[^a-z0-9äöüß\s]/g, '');
+}
+
+function matchVoiceToOption(transcript, q) {
+    var norm = hfNormalize(transcript);
+    var matched = null;
+    q.options.forEach(function(opt, idx) {
+        var optNorm = hfNormalize(opt.text);
+        if (norm === optNorm || norm.indexOf(optNorm) !== -1 || optNorm.indexOf(norm) !== -1) {
+            matched = idx;
+        }
+    });
+    return matched; // index into q.options, or null
+}
+
+function startHFListening() {
+    if (!hfSpeechSupported || !handsFreeModeActive) return;
+    var q = testQuestions[testCurrentIndex];
+    var lang = q.direction === 'de_to_en' ? 'en-US' : 'de-DE';
+    hfRecognition.lang = lang;
+
+    var mic = document.getElementById('mic-indicator');
+    mic.classList.remove('hidden');
+    document.getElementById('mic-indicator').querySelector('.mic-status').textContent = 'Listening…';
+
+    try { hfRecognition.start(); } catch(e) { /* already started */ }
+
+    hfListenTimer = setTimeout(function() {
+        try { hfRecognition.stop(); } catch(e) {}
+        hfHandleNoMatch();
+    }, 7000);
+}
+
+function stopHFListening() {
+    clearTimeout(hfListenTimer);
+    document.getElementById('mic-indicator').classList.add('hidden');
+    try { hfRecognition.stop(); } catch(e) {}
+}
+
+function hfProcessVoiceInput(transcript) {
+    stopHFListening();
+    var q = testQuestions[testCurrentIndex];
+    var matchIdx = matchVoiceToOption(transcript, q);
+    var optionsContainer = document.getElementById('test-options');
+    var btns = optionsContainer.querySelectorAll('.test-option');
+
+    if (matchIdx !== null) {
+        hfRetryCount = 0;
+        handleTestAnswer(q.options[matchIdx].correct, btns[matchIdx], optionsContainer);
+
+        var resultText = q.options[matchIdx].correct ? 'Richtig!' : 'Falsch — die Antwort ist ' + q.options.filter(function(o){return o.correct;})[0].text;
+        var resultLang = 'de-DE';
+        setTimeout(function() {
+            speakText(resultText, resultLang, null);
+        }, 300);
+    } else {
+        hfHandleNoMatch();
+    }
+}
+
+function hfHandleNoMatch() {
+    hfRetryCount++;
+    if (hfRetryCount > 2) {
+        // Auto-skip
+        hfRetryCount = 0;
+        stopHFListening();
+        var q = testQuestions[testCurrentIndex];
+        var optionsContainer = document.getElementById('test-options');
+        var btns = optionsContainer.querySelectorAll('.test-option');
+        var correctIdx = 0;
+        q.options.forEach(function(o, i) { if (o.correct) correctIdx = i; });
+        handleTestAnswer(false, btns[correctIdx], optionsContainer);
+        speakText('Übersprungen — die Antwort ist ' + q.options[correctIdx].text, 'de-DE', null);
+    } else {
+        speakText('Bitte nochmal', 'de-DE', function() {
+            startHFListening();
+        });
+    }
 }
 
 // ── Scenes Screen ──────────────────────────────────────────────

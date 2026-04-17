@@ -79,6 +79,13 @@
                 </select>
             </header>
             <div class="test-content">
+                <div id="hands-free-bar" class="hands-free-bar hidden">
+                    <span class="hands-free-label">🎤 Hands-free</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="hands-free-toggle">
+                        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    </label>
+                </div>
                 <div class="test-score" id="test-score">
                     <span id="test-correct">0</span> / <span id="test-total">10</span> correct
                 </div>
@@ -88,6 +95,10 @@
                 <div class="test-question" id="test-question">
                     <div class="test-prompt" id="test-prompt"></div>
                     <div class="test-options" id="test-options"></div>
+                    <div id="mic-indicator" class="mic-indicator hidden">
+                        <div class="mic-pulse"></div>
+                        <span class="mic-status">Listening…</span>
+                    </div>
                 </div>
                 <div class="test-result" id="test-result" style="display:none">
                     <div class="test-result-icon" id="test-result-icon"></div>
