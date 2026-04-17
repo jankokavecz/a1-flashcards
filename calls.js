@@ -120,3 +120,60 @@ var CALLS_SCENARIOS = [
     firstLine: 'Guten Morgen! Ihr Kind ist auch neu hier, oder?'
   }
 ];
+
+// ── Calls State ────────────────────────────────────────────────
+var callsCurrentScenario = null;    // active scenario object
+var callsConversation = [];         // [{role, content}] for OpenAI
+var callsRecognition = null;        // SpeechRecognition instance
+var callsListening = false;
+var callsEnded = false;
+
+function initCalls() {
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        callsRecognition = new SpeechRecognition();
+        callsRecognition.continuous = false;
+        callsRecognition.interimResults = false;
+        callsRecognition.lang = 'de-DE';
+
+        callsRecognition.onresult = function(event) {
+            var transcript = event.results[0][0].transcript;
+            callsHandleUserSpeech(transcript);
+        };
+
+        callsRecognition.onerror = function(e) {
+            if (e.error === 'no-speech' || e.error === 'aborted') return;
+            callsSetMicStatus('Tap to speak');
+            callsListening = false;
+        };
+
+        callsRecognition.onend = function() {
+            callsListening = false;
+        };
+    }
+
+    renderCallsScreen();
+}
+
+function callsGetApiKey() {
+    return localStorage.getItem('openai_api_key') || '';
+}
+
+function callsSaveApiKey(key) {
+    localStorage.setItem('openai_api_key', key.trim());
+}
+
+function callsGetCompletedCount() {
+    return parseInt(localStorage.getItem('calls_completed') || '0', 10);
+}
+
+function callsIncrementCompleted() {
+    localStorage.setItem('calls_completed', callsGetCompletedCount() + 1);
+}
+
+function callsDifficultyInstructions() {
+    var n = callsGetCompletedCount();
+    if (n <= 3) return 'Speak slowly and clearly. If the user makes a grammar mistake, understand them anyway and keep the conversation going. Use only simple A1 vocabulary.';
+    if (n <= 8) return 'Speak at a natural pace. Occasionally ask the user to repeat if something is unclear. Use A1-A2 vocabulary.';
+    return 'Speak naturally. Do not simplify your language. If you do not understand, say so in German. Use natural conversational German.';
+}
