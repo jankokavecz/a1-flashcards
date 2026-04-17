@@ -127,8 +127,32 @@ var callsConversation = [];         // [{role, content}] for OpenAI
 var callsRecognition = null;        // SpeechRecognition instance
 var callsListening = false;
 var callsEnded = false;
+var callsSelectedVoice = null;      // best German TTS voice found on device
 
 function initCalls() {
+    // Pick the best German TTS voice available
+    function pickBestGermanVoice() {
+        var voices = window.speechSynthesis.getVoices();
+        if (!voices.length) return;
+        // Priority: Enhanced > Premium > female name 'Anna' (iOS) > any de-DE > any de-*
+        var tiers = [
+            function(v) { return v.lang === 'de-DE' && /enhanced/i.test(v.name); },
+            function(v) { return v.lang === 'de-DE' && /premium/i.test(v.name); },
+            function(v) { return v.lang === 'de-DE' && /anna/i.test(v.name); },
+            function(v) { return v.lang === 'de-DE'; },
+            function(v) { return v.lang.startsWith('de'); }
+        ];
+        for (var i = 0; i < tiers.length; i++) {
+            var found = voices.filter(tiers[i]);
+            if (found.length) { callsSelectedVoice = found[0]; return; }
+        }
+    }
+
+    pickBestGermanVoice();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = pickBestGermanVoice;
+    }
+
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         callsRecognition = new SpeechRecognition();
@@ -143,8 +167,12 @@ function initCalls() {
 
         callsRecognition.onerror = function(e) {
             if (e.error === 'no-speech' || e.error === 'aborted') return;
-            callsSetMicStatus('Tap to speak');
             callsListening = false;
+            // Show speak button so user can retry manually
+            var speakBtn = document.getElementById('calls-speak-btn');
+            var micEl = document.getElementById('calls-mic-indicator');
+            if (micEl) micEl.classList.add('hidden');
+            if (speakBtn) speakBtn.classList.remove('hidden');
         };
 
         callsRecognition.onend = function() {
@@ -272,7 +300,7 @@ function callsStartScenario(scenarioId) {
                     '<div class="calls-mic-pulse"></div>' +
                     '<span id="calls-mic-status">Listening…</span>' +
                 '</div>' +
-                '<button class="calls-speak-btn hidden" id="calls-speak-btn" onclick="callsStartListening()">🎤 Tap to Speak</button>' +
+                '<button class="calls-speak-btn" id="calls-speak-btn" onclick="callsStartListening()" disabled>⏳ AI speaking…</button>' +
             '</div>' +
         '</div>';
 
@@ -320,18 +348,41 @@ function callsSpeakAI(text, onDone) {
     window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
     u.lang = 'de-DE';
-    u.rate = 0.85;
-    u.onend = onDone || null;
-    u.onerror = onDone || null;
+    u.rate = 0.88;
+    u.pitch = 1.05;
+    if (callsSelectedVoice) u.voice = callsSelectedVoice;
+
+    // Guard: fire onDone only once (onend unreliable on iOS)
+    var fired = false;
+    var done = function() {
+        if (!fired) {
+            fired = true;
+            if (onDone) onDone();
+        }
+    };
+    u.onend = done;
+    u.onerror = done;
+
+    // Fallback timeout: ~75ms per character + 1s buffer
+    var fallbackMs = Math.max(2500, text.length * 75 + 1000);
+    setTimeout(done, fallbackMs);
+
     window.speechSynthesis.speak(u);
 }
 
 function callsStartListening() {
-    if (!callsRecognition || callsEnded) return;
+    if (callsEnded) return;
 
     var micEl = document.getElementById('calls-mic-indicator');
     var speakBtn = document.getElementById('calls-speak-btn');
 
+    if (!callsRecognition) {
+        // No speech recognition — show speak button as manual fallback (shouldn't be needed on HTTPS)
+        if (speakBtn) { speakBtn.textContent = '🎤 Tap to Speak'; speakBtn.disabled = false; }
+        return;
+    }
+
+    // Show mic indicator, hide/disable speak button
     if (micEl) micEl.classList.remove('hidden');
     if (speakBtn) speakBtn.classList.add('hidden');
     callsSetMicStatus('Listening…');
@@ -340,7 +391,7 @@ function callsStartListening() {
         callsRecognition.start();
         callsListening = true;
     } catch(e) {
-        // already started
+        // Already started — that's fine
     }
 }
 
@@ -413,6 +464,12 @@ function callsSendToOpenAI(userText) {
         var reply = data.choices[0].message.content.trim();
         callsConversation.push({ role: 'assistant', content: reply });
         callsAddBubble('ai', reply, '');
+
+        // Show "AI speaking" state on button while TTS plays
+        var speakBtn = document.getElementById('calls-speak-btn');
+        var micEl = document.getElementById('calls-mic-indicator');
+        if (speakBtn) { speakBtn.classList.remove('hidden'); speakBtn.textContent = '⏳ AI speaking…'; speakBtn.disabled = true; }
+        if (micEl) micEl.classList.add('hidden');
 
         // Detect natural end (Tschüss / Auf Wiedersehen / Auf Wiederhören)
         var endWords = ['tschüss', 'auf wiedersehen', 'auf wiederhören', 'tschau', 'ciao'];
