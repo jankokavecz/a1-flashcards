@@ -22,6 +22,7 @@ function init() {
     renderScenes();
     renderComics();
     initHandsFree();
+    initCalls();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
@@ -33,11 +34,10 @@ document.addEventListener('DOMContentLoaded', init);
 // ── Navigation ──────────────────────────────────────────────────
 
 function switchTab(tabName) {
-    // Stop hands-free when leaving test tab
-    if (tabName !== 'test') {
-        window.speechSynthesis.cancel();
-        stopHFListening();
-    }
+    // Stop hands-free and calls speech when switching away
+    window.speechSynthesis.cancel();
+    if (tabName !== 'test') stopHFListening();
+    if (tabName !== 'calls') callsStopAll();
 
     document.querySelectorAll('.screen').forEach(function(s) {
         s.classList.remove('active');
@@ -51,6 +51,7 @@ function switchTab(tabName) {
 
     if (tabName === 'words') renderWordList();
     if (tabName === 'test' && testQuestions.length === 0) startTest();
+    if (tabName === 'calls') renderCallsScreen();
 }
 
 // ── Cards Logic ─────────────────────────────────────────────────
