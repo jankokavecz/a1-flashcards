@@ -237,14 +237,23 @@ function examStartHoeren() {
     var container = document.getElementById('exam-content');
     container.innerHTML = examLoadingHtml('Hören wird vorbereitet…', 'Generating questions and audio (~30s)');
 
-    var prompt = 'You are a Goethe A1 exam writer. Create a complete Hören practice test using only A1-level German vocabulary about everyday situations (shopping, travel, family, time, weather, food, transport).\n\n' +
-        'Return ONLY a JSON object with this shape — every field must contain real, fully-written German content (NOT placeholders like "a", "b", "c"):\n\n' +
+    var prompt = 'Create a Goethe A1 Hören practice test in German. Return JSON only.\n\n' +
+        'Required schema (use this EXACT example as your style guide — replace its content but match the structure):\n\n' +
         '{\n' +
-        '  "teil1": [ 6 items, each with: "context" (English, where this happens), "dialog" (array of 2-3 turns: {speaker:"A"|"B", text:"German line"}), "question" (German question about the dialog), "options" (array of THREE distinct German answer phrases — real words, e.g. ["um 8 Uhr", "um 9 Uhr", "um 10 Uhr"]), "correct" (index 0/1/2) ],\n' +
-        '  "teil2": [ 4 items, each with: "context" (English), "text" (German announcement, 30-50 words), "statement" (German claim about the text), "correct" (true|false) ],\n' +
-        '  "teil3": [ 5 items, each with: "context" (English), "text" (German message, 30-60 words), "question" (German question), "options" (array of THREE distinct German phrases), "correct" (index 0/1/2) ]\n' +
+        '  "teil1": [\n' +
+        '    {"context":"At a train station","dialog":[{"speaker":"A","text":"Wann fährt der Zug nach Berlin?"},{"speaker":"B","text":"Der Zug fährt um halb zehn."}],"question":"Wann fährt der Zug nach Berlin?","options":["um 9:00 Uhr","um 9:30 Uhr","um 10:00 Uhr"],"correct":1},\n' +
+        '    ... 5 more items ...\n' +
+        '  ],\n' +
+        '  "teil2": [\n' +
+        '    {"context":"Supermarket announcement","text":"Liebe Kunden, der Supermarkt schließt heute um 20 Uhr. Wir wünschen Ihnen einen schönen Abend.","statement":"Der Supermarkt schließt heute früher als sonst.","correct":true},\n' +
+        '    ... 3 more items ...\n' +
+        '  ],\n' +
+        '  "teil3": [\n' +
+        '    {"context":"Phone message","text":"Hallo Maria, hier ist Tom. Wir treffen uns morgen um 18 Uhr im Café Lehmann. Bring bitte deine Schwester mit!","question":"Wo treffen sich Maria und Tom?","options":["im Restaurant","im Café","im Park"],"correct":1},\n' +
+        '    ... 4 more items ...\n' +
+        '  ]\n' +
         '}\n\n' +
-        'IMPORTANT: All options must be real German content phrases relevant to the question. Do not output single letters or empty placeholders.';
+        'CRITICAL: every "options" array must contain THREE real German answer phrases like the example above. NEVER output single letters. Use varied A1 topics: shopping, travel, family, time, weather, food, transport.';
 
     examChatJson(prompt, 3000, function(res) {
         if (res.error) { examShowError(res.error); return; }
@@ -336,14 +345,23 @@ function examStartLesen() {
     var container = document.getElementById('exam-content');
     container.innerHTML = examLoadingHtml('Lesen wird vorbereitet…', 'Generating reading test…');
 
-    var prompt = 'You are a Goethe A1 exam writer. Create a complete Lesen practice test using only A1-level German vocabulary.\n\n' +
-        'Return ONLY a JSON object — every field must contain real, fully-written German content (NOT placeholders like "a", "b", "c"):\n\n' +
+    var prompt = 'Create a Goethe A1 Lesen practice test in German. Return JSON only.\n\n' +
+        'Required schema (use this EXACT example as your style guide — replace its content but match the structure):\n\n' +
         '{\n' +
-        '  "teil1": [ 5 items, each with: "text" (a short German email or message, 40-60 words), "statement" (German claim about it), "correct" (true|false) ],\n' +
-        '  "teil2": [ 5 items, each with: "text" (a German ad, sign, or notice, 30-50 words), "question" (a German question about it), "options" (array of THREE distinct German answer phrases — real complete answers like ["Sie soll dort schlafen", "Sie soll dort nicht laufen", "Sie soll dort einkaufen"]), "correct" (index 0/1/2) ],\n' +
-        '  "teil3": [ 5 items, each with: "text" (a German note, sign, or short instruction, 20-40 words), "statement" (German claim about it), "correct" (true|false) ]\n' +
+        '  "teil1": [\n' +
+        '    {"text":"Hallo Anna! Ich komme heute Abend um 19 Uhr nach Hause. Können wir zusammen kochen? Ich kaufe noch Brot und Käse. Bis später! Lukas","statement":"Lukas kommt um sieben Uhr abends nach Hause.","correct":true},\n' +
+        '    ... 4 more items ...\n' +
+        '  ],\n' +
+        '  "teil2": [\n' +
+        '    {"text":"Bäckerei Müller — Heute frische Brötchen für nur 30 Cent! Geöffnet von 6 bis 18 Uhr. Sonntag geschlossen.","question":"Wann ist die Bäckerei am Sonntag geöffnet?","options":["von 6 bis 18 Uhr","gar nicht","nur morgens"],"correct":1},\n' +
+        '    ... 4 more items ...\n' +
+        '  ],\n' +
+        '  "teil3": [\n' +
+        '    {"text":"Achtung! Die Bibliothek ist heute geschlossen. Wir öffnen wieder am Montag um 9 Uhr.","statement":"Die Bibliothek ist morgen offen.","correct":false},\n' +
+        '    ... 4 more items ...\n' +
+        '  ]\n' +
         '}\n\n' +
-        'IMPORTANT: The "options" field must contain THREE real German content phrases relevant to the question — never single letters, never placeholders. Mix true and false correct values across the items.';
+        'CRITICAL: every "options" array must contain THREE real German answer phrases (full words and short sentences), like the example above. NEVER output single letters such as "a", "b", "c". Use varied A1 topics: shopping, food, travel, family, work, weather, time. Mix true/false answers across items.';
 
     examChatJson(prompt, 2500, function(res) {
         if (res.error) { examShowError(res.error); return; }
