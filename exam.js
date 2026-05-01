@@ -647,3 +647,132 @@ function examGradeSprechen() {
         examShowResults('sprechen', res.data.total, res.data.feedback, null);
     });
 }
+
+// ── Shared UI helpers ──────────────────────────────────────────
+
+function examLoadingHtml(title, sub) {
+    return '<div class="exam-loading">' +
+        '<div class="exam-spinner"></div>' +
+        '<div class="exam-loading-title">' + title + '</div>' +
+        '<div class="exam-loading-sub">' + sub + '</div>' +
+    '</div>';
+}
+
+function examActiveHeader(title, progress) {
+    return '<div class="exam-active-header">' +
+        '<button class="exam-exit-btn" onclick="examExit()">⛔ Beenden</button>' +
+        '<div class="exam-active-title">' + title + '</div>' +
+        '<div class="exam-active-progress">' + progress + '</div>' +
+    '</div>';
+}
+
+function examMicArea() {
+    return '<div class="exam-mic-area">' +
+        '<div class="exam-mic-pulse"></div>' +
+        '<div class="exam-mic-status">🎤 Sprich jetzt…</div>' +
+    '</div>';
+}
+
+function examShowError(msg) {
+    var container = document.getElementById('exam-content');
+    container.innerHTML =
+        '<div class="exam-error-screen">' +
+            '<div class="exam-error-icon">⚠️</div>' +
+            '<p>' + msg + '</p>' +
+            '<button class="btn btn-primary" onclick="renderExamScreen()">Zurück</button>' +
+        '</div>';
+}
+
+function examExit() {
+    if (examActiveAudio) { try { examActiveAudio.pause(); } catch(e) {} }
+    if (examRecognition) { try { examRecognition.stop(); } catch(e) {} }
+    renderExamScreen();
+}
+
+// ── Auto-graded scoring (Hören, Lesen) ─────────────────────────
+
+function examFinishAutoGraded() {
+    var test = examCurrentTest;
+    var ans = examUserAnswers;
+    var correct = 0, total = 0, wrongList = [];
+
+    ['teil1', 'teil2', 'teil3'].forEach(function(key, ti) {
+        test[key].forEach(function(item, idx) {
+            total++;
+            var userAns = ans[key][idx];
+            var isCorrect = userAns === item.correct;
+            if (isCorrect) correct++;
+            else wrongList.push({
+                teil: ti + 1,
+                question: item.question || item.statement,
+                userAnswer: examFormatAnswer(userAns, item),
+                correctAnswer: examFormatAnswer(item.correct, item)
+            });
+        });
+    });
+
+    var pct = total ? Math.round((correct / total) * 100) : 0;
+    examShowResults(examCurrentSection, pct, null, wrongList);
+}
+
+function examFormatAnswer(ans, item) {
+    if (item.options) {
+        if (typeof ans !== 'number' || ans < 0) return '(no answer)';
+        return String.fromCharCode(65 + ans) + ') ' + item.options[ans];
+    }
+    if (ans === true) return 'Richtig';
+    if (ans === false) return 'Falsch';
+    return '(no answer)';
+}
+
+// ── Results screen ─────────────────────────────────────────────
+
+function examShowResults(section, percentage, feedback, wrongList) {
+    examSaveAttempt(section, percentage, feedback);
+
+    var sec = EXAM_SECTIONS[section];
+    var passed = percentage >= 60;
+    var allScores = examSectionHistory(section).map(function(a) { return a.percentage; });
+    var chart = examDrawChart(allScores.slice(-30), 320, 140, false);
+
+    var html = '<div class="exam-results">' +
+        '<div class="exam-results-header">' + sec.emoji + ' ' + sec.titleDe + ' — Ergebnis</div>' +
+        '<div class="exam-results-score-box">' +
+            '<div class="exam-results-score ' + (passed ? 'passed' : 'failed') + '">' + percentage + '%</div>' +
+            '<div class="exam-results-badge ' + (passed ? 'passed' : 'failed') + '">' + (passed ? '✅ Bestanden' : '❌ Nicht bestanden') + '</div>' +
+        '</div>';
+
+    if (feedback) {
+        html += '<div class="exam-results-feedback">' +
+            '<div class="exam-results-section-title">📝 Feedback</div>' +
+            '<p>' + feedback + '</p>' +
+        '</div>';
+    }
+
+    if (wrongList && wrongList.length) {
+        html += '<div class="exam-results-wrong">' +
+            '<div class="exam-results-section-title">❌ Falsche Antworten (' + wrongList.length + ')</div>';
+        wrongList.forEach(function(w) {
+            html += '<div class="exam-wrong-item">' +
+                '<div class="exam-wrong-q">Teil ' + w.teil + ': ' + w.question + '</div>' +
+                '<div class="exam-wrong-yours">Deine Antwort: <span class="exam-wrong-bad">' + w.userAnswer + '</span></div>' +
+                '<div class="exam-wrong-right">Richtig: <span class="exam-wrong-good">' + w.correctAnswer + '</span></div>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+
+    html += '<div class="exam-results-chart">' +
+        '<div class="exam-results-section-title">📈 Fortschritt</div>' +
+        chart +
+    '</div>';
+
+    html += '<div class="exam-results-actions">' +
+        '<button class="btn btn-primary" onclick="examStartSection(\'' + section + '\')">Nochmal</button>' +
+        '<button class="btn" onclick="renderExamScreen()">Zurück</button>' +
+    '</div>';
+
+    html += '</div>';
+
+    document.getElementById('exam-content').innerHTML = html;
+}
