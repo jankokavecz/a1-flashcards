@@ -331,6 +331,76 @@ function examAnswerHoeren(answer) {
     examItemIndex++;
     examShowHoerenItem();
 }
-function examStartLesen()     { /* Task 4 */ }
+function examStartLesen() {
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Lesen wird vorbereitet…', 'Generating reading test…');
+
+    var prompt = 'Generate a Goethe A1 Lesen practice test as JSON. Use A1-level German. Return EXACTLY:\n' +
+        '{\n' +
+        '  "teil1": [ { "text": "Short personal email or text message (40-60 words)", "statement": "Statement about the text", "correct": true }, ... 5 items ],\n' +
+        '  "teil2": [ { "text": "Short ad, sign, or notice (30-50 words)", "question": "Question in German", "options": ["a","b","c"], "correct": 0 }, ... 5 items ],\n' +
+        '  "teil3": [ { "text": "Short note, sign, or instruction (20-40 words)", "statement": "Statement about it", "correct": false }, ... 5 items ]\n' +
+        '}';
+
+    examChatJson(prompt, 2500, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examCurrentTest = res.data;
+        examUserAnswers = { teil1: [], teil2: [], teil3: [] };
+        examPartIndex = 0;
+        examItemIndex = 0;
+        examShowLesenItem();
+    });
+}
+
+function examShowLesenItem() {
+    var teilKey = ['teil1', 'teil2', 'teil3'][examPartIndex];
+    var teil = examCurrentTest[teilKey];
+
+    if (!teil || examItemIndex >= teil.length) {
+        examPartIndex++;
+        examItemIndex = 0;
+        if (examPartIndex >= 3) { examFinishAutoGraded(); return; }
+        examShowLesenItem();
+        return;
+    }
+
+    var item = teil[examItemIndex];
+    var container = document.getElementById('exam-content');
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('📖 Lesen', 'Teil ' + (examPartIndex + 1) + ' · Frage ' + (examItemIndex + 1) + ' / ' + teil.length) +
+            '<div class="exam-question">' +
+                '<div class="exam-reading-text">' + item.text.replace(/\n/g, '<br>') + '</div>' +
+                '<div class="exam-question-text">' + (item.question || item.statement) + '</div>' +
+                '<div class="exam-options" id="exam-options"></div>' +
+            '</div>' +
+        '</div>';
+
+    var optsEl = document.getElementById('exam-options');
+    if (item.options) {
+        item.options.forEach(function(opt, idx) {
+            var btn = document.createElement('button');
+            btn.className = 'exam-option';
+            btn.textContent = String.fromCharCode(65 + idx) + ') ' + opt;
+            btn.addEventListener('click', function() { examAnswerLesen(idx); });
+            optsEl.appendChild(btn);
+        });
+    } else {
+        ['Richtig', 'Falsch'].forEach(function(label, idx) {
+            var btn = document.createElement('button');
+            btn.className = 'exam-option';
+            btn.textContent = label;
+            btn.addEventListener('click', function() { examAnswerLesen(idx === 0); });
+            optsEl.appendChild(btn);
+        });
+    }
+}
+
+function examAnswerLesen(answer) {
+    var teilKey = ['teil1', 'teil2', 'teil3'][examPartIndex];
+    examUserAnswers[teilKey].push(answer);
+    examItemIndex++;
+    examShowLesenItem();
+}
 function examStartSchreiben() { /* Task 5 */ }
 function examStartSprechen()  { /* Task 6 */ }
