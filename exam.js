@@ -139,5 +139,101 @@ function renderExamScreen() {
 }
 
 function renderExamSectionList(container) {
-    container.innerHTML = ''; // populated in Task 2
+    var html = '<div class="exam-list-header">' +
+        '<p class="exam-list-subtitle">Tap a section to practise</p>' +
+    '</div>';
+
+    html += '<div class="exam-sections">';
+    Object.keys(EXAM_SECTIONS).forEach(function(key) {
+        var sec = EXAM_SECTIONS[key];
+        var best = examBestScore(key);
+        var last = examLastScore(key);
+        var attempts = examSectionHistory(key).length;
+        var miniChart = examDrawChart(examSectionHistory(key).slice(-10).map(function(a) { return a.percentage; }), 80, 36, true);
+
+        html += '<div class="exam-section-card" onclick="examStartSection(\'' + key + '\')">' +
+            '<div class="exam-section-top">' +
+                '<div class="exam-section-emoji">' + sec.emoji + '</div>' +
+                '<div class="exam-section-info">' +
+                    '<div class="exam-section-title">' + sec.titleDe + '</div>' +
+                    '<div class="exam-section-subtitle">' + sec.titleEn + '</div>' +
+                '</div>' +
+                '<div class="exam-section-score">' +
+                    (best !== null ? '<div class="exam-best">' + best + '%</div><div class="exam-best-label">best</div>' : '<div class="exam-best-empty">—</div>') +
+                '</div>' +
+            '</div>' +
+            '<div class="exam-section-bottom">' +
+                '<div class="exam-section-stats">' +
+                    (last !== null ? 'Last: ' + last + '%' : 'Not started') +
+                    ' · ' + attempts + ' attempt' + (attempts === 1 ? '' : 's') +
+                '</div>' +
+                '<div class="exam-section-chart">' + miniChart + '</div>' +
+            '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
 }
+
+// ── SVG Chart ──────────────────────────────────────────────────
+
+function examDrawChart(scores, width, height, isMini) {
+    var w = width || 320;
+    var h = height || 120;
+    var pad = isMini ? 2 : 24;
+
+    if (!scores.length) {
+        return '<svg width="' + w + '" height="' + h + '" class="exam-chart-empty">' +
+            '<line x1="' + pad + '" x2="' + (w - pad) + '" y1="' + (h * 0.4) + '" y2="' + (h * 0.4) + '" stroke="#444" stroke-dasharray="3,3"/>' +
+        '</svg>';
+    }
+
+    var innerW = w - pad * 2;
+    var innerH = h - pad * 2;
+    var n = scores.length;
+
+    function x(i) { return pad + (n === 1 ? innerW / 2 : (i * innerW) / (n - 1)); }
+    function y(s) { return pad + innerH - (s / 100) * innerH; }
+
+    var passLineY = y(60);
+    var lastScore = scores[n - 1];
+    var lineColor = lastScore >= 60 ? '#10b981' : '#ef4444';
+
+    var pts = scores.map(function(s, i) { return x(i) + ',' + y(s); }).join(' ');
+
+    var svg = '<svg width="' + w + '" height="' + h + '" class="exam-chart' + (isMini ? ' exam-chart-mini' : '') + '">';
+    svg += '<line x1="' + pad + '" x2="' + (w - pad) + '" y1="' + passLineY + '" y2="' + passLineY + '" stroke="#666" stroke-dasharray="3,3" stroke-width="1"/>';
+
+    if (!isMini) {
+        svg += '<text x="' + (pad - 4) + '" y="' + (y(0) + 4) + '" text-anchor="end" fill="#666" font-size="10">0</text>';
+        svg += '<text x="' + (pad - 4) + '" y="' + (passLineY + 4) + '" text-anchor="end" fill="#666" font-size="10">60</text>';
+        svg += '<text x="' + (pad - 4) + '" y="' + (y(100) + 4) + '" text-anchor="end" fill="#666" font-size="10">100</text>';
+    }
+
+    if (n >= 2) {
+        svg += '<polyline points="' + pts + '" fill="none" stroke="' + lineColor + '" stroke-width="' + (isMini ? 1.5 : 2) + '"/>';
+    }
+
+    scores.forEach(function(s, i) {
+        var r = isMini ? 1.5 : 3;
+        var pointColor = s >= 60 ? '#10b981' : '#ef4444';
+        svg += '<circle cx="' + x(i) + '" cy="' + y(s) + '" r="' + r + '" fill="' + pointColor + '"/>';
+    });
+
+    svg += '</svg>';
+    return svg;
+}
+
+function examStartSection(sectionId) {
+    examCurrentSection = sectionId;
+    if (sectionId === 'hoeren') examStartHoeren();
+    else if (sectionId === 'lesen') examStartLesen();
+    else if (sectionId === 'schreiben') examStartSchreiben();
+    else if (sectionId === 'sprechen') examStartSprechen();
+}
+
+function examStartHoeren()    { /* Task 3 */ }
+function examStartLesen()     { /* Task 4 */ }
+function examStartSchreiben() { /* Task 5 */ }
+function examStartSprechen()  { /* Task 6 */ }
