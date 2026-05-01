@@ -500,4 +500,150 @@ function examGradeSchreiben() {
         examShowResults('schreiben', res.data.total, res.data.feedback, null);
     });
 }
-function examStartSprechen()  { /* Task 6 */ }
+function examStartSprechen() {
+    if (!examRecognition) {
+        examShowError('Speech recognition not available on this device. Please use a recent Safari (iOS) or Chrome browser.');
+        return;
+    }
+
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Sprechen wird vorbereitet…', 'Generating speaking prompts…');
+
+    var prompt = 'Generate Goethe A1 Sprechen prompts as JSON:\n' +
+        '{\n' +
+        '  "teil1_fields": ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"],\n' +
+        '  "teil2": { "topic": "Single A1 topic word in German (e.g. Familie, Hobby, Wohnung, Essen)", "questions": ["Q1 in German","Q2 in German","Q3 in German"] },\n' +
+        '  "teil3": { "scenario": "Brief A1 situation in German (e.g. Im Restaurant)", "request_prompt": "What you must request in German", "respond_prompt": "What you must respond to in German" }\n' +
+        '}';
+
+    examChatJson(prompt, 800, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examCurrentTest = res.data;
+        examUserAnswers = { teil1: [], teil2: [], teil3: [] };
+        examPartIndex = 0;
+        examItemIndex = 0;
+        examShowSprechenItem();
+    });
+}
+
+function examShowSprechenItem() {
+    var container = document.getElementById('exam-content');
+
+    if (examPartIndex === 0) {
+        var fields = examCurrentTest.teil1_fields;
+        if (examItemIndex >= fields.length) {
+            examPartIndex = 1; examItemIndex = 0;
+            examShowSprechenItem();
+            return;
+        }
+        var field = fields[examItemIndex];
+        container.innerHTML =
+            '<div class="exam-active">' +
+                examActiveHeader('🗣️ Sprechen', 'Teil 1 · ' + (examItemIndex + 1) + ' / ' + fields.length) +
+                '<div class="exam-question">' +
+                    '<div class="exam-sprechen-prompt">Sagen Sie etwas über: <strong>' + field + '</strong></div>' +
+                    examMicArea() +
+                '</div>' +
+            '</div>';
+        examStartSprechenListen();
+        return;
+    }
+
+    if (examPartIndex === 1) {
+        var qs = examCurrentTest.teil2.questions;
+        if (examItemIndex >= qs.length) {
+            examPartIndex = 2; examItemIndex = 0;
+            examShowSprechenItem();
+            return;
+        }
+        container.innerHTML =
+            '<div class="exam-active">' +
+                examActiveHeader('🗣️ Sprechen', 'Teil 2 · ' + (examItemIndex + 1) + ' / ' + qs.length) +
+                '<div class="exam-question">' +
+                    '<div class="exam-scenario-banner">📌 Thema: ' + examCurrentTest.teil2.topic + '</div>' +
+                    '<div class="exam-sprechen-prompt">' + qs[examItemIndex] + '</div>' +
+                    examMicArea() +
+                '</div>' +
+            '</div>';
+        examStartSprechenListen();
+        return;
+    }
+
+    var t3 = examCurrentTest.teil3;
+    var prompts = [t3.request_prompt, t3.respond_prompt];
+    if (examItemIndex >= prompts.length) {
+        examGradeSprechen();
+        return;
+    }
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('🗣️ Sprechen', 'Teil 3 · ' + (examItemIndex + 1) + ' / 2') +
+            '<div class="exam-question">' +
+                '<div class="exam-scenario-banner">📍 ' + t3.scenario + '</div>' +
+                '<div class="exam-sprechen-prompt">' + prompts[examItemIndex] + '</div>' +
+                examMicArea() +
+            '</div>' +
+        '</div>';
+    examStartSprechenListen();
+}
+
+function examStartSprechenListen() {
+    if (!examRecognition) return;
+    var oldOnResult = examRecognition.onresult;
+    var oldOnError = examRecognition.onerror;
+
+    examRecognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        examRecognition.onresult = oldOnResult;
+        examRecognition.onerror = oldOnError;
+        examHandleSprechenAnswer(transcript);
+    };
+
+    examRecognition.onerror = function(e) {
+        if (e.error === 'no-speech' || e.error === 'aborted') return;
+        examRecognition.onresult = oldOnResult;
+        examRecognition.onerror = oldOnError;
+        examHandleSprechenAnswer('(could not transcribe)');
+    };
+
+    try { examRecognition.start(); } catch(e) {}
+}
+
+function examHandleSprechenAnswer(transcript) {
+    var teilKey = ['teil1', 'teil2', 'teil3'][examPartIndex];
+    examUserAnswers[teilKey].push(transcript);
+    examItemIndex++;
+    examShowSprechenItem();
+}
+
+function examGradeSprechen() {
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Wird bewertet…', 'AI is grading your speaking');
+
+    var teil1Sub = examCurrentTest.teil1_fields.map(function(f, i) {
+        return f + ': ' + (examUserAnswers.teil1[i] || '(silent)');
+    }).join('\n');
+    var teil2Sub = examCurrentTest.teil2.questions.map(function(q, i) {
+        return 'Q: ' + q + '\nA: ' + (examUserAnswers.teil2[i] || '(silent)');
+    }).join('\n');
+    var teil3Sub = [examCurrentTest.teil3.request_prompt, examCurrentTest.teil3.respond_prompt].map(function(p, i) {
+        return 'Prompt: ' + p + '\nUser said: ' + (examUserAnswers.teil3[i] || '(silent)');
+    }).join('\n');
+
+    var prompt = 'Grade this Goethe A1 Sprechen submission (transcripts). Return JSON only:\n' +
+        '{\n' +
+        '  "teil1_score": 0-30,\n' +
+        '  "teil2_score": 0-35,\n' +
+        '  "teil3_score": 0-35,\n' +
+        '  "total": 0-100,\n' +
+        '  "feedback": "1-2 paragraph feedback in English. Note grammar/vocab/task fulfilment, plus at least one positive note. Do not comment on pronunciation since we only have transcripts."\n' +
+        '}\n\n' +
+        'TEIL 1 (self-introduction):\n' + teil1Sub + '\n\n' +
+        'TEIL 2 (topic ' + examCurrentTest.teil2.topic + '):\n' + teil2Sub + '\n\n' +
+        'TEIL 3 (scenario ' + examCurrentTest.teil3.scenario + '):\n' + teil3Sub;
+
+    examChatJson(prompt, 800, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examShowResults('sprechen', res.data.total, res.data.feedback, null);
+    });
+}
