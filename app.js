@@ -20,7 +20,7 @@ function init() {
     renderWordList();
     renderGrammar();
     renderScenes();
-    renderComics();
+    initExam();
     initHandsFree();
     initCalls();
 
@@ -38,6 +38,10 @@ function switchTab(tabName) {
     window.speechSynthesis.cancel();
     if (tabName !== 'test') stopHFListening();
     if (tabName !== 'calls') callsStopAll();
+    if (tabName !== 'exam' && typeof examExit === 'function') {
+        if (typeof examActiveAudio !== 'undefined' && examActiveAudio) { try { examActiveAudio.pause(); } catch(e) {} }
+        if (typeof examRecognition !== 'undefined' && examRecognition) { try { examRecognition.stop(); } catch(e) {} }
+    }
 
     document.querySelectorAll('.screen').forEach(function(s) {
         s.classList.remove('active');
@@ -52,6 +56,7 @@ function switchTab(tabName) {
     if (tabName === 'words') renderWordList();
     if (tabName === 'test' && testQuestions.length === 0) startTest();
     if (tabName === 'calls') renderCallsScreen();
+    if (tabName === 'exam') renderExamScreen();
 }
 
 // ── Cards Logic ─────────────────────────────────────────────────
