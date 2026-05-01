@@ -233,7 +233,104 @@ function examStartSection(sectionId) {
     else if (sectionId === 'sprechen') examStartSprechen();
 }
 
-function examStartHoeren()    { /* Task 3 */ }
+function examStartHoeren() {
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Hören wird vorbereitet…', 'Generating questions and audio (~30s)');
+
+    var prompt = 'Generate a complete Goethe A1 Hören practice test as JSON. Use only A1-level German vocabulary. Topics: everyday situations (shopping, travel, family, time, weather). Return EXACTLY this structure:\n' +
+        '{\n' +
+        '  "teil1": [ { "context": "Where is the dialogue happening?", "dialog": [ {"speaker":"A","text":"..."},{"speaker":"B","text":"..."} ], "question": "...", "options": ["a","b","c"], "correct": 0 }, ... 6 items ],\n' +
+        '  "teil2": [ { "context": "Public announcement", "text": "longer announcement", "statement": "Statement to judge as true or false", "correct": true }, ... 4 items ],\n' +
+        '  "teil3": [ { "context": "Phone message or radio", "text": "...", "question": "...", "options": ["a","b","c"], "correct": 0 }, ... 5 items ]\n' +
+        '}\n' +
+        'All German text natural for A1. Questions in German. Make options plausible distractors.';
+
+    examChatJson(prompt, 3000, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examCurrentTest = res.data;
+        examUserAnswers = { teil1: [], teil2: [], teil3: [] };
+        examPartIndex = 0;
+        examItemIndex = 0;
+        examShowHoerenItem();
+    });
+}
+
+function examShowHoerenItem() {
+    var teilKey = ['teil1', 'teil2', 'teil3'][examPartIndex];
+    var teil = examCurrentTest[teilKey];
+
+    if (!teil || examItemIndex >= teil.length) {
+        examPartIndex++;
+        examItemIndex = 0;
+        if (examPartIndex >= 3) { examFinishAutoGraded(); return; }
+        examShowHoerenItem();
+        return;
+    }
+
+    var item = teil[examItemIndex];
+
+    var container = document.getElementById('exam-content');
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('🎧 Hören', 'Teil ' + (examPartIndex + 1) + ' · Frage ' + (examItemIndex + 1) + ' / ' + teil.length) +
+            '<div class="exam-question">' +
+                '<div class="exam-context">' + item.context + '</div>' +
+                '<div class="exam-audio-loading" id="exam-audio-loading">⏳ Audio wird geladen…</div>' +
+                '<audio id="exam-audio" controls class="exam-audio hidden"></audio>' +
+                '<div class="exam-question-text">' + (item.question || item.statement) + '</div>' +
+                '<div class="exam-options" id="exam-options"></div>' +
+            '</div>' +
+        '</div>';
+
+    var audioText, voice;
+    if (item.dialog) {
+        audioText = item.dialog.map(function(d) { return d.text; }).join(' … ');
+        voice = 'nova';
+    } else {
+        audioText = item.text;
+        voice = 'onyx';
+    }
+
+    examTtsToBlob(audioText, voice, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        var audioEl = document.getElementById('exam-audio');
+        var loadingEl = document.getElementById('exam-audio-loading');
+        if (audioEl) {
+            audioEl.src = res.url;
+            audioEl.classList.remove('hidden');
+            examActiveAudio = audioEl;
+        }
+        if (loadingEl) loadingEl.style.display = 'none';
+    });
+
+    var optsEl = document.getElementById('exam-options');
+    if (item.options) {
+        item.options.forEach(function(opt, idx) {
+            var btn = document.createElement('button');
+            btn.className = 'exam-option';
+            btn.textContent = String.fromCharCode(65 + idx) + ') ' + opt;
+            btn.addEventListener('click', function() { examAnswerHoeren(idx); });
+            optsEl.appendChild(btn);
+        });
+    } else {
+        ['Richtig', 'Falsch'].forEach(function(label, idx) {
+            var btn = document.createElement('button');
+            btn.className = 'exam-option';
+            btn.textContent = label;
+            btn.addEventListener('click', function() { examAnswerHoeren(idx === 0); });
+            optsEl.appendChild(btn);
+        });
+    }
+}
+
+function examAnswerHoeren(answer) {
+    var teilKey = ['teil1', 'teil2', 'teil3'][examPartIndex];
+    examUserAnswers[teilKey].push(answer);
+    var audioEl = document.getElementById('exam-audio');
+    if (audioEl) audioEl.pause();
+    examItemIndex++;
+    examShowHoerenItem();
+}
 function examStartLesen()     { /* Task 4 */ }
 function examStartSchreiben() { /* Task 5 */ }
 function examStartSprechen()  { /* Task 6 */ }
