@@ -402,5 +402,102 @@ function examAnswerLesen(answer) {
     examItemIndex++;
     examShowLesenItem();
 }
-function examStartSchreiben() { /* Task 5 */ }
+function examStartSchreiben() {
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Schreiben wird vorbereitet…', 'Generating writing prompts…');
+
+    var prompt = 'Generate Goethe A1 Schreiben practice prompts as JSON:\n' +
+        '{\n' +
+        '  "teil1": { "scenario": "What form context (e.g. Library card application, Gym registration)", "intro": "Short German context paragraph (30-50 words) giving info to fill in", "fields": [ {"label":"Vorname","correct_answer":"..."}, ... 5 fields with German labels and correct answers extractable from intro ] },\n' +
+        '  "teil2": { "scenario": "Who you are writing to and why (in English, brief)", "task_de": "German task description with 3 bullet points to address", "min_words": 30 }\n' +
+        '}';
+
+    examChatJson(prompt, 1500, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examCurrentTest = res.data;
+        examUserAnswers = { teil1: {}, teil2: '' };
+        examPartIndex = 0;
+        examShowSchreibenTeil1();
+    });
+}
+
+function examShowSchreibenTeil1() {
+    var t1 = examCurrentTest.teil1;
+    var container = document.getElementById('exam-content');
+
+    var fieldsHtml = t1.fields.map(function(f, i) {
+        return '<div class="exam-form-field">' +
+            '<label class="exam-form-label">' + f.label + '</label>' +
+            '<input type="text" class="exam-form-input" id="exam-field-' + i + '" autocomplete="off">' +
+        '</div>';
+    }).join('');
+
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('✍️ Schreiben', 'Teil 1 · Formular ausfüllen') +
+            '<div class="exam-question">' +
+                '<div class="exam-scenario-banner">📝 ' + t1.scenario + '</div>' +
+                '<div class="exam-reading-text">' + t1.intro + '</div>' +
+                '<div class="exam-form">' + fieldsHtml + '</div>' +
+                '<button class="btn btn-primary exam-next-btn" onclick="examSubmitSchreibenTeil1()">Weiter zu Teil 2 →</button>' +
+            '</div>' +
+        '</div>';
+}
+
+function examSubmitSchreibenTeil1() {
+    var t1 = examCurrentTest.teil1;
+    t1.fields.forEach(function(f, i) {
+        var input = document.getElementById('exam-field-' + i);
+        examUserAnswers.teil1[f.label] = input ? input.value.trim() : '';
+    });
+    examShowSchreibenTeil2();
+}
+
+function examShowSchreibenTeil2() {
+    var t2 = examCurrentTest.teil2;
+    var container = document.getElementById('exam-content');
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('✍️ Schreiben', 'Teil 2 · Mitteilung schreiben') +
+            '<div class="exam-question">' +
+                '<div class="exam-scenario-banner">✉️ ' + t2.scenario + '</div>' +
+                '<div class="exam-reading-text">' + t2.task_de + '</div>' +
+                '<div class="exam-min-words">Mindestens ' + t2.min_words + ' Wörter</div>' +
+                '<textarea class="exam-textarea" id="exam-text-input" rows="8" placeholder="Hier schreiben…"></textarea>' +
+                '<button class="btn btn-primary exam-next-btn" onclick="examSubmitSchreibenTeil2()">Abgeben & Bewerten</button>' +
+            '</div>' +
+        '</div>';
+}
+
+function examSubmitSchreibenTeil2() {
+    examUserAnswers.teil2 = document.getElementById('exam-text-input').value.trim();
+    examGradeSchreiben();
+}
+
+function examGradeSchreiben() {
+    var container = document.getElementById('exam-content');
+    container.innerHTML = examLoadingHtml('Wird bewertet…', 'AI is grading your writing');
+
+    var t1 = examCurrentTest.teil1;
+    var teil1Submission = t1.fields.map(function(f) {
+        return f.label + ': ' + (examUserAnswers.teil1[f.label] || '(blank)') + ' (correct: ' + f.correct_answer + ')';
+    }).join('\n');
+
+    var prompt = 'Grade this Goethe A1 Schreiben submission. Return JSON only:\n' +
+        '{\n' +
+        '  "teil1_score": 0-50,\n' +
+        '  "teil2_score": 0-50,\n' +
+        '  "total": 0-100,\n' +
+        '  "feedback": "1-2 paragraph feedback in English with specific corrections and at least one positive note"\n' +
+        '}\n\n' +
+        'TEIL 1 (form, score 10 per correct or near-correct field, accept minor spelling):\n' + teil1Submission + '\n\n' +
+        'TEIL 2 (message, score: task fulfillment 0-20, grammar 0-15, vocab 0-15):\n' +
+        'Task: ' + examCurrentTest.teil2.task_de + '\n' +
+        'User wrote: ' + (examUserAnswers.teil2 || '(empty)');
+
+    examChatJson(prompt, 800, function(res) {
+        if (res.error) { examShowError(res.error); return; }
+        examShowResults('schreiben', res.data.total, res.data.feedback, null);
+    });
+}
 function examStartSprechen()  { /* Task 6 */ }
