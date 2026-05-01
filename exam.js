@@ -237,13 +237,14 @@ function examStartHoeren() {
     var container = document.getElementById('exam-content');
     container.innerHTML = examLoadingHtml('Hören wird vorbereitet…', 'Generating questions and audio (~30s)');
 
-    var prompt = 'Generate a complete Goethe A1 Hören practice test as JSON. Use only A1-level German vocabulary. Topics: everyday situations (shopping, travel, family, time, weather). Return EXACTLY this structure:\n' +
+    var prompt = 'You are a Goethe A1 exam writer. Create a complete Hören practice test using only A1-level German vocabulary about everyday situations (shopping, travel, family, time, weather, food, transport).\n\n' +
+        'Return ONLY a JSON object with this shape — every field must contain real, fully-written German content (NOT placeholders like "a", "b", "c"):\n\n' +
         '{\n' +
-        '  "teil1": [ { "context": "Where is the dialogue happening?", "dialog": [ {"speaker":"A","text":"..."},{"speaker":"B","text":"..."} ], "question": "...", "options": ["a","b","c"], "correct": 0 }, ... 6 items ],\n' +
-        '  "teil2": [ { "context": "Public announcement", "text": "longer announcement", "statement": "Statement to judge as true or false", "correct": true }, ... 4 items ],\n' +
-        '  "teil3": [ { "context": "Phone message or radio", "text": "...", "question": "...", "options": ["a","b","c"], "correct": 0 }, ... 5 items ]\n' +
-        '}\n' +
-        'All German text natural for A1. Questions in German. Make options plausible distractors.';
+        '  "teil1": [ 6 items, each with: "context" (English, where this happens), "dialog" (array of 2-3 turns: {speaker:"A"|"B", text:"German line"}), "question" (German question about the dialog), "options" (array of THREE distinct German answer phrases — real words, e.g. ["um 8 Uhr", "um 9 Uhr", "um 10 Uhr"]), "correct" (index 0/1/2) ],\n' +
+        '  "teil2": [ 4 items, each with: "context" (English), "text" (German announcement, 30-50 words), "statement" (German claim about the text), "correct" (true|false) ],\n' +
+        '  "teil3": [ 5 items, each with: "context" (English), "text" (German message, 30-60 words), "question" (German question), "options" (array of THREE distinct German phrases), "correct" (index 0/1/2) ]\n' +
+        '}\n\n' +
+        'IMPORTANT: All options must be real German content phrases relevant to the question. Do not output single letters or empty placeholders.';
 
     examChatJson(prompt, 3000, function(res) {
         if (res.error) { examShowError(res.error); return; }
@@ -335,12 +336,14 @@ function examStartLesen() {
     var container = document.getElementById('exam-content');
     container.innerHTML = examLoadingHtml('Lesen wird vorbereitet…', 'Generating reading test…');
 
-    var prompt = 'Generate a Goethe A1 Lesen practice test as JSON. Use A1-level German. Return EXACTLY:\n' +
+    var prompt = 'You are a Goethe A1 exam writer. Create a complete Lesen practice test using only A1-level German vocabulary.\n\n' +
+        'Return ONLY a JSON object — every field must contain real, fully-written German content (NOT placeholders like "a", "b", "c"):\n\n' +
         '{\n' +
-        '  "teil1": [ { "text": "Short personal email or text message (40-60 words)", "statement": "Statement about the text", "correct": true }, ... 5 items ],\n' +
-        '  "teil2": [ { "text": "Short ad, sign, or notice (30-50 words)", "question": "Question in German", "options": ["a","b","c"], "correct": 0 }, ... 5 items ],\n' +
-        '  "teil3": [ { "text": "Short note, sign, or instruction (20-40 words)", "statement": "Statement about it", "correct": false }, ... 5 items ]\n' +
-        '}';
+        '  "teil1": [ 5 items, each with: "text" (a short German email or message, 40-60 words), "statement" (German claim about it), "correct" (true|false) ],\n' +
+        '  "teil2": [ 5 items, each with: "text" (a German ad, sign, or notice, 30-50 words), "question" (a German question about it), "options" (array of THREE distinct German answer phrases — real complete answers like ["Sie soll dort schlafen", "Sie soll dort nicht laufen", "Sie soll dort einkaufen"]), "correct" (index 0/1/2) ],\n' +
+        '  "teil3": [ 5 items, each with: "text" (a German note, sign, or short instruction, 20-40 words), "statement" (German claim about it), "correct" (true|false) ]\n' +
+        '}\n\n' +
+        'IMPORTANT: The "options" field must contain THREE real German content phrases relevant to the question — never single letters, never placeholders. Mix true and false correct values across the items.';
 
     examChatJson(prompt, 2500, function(res) {
         if (res.error) { examShowError(res.error); return; }
