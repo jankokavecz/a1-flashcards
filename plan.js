@@ -158,6 +158,148 @@ function planGoto(tab, arg) {
     }
 }
 
+// ── Week activity (what was actually studied that calendar week) ────
+// Built from the daily log (log.js) rather than a fixed syllabus, so it
+// always reflects what really happened -- including weeks you haven't
+// reached yet (empty) or studied out of order.
+
+var planCurrentWeekDetail = null; // week number, or null for the overview
+
+function planWeekActivity(week) {
+    var start = planDate(week.from);
+    var end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+    var log = typeof dailyLogLoad === 'function' ? dailyLogLoad() : {};
+    var wordsNew = [], wordsReview = [], grammar = [], tracks = [], scenes = [], calls = [];
+
+    function addUnique(arr, id) { if (arr.indexOf(id) === -1) arr.push(id); }
+
+    Object.keys(log).forEach(function(dateKey) {
+        var d = planDate(dateKey);
+        if (d < start || d > end) return;
+        var entry = log[dateKey];
+        (entry.wordsNew || []).forEach(function(id) { addUnique(wordsNew, id); });
+        (entry.wordsReview || []).forEach(function(id) { if (wordsNew.indexOf(id) === -1) addUnique(wordsReview, id); });
+        (entry.grammar || []).forEach(function(id) { addUnique(grammar, id); });
+        (entry.tracks || []).forEach(function(id) { addUnique(tracks, id); });
+        (entry.scenes || []).forEach(function(t) { addUnique(scenes, t); });
+        (entry.calls || []).forEach(function(t) { addUnique(calls, t); });
+    });
+
+    return { wordsNew: wordsNew, wordsReview: wordsReview, grammar: grammar, tracks: tracks, scenes: scenes, calls: calls };
+}
+
+function planShowWeekDetail(weekNum) {
+    planCurrentWeekDetail = weekNum;
+    renderPlanScreen();
+}
+
+function planBackToOverview() {
+    planCurrentWeekDetail = null;
+    renderPlanScreen();
+}
+
+function planRenderWordCard(w, isNew) {
+    var deClass = 'word-de';
+    if (w.type === 'noun' && w.gender) deClass += ' word-de-gender-' + w.gender;
+    return '<div class="plan-word-card">' +
+        '<div class="plan-word-top">' +
+            '<span class="' + deClass + '">' + escapeHtml(w.de) + '</span>' +
+            '<span class="word-type-badge type-' + w.type + '">' + w.type + '</span>' +
+            (isNew ? '<span class="plan-word-new-badge">new</span>' : '') +
+        '</div>' +
+        '<div class="plan-word-en">' + escapeHtml(w.en) + '</div>' +
+        (w.plural ? '<div class="plan-word-plural">Plural: ' + escapeHtml(w.plural) + '</div>' : '') +
+        (w.example ? '<div class="plan-word-example">"' + escapeHtml(w.example.de) + '"</div><div class="plan-word-example-en">' + escapeHtml(w.example.en) + '</div>' : '') +
+    '</div>';
+}
+
+function planRenderGrammarContentItem(item) {
+    switch (item.type) {
+        case 'text':
+            return '<p class="grammar-text">' + escapeHtml(item.value) + '</p>';
+        case 'heading':
+            return '<h3 class="grammar-heading">' + escapeHtml(item.value) + '</h3>';
+        case 'table':
+            var thead = '<thead><tr>' + item.headers.map(function(h) { return '<th>' + escapeHtml(h) + '</th>'; }).join('') + '</tr></thead>';
+            var tbody = '<tbody>' + item.rows.map(function(row) {
+                return '<tr>' + row.map(function(cell) { return '<td>' + escapeHtml(cell) + '</td>'; }).join('') + '</tr>';
+            }).join('') + '</tbody>';
+            return '<div style="overflow-x:auto"><table class="grammar-table">' + thead + tbody + '</table></div>';
+        case 'example':
+            return '<div class="grammar-example"><div class="de">' + escapeHtml(item.de) + '</div><div class="en">' + escapeHtml(item.en) + '</div></div>';
+        case 'tip':
+            return '<div class="grammar-tip">💡 ' + escapeHtml(item.value) + '</div>';
+        default:
+            return '';
+    }
+}
+
+function planRenderGrammarChapter(sec) {
+    var body = sec.content.map(planRenderGrammarContentItem).join('');
+    return '<div class="grammar-section open" onclick="event.currentTarget.classList.toggle(\'open\')">' +
+        '<div class="grammar-section-header"><span class="emoji">' + sec.emoji + '</span><span>' + escapeHtml(sec.title) + '</span><span class="chevron">&#9654;</span></div>' +
+        '<div class="grammar-section-body">' + body + '</div>' +
+    '</div>';
+}
+
+function renderPlanWeekDetail(container, weekNum) {
+    var week = B1_WEEKS.filter(function(w) { return w.n === weekNum; })[0];
+    if (!week) { planBackToOverview(); return; }
+
+    var activity = planWeekActivity(week);
+    var html = '<div class="plan-detail-header"><button class="tracks-back-btn" onclick="planBackToOverview()">&larr; Plan</button></div>';
+    html += '<div class="plan-header-week" style="margin-bottom:2px;">Week ' + week.n + ' · ' + escapeHtml(week.label) + '</div>';
+    if (week.milestone) html += '<div class="plan-week-range" style="margin-bottom:10px;">🏁 ' + escapeHtml(week.milestone) + '</div>';
+
+    html += '<div class="plan-today-card">';
+    [B1_SLOTS.scooter, B1_SLOTS.gym, B1_SLOTS.evening].forEach(function(slot) {
+        var text = slot.id === 'scooter' ? week.scooter : (slot.id === 'gym' ? week.gym : week.evening);
+        if (!text) return;
+        html += '<div class="plan-slot-row"><span class="plan-slot-emoji">' + slot.emoji + '</span>' +
+            '<span class="plan-slot-name">' + slot.name + '</span>' +
+            '<span class="plan-slot-task">' + planLinkify(text) + '</span></div>';
+    });
+    html += '</div>';
+
+    var wordCount = activity.wordsNew.length + activity.wordsReview.length;
+    html += '<div class="plan-section-title">Words (' + activity.wordsNew.length + ' new, ' + activity.wordsReview.length + ' reviewed)</div>';
+    if (!wordCount) {
+        html += '<div class="plan-empty-state">No words logged for this week yet.</div>';
+    } else {
+        activity.wordsNew.forEach(function(id) {
+            var w = ALL_WORDS.filter(function(x) { return x.id === id; })[0];
+            if (w) html += planRenderWordCard(w, true);
+        });
+        activity.wordsReview.forEach(function(id) {
+            var w = ALL_WORDS.filter(function(x) { return x.id === id; })[0];
+            if (w) html += planRenderWordCard(w, false);
+        });
+    }
+
+    html += '<div class="plan-section-title">Grammar (' + activity.grammar.length + ')</div>';
+    if (!activity.grammar.length) {
+        html += '<div class="plan-empty-state">No grammar chapters opened this week yet.</div>';
+    } else {
+        activity.grammar.forEach(function(id) {
+            var sec = ALL_GRAMMAR.filter(function(x) { return x.id === id; })[0];
+            if (sec) html += planRenderGrammarChapter(sec);
+        });
+    }
+
+    if (activity.tracks.length || activity.scenes.length || activity.calls.length) {
+        html += '<div class="plan-section-title">Also this week</div><div class="plan-today-card">';
+        if (activity.tracks.length) {
+            var trackNames = activity.tracks.map(function(id) { return typeof logTrackName === 'function' ? logTrackName(id) : id; });
+            html += '<div class="log-detail-row"><span class="log-detail-label">Tracks</span>' + escapeHtml(trackNames.join(', ')) + '</div>';
+        }
+        if (activity.scenes.length) html += '<div class="log-detail-row"><span class="log-detail-label">Scenes</span>' + escapeHtml(activity.scenes.join(', ')) + '</div>';
+        if (activity.calls.length) html += '<div class="log-detail-row"><span class="log-detail-label">Calls</span>' + escapeHtml(activity.calls.join(', ')) + '</div>';
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+}
+
 // ── Render ──────────────────────────────────────────────────────
 
 function renderPlanScreen() {
@@ -165,6 +307,10 @@ function renderPlanScreen() {
     if (!container) return;
     if (typeof B1_WEEKS === 'undefined') {
         container.innerHTML = '<div class="plan-empty-state">Plan data not loaded.</div>';
+        return;
+    }
+    if (planCurrentWeekDetail !== null) {
+        renderPlanWeekDetail(container, planCurrentWeekDetail);
         return;
     }
 
@@ -255,18 +401,14 @@ function renderPlanScreen() {
             var done = planIsWeekDone(w.n);
             var cls = 'plan-week-row';
             if (w.n === week.n) cls += ' cur';
-            html += '<div class="' + cls + '" id="plan-week-' + w.n + '" onclick="planToggleWeekExpand(' + w.n + ')">' +
+            html += '<div class="' + cls + '" id="plan-week-' + w.n + '" onclick="planShowWeekDetail(' + w.n + ')">' +
                 '<div class="plan-week-row-top">' +
                     '<div class="plan-week-checkbox' + (done ? ' checked' : '') + '" onclick="event.stopPropagation(); planToggleWeekUI(' + w.n + ')">&#10003;</div>' +
                     '<div>' +
                         '<div class="plan-week-label">Week ' + w.n + ' · ' + escapeHtml(w.label) + '</div>' +
                         (w.milestone ? '<div class="plan-week-range">🏁 ' + escapeHtml(w.milestone) + '</div>' : '') +
                     '</div>' +
-                '</div>' +
-                '<div class="plan-week-detail">' +
-                    (w.scooter ? '<div class="plan-week-detail-row"><span class="plan-week-detail-label">Scooter</span>' + planLinkify(w.scooter) + '</div>' : '') +
-                    (w.gym ? '<div class="plan-week-detail-row"><span class="plan-week-detail-label">Gym</span>' + planLinkify(w.gym) + '</div>' : '') +
-                    (w.evening ? '<div class="plan-week-detail-row"><span class="plan-week-detail-label">Evening</span>' + planLinkify(w.evening) + '</div>' : '') +
+                    '<span class="plan-week-chevron">&#9654;</span>' +
                 '</div>' +
             '</div>';
         });
@@ -290,9 +432,4 @@ function planToggleToday() {
 function planToggleWeekUI(n) {
     planToggleWeek(n);
     renderPlanScreen();
-}
-
-function planToggleWeekExpand(n) {
-    var row = document.getElementById('plan-week-' + n);
-    if (row) row.classList.toggle('expanded');
 }
