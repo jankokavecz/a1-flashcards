@@ -195,6 +195,10 @@ function populateCategoryFilter() {
 }
 
 function startSession(category) {
+    if (category === 'mydeck') {
+        startMyDeckSession();
+        return;
+    }
     var words;
     if (category === 'all') {
         words = ALL_WORDS.slice();
@@ -248,6 +252,24 @@ function startSession(category) {
     } else {
         counterEl.textContent = due.length + ' due, ' + newSlice.length + ' new';
     }
+
+    updateIntroducedCounter();
+    showCurrentCard();
+}
+
+// "My Deck": every word ever introduced, all in one flippable session --
+// grows day by day as gradeCard() adds new entries to wordProgress, never
+// resets, never mixes in brand-new not-yet-seen words. Not gated by SRS due
+// dates or the daily budget, since the point here is browsing/reviewing
+// everything learned so far, not paced daily practice (that's "All Categories").
+function startMyDeckSession() {
+    var introduced = ALL_WORDS.filter(function(w) { return !!wordProgress[w.id]; });
+    currentDeck = shuffle(introduced);
+    currentIndex = 0;
+    isFlipped = false;
+
+    var counterEl = document.getElementById('card-counter');
+    counterEl.textContent = currentDeck.length === 0 ? 'Nothing learned yet' : currentDeck.length + ' in your deck';
 
     updateIntroducedCounter();
     showCurrentCard();
