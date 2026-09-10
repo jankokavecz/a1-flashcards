@@ -1,9 +1,34 @@
-// Goethe A1 Flashcard App — Core Logic
-// Depends on globals from words.js (WORDS, CATEGORIES) and grammar.js (GRAMMAR_SECTIONS)
+// Goethe A1+B1 Flashcard App — Core Logic
+// Depends on globals from words.js (WORDS, CATEGORIES), grammar.js (GRAMMAR_SECTIONS),
+// scenarios.js (SCENARIO_THEMES, SCENARIOS), and their B1 siblings if loaded
+// (b1-words.js, b1-grammar.js, b1-scenes.js). words.js/grammar.js/scenarios.js
+// are never edited -- B1 content is concatenated on top of them, once, below.
+
+// ── Unified word/grammar/scene pool ────────────────────────────────
+// One continuous deck spanning A1 through B1: no level switch, no
+// per-level branching. WORDS keeps its existing (easiest-first) order;
+// B1_WORDS is ordered Core-800 (freq:1) before the rest (freq:2).
+
+function mergeMaps() {
+    var merged = {};
+    for (var i = 0; i < arguments.length; i++) {
+        var map = arguments[i];
+        if (!map) continue;
+        for (var k in map) merged[k] = map[k];
+    }
+    return merged;
+}
+
+var ALL_WORDS = WORDS.concat(typeof B1_WORDS !== 'undefined' ? B1_WORDS : []);
+var ALL_CATEGORIES = mergeMaps(CATEGORIES, typeof B1_CATEGORIES !== 'undefined' ? B1_CATEGORIES : null);
+var ALL_GRAMMAR = GRAMMAR_SECTIONS.concat(typeof B1_GRAMMAR_SECTIONS !== 'undefined' ? B1_GRAMMAR_SECTIONS : []);
+var ALL_SCENARIO_THEMES = mergeMaps(SCENARIO_THEMES, typeof B1_SCENARIO_THEMES !== 'undefined' ? B1_SCENARIO_THEMES : null);
+var ALL_SCENARIOS = SCENARIOS.concat(typeof B1_SCENARIOS !== 'undefined' ? B1_SCENARIOS : []);
+var ALL_CALLS_SCENARIOS = CALLS_SCENARIOS.concat(typeof B1_CALLS_SCENARIOS !== 'undefined' ? B1_CALLS_SCENARIOS : []);
 
 // Spaced repetition intervals in days per level
 var SRS_INTERVALS = [0, 1, 3, 7, 14, 30];
-var LEARNED_THRESHOLD = 1; // level >= 1 counts as "learned" (seen at least once)
+var LEARNED_THRESHOLD = 3; // level >= 3 counts as "learned" (survives 3 correct recalls)
 
 var wordProgress = {}; // { wordId: { level: 0, nextReview: timestamp } }
 var currentDeck = [];
@@ -13,9 +38,14 @@ var isFlipped = false;
 // ── Initialization ──────────────────────────────────────────────
 
 function init() {
+    rebuildTabBar();
     loadProgress();
     populateCategoryFilter();
     populateTestCategoryFilter();
+    var coreToggle = document.getElementById('core-only-toggle');
+    if (coreToggle) coreToggle.checked = coreOnlyEnabled();
+    var speakToggle = document.getElementById('speak-on-flip-toggle');
+    if (speakToggle) speakToggle.checked = speakOnFlipEnabled();
     startSession('all');
     renderWordList();
     renderGrammar();
@@ -23,6 +53,9 @@ function init() {
     initExam();
     initHandsFree();
     initCalls();
+    if (typeof renderPlanScreen === 'function') renderPlanScreen();
+    if (typeof renderTracksScreen === 'function') renderTracksScreen();
+    switchTab('plan');
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
@@ -32,6 +65,67 @@ function init() {
 document.addEventListener('DOMContentLoaded', init);
 
 // ── Navigation ──────────────────────────────────────────────────
+// A single tab bar for everyone: 4 primary slots plus a "More" sheet for
+// the rest, since the full tab set (9 screens) doesn't fit one row.
+
+var TAB_META = {
+    plan:    { icon: '🗓️', label: 'Plan' },
+    cards:   { icon: '🃏', label: 'Cards' },
+    words:   { icon: '📖', label: 'Words' },
+    test:    { icon: '✅', label: 'Test' },
+    tracks:  { icon: '🎧', label: 'Tracks' },
+    scenes:  { icon: '💬', label: 'Scenes' },
+    grammar: { icon: '📐', label: 'Grammar' },
+    exam:    { icon: '🎓', label: 'Exam' },
+    calls:   { icon: '🗣️', label: 'Speak' }
+};
+var PRIMARY_TABS = ['plan', 'cards', 'test', 'tracks'];
+var ALL_TAB_IDS = ['plan', 'cards', 'words', 'test', 'tracks', 'scenes', 'grammar', 'exam', 'calls'];
+
+function buildTabButton(id) {
+    var meta = TAB_META[id];
+    var btn = document.createElement('button');
+    btn.className = 'tab';
+    btn.setAttribute('data-tab', id);
+    btn.addEventListener('click', function() { switchTab(id); });
+    btn.innerHTML = '<span class="tab-icon">' + meta.icon + '</span><span class="tab-label">' + meta.label + '</span>';
+    return btn;
+}
+
+function rebuildTabBar() {
+    var nav = document.querySelector('.tab-bar');
+    if (!nav) return;
+    nav.innerHTML = '';
+    PRIMARY_TABS.forEach(function(id) { nav.appendChild(buildTabButton(id)); });
+
+    var moreBtn = document.createElement('button');
+    moreBtn.className = 'tab';
+    moreBtn.setAttribute('data-tab', 'more');
+    moreBtn.addEventListener('click', openMoreSheet);
+    moreBtn.innerHTML = '<span class="tab-icon">⋯</span><span class="tab-label">More</span>';
+    nav.appendChild(moreBtn);
+}
+
+function openMoreSheet() {
+    var sheet = document.getElementById('more-sheet');
+    var list = document.getElementById('more-sheet-list');
+    if (!sheet || !list) return;
+    list.innerHTML = '';
+    ALL_TAB_IDS.filter(function(id) { return PRIMARY_TABS.indexOf(id) === -1; }).forEach(function(id) {
+        var meta = TAB_META[id];
+        var item = document.createElement('button');
+        item.className = 'more-sheet-item';
+        item.innerHTML = '<span class="tab-icon">' + meta.icon + '</span><span>' + meta.label + '</span>';
+        item.addEventListener('click', function() { closeMoreSheet(); switchTab(id); });
+        list.appendChild(item);
+    });
+    sheet.classList.add('open');
+}
+
+function closeMoreSheet() {
+    var sheet = document.getElementById('more-sheet');
+    if (sheet) sheet.classList.remove('open');
+}
 
 function switchTab(tabName) {
     // Stop hands-free and calls speech when switching away
@@ -42,32 +136,39 @@ function switchTab(tabName) {
         if (typeof examActiveAudio !== 'undefined' && examActiveAudio) { try { examActiveAudio.pause(); } catch(e) {} }
         if (typeof examRecognition !== 'undefined' && examRecognition) { try { examRecognition.stop(); } catch(e) {} }
     }
+    closeMoreSheet();
 
+    var screenEl = document.getElementById(tabName + '-screen');
+    if (!screenEl) return;
     document.querySelectorAll('.screen').forEach(function(s) {
         s.classList.remove('active');
     });
-    document.getElementById(tabName + '-screen').classList.add('active');
+    screenEl.classList.add('active');
 
     document.querySelectorAll('.tab').forEach(function(t) {
         t.classList.remove('active');
     });
-    document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
+    var isPrimary = PRIMARY_TABS.indexOf(tabName) !== -1;
+    var activeBtn = document.querySelector('[data-tab="' + (isPrimary ? tabName : 'more') + '"]');
+    if (activeBtn) activeBtn.classList.add('active');
 
     if (tabName === 'words') renderWordList();
     if (tabName === 'test' && testQuestions.length === 0) startTest();
     if (tabName === 'calls') renderCallsScreen();
     if (tabName === 'exam') renderExamScreen();
+    if (tabName === 'plan' && typeof renderPlanScreen === 'function') renderPlanScreen();
+    if (tabName === 'tracks' && typeof renderTracksScreen === 'function') renderTracksScreen();
 }
 
 // ── Cards Logic ─────────────────────────────────────────────────
 
 function populateCategoryFilter() {
     var select = document.getElementById('category-filter');
-    var cats = Object.keys(CATEGORIES).sort();
+    var cats = Object.keys(ALL_CATEGORIES).sort();
     cats.forEach(function(catId) {
         var opt = document.createElement('option');
         opt.value = catId;
-        opt.textContent = CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name;
+        opt.textContent = ALL_CATEGORIES[catId].emoji + ' ' + ALL_CATEGORIES[catId].name;
         select.appendChild(opt);
     });
     select.addEventListener('change', function() {
@@ -78,33 +179,47 @@ function populateCategoryFilter() {
 function startSession(category) {
     var words;
     if (category === 'all') {
-        words = WORDS.slice();
+        words = ALL_WORDS.slice();
     } else {
-        words = WORDS.filter(function(w) { return w.category === category; });
+        words = ALL_WORDS.filter(function(w) { return w.category === category; });
+    }
+    if (coreOnlyEnabled()) {
+        words = words.filter(function(w) { return w.freq !== 2; });
     }
 
     var now = Date.now();
 
-    // Split into due (overdue) and new cards
+    // Split into due (overdue) and new cards; migrate any old-schema progress
     var due = [];
     var newCards = [];
+    var migrated = false;
     words.forEach(function(w) {
         var prog = wordProgress[w.id];
         if (!prog) {
             newCards.push(w);
-        } else if (prog.nextReview <= now) {
-            due.push(w);
+            return;
         }
-        // Skip cards not yet due
+        var migratedProg = srsMigrateCard(prog);
+        if (migratedProg !== prog) { wordProgress[w.id] = migratedProg; migrated = true; }
+        if (migratedProg.due <= now) due.push(w);
     });
+    if (migrated) saveProgress();
 
     // Sort due cards: most overdue first
     due.sort(function(a, b) {
-        return (wordProgress[a.id].nextReview || 0) - (wordProgress[b.id].nextReview || 0);
+        return (wordProgress[a.id].due || 0) - (wordProgress[b.id].due || 0);
     });
 
+    // Respect the daily review cap and the date-stepped new-card budget
+    var todayCounts = srsTodayCounts();
+    var reviewsLeft = Math.max(0, srsReviewCap() - todayCounts.reviews);
+    due = due.slice(0, reviewsLeft);
+
+    var newLeft = Math.max(0, srsNewPerDay() - todayCounts.new);
+    var newSlice = shuffle(newCards).slice(0, newLeft);
+
     // Combine: due cards first, then shuffled new cards
-    currentDeck = due.concat(shuffle(newCards));
+    currentDeck = due.concat(newSlice);
     currentIndex = 0;
     isFlipped = false;
 
@@ -113,12 +228,26 @@ function startSession(category) {
     if (currentDeck.length === 0) {
         counterEl.textContent = 'All reviewed!';
     } else {
-        var dueCount = due.length;
-        var newCount = newCards.length;
-        counterEl.textContent = dueCount + ' due, ' + newCount + ' new';
+        counterEl.textContent = due.length + ' due, ' + newSlice.length + ' new';
     }
 
+    updateIntroducedCounter();
     showCurrentCard();
+}
+
+function updateIntroducedCounter() {
+    var introducedEl = document.getElementById('cards-introduced-counter');
+    if (!introducedEl) return;
+    var introducedTotal = 0;
+    for (var id in wordProgress) introducedTotal++;
+    var coreTotal = ALL_WORDS.filter(function(w) { return w.freq === 1; }).length;
+    if (coreTotal > 0) {
+        var coreIntroduced = 0;
+        ALL_WORDS.forEach(function(w) { if (w.freq === 1 && wordProgress[w.id]) coreIntroduced++; });
+        introducedEl.textContent = introducedTotal + ' / ' + ALL_WORDS.length + ' introduced · Core 800: ' + coreIntroduced + ' / ' + coreTotal;
+    } else {
+        introducedEl.textContent = introducedTotal + ' / ' + ALL_WORDS.length + ' introduced';
+    }
 }
 
 function shuffle(arr) {
@@ -213,38 +342,140 @@ function showCurrentCard() {
 function flipCard() {
     isFlipped = !isFlipped;
     document.getElementById('flashcard').classList.toggle('flipped');
+    if (isFlipped && speakOnFlipEnabled()) speakCurrentWord();
 }
 
-function markKnown() {
+function speakCurrentWord() {
     if (currentDeck.length === 0 || currentIndex >= currentDeck.length) return;
     var word = currentDeck[currentIndex];
+    var text = isFlipped && word.example && word.example.de ? word.example.de : word.de;
+    speakText(text, 'de-DE', null);
+}
 
-    // Increase SRS level
-    var prog = wordProgress[word.id] || { level: 0, nextReview: 0 };
-    prog.level = Math.min(prog.level + 1, 5);
-    var intervalDays = SRS_INTERVALS[prog.level];
-    prog.nextReview = Date.now() + intervalDays * 24 * 60 * 60 * 1000;
+// ── SRS: SM-2-style scheduling ────────────────────────────────────
+// Per-card state: { level, ease, due, reps, lapses, intervalDays, leech }.
+// Old { level, nextReview } cards are migrated on read, never reset.
+
+var SRS_DAILY_KEY = 'srs-daily';
+var CORE_ONLY_KEY = 'core-only';
+var SPEAK_ON_FLIP_KEY = 'speak-on-flip';
+var LEECH_LAPSES = 8;
+
+function srsMigrateCard(prog) {
+    if (prog.ease !== undefined) return prog; // already migrated
+    var oldLevel = prog.level || 0;
+    return {
+        level: oldLevel,
+        ease: 2.5,
+        due: prog.nextReview || 0,
+        reps: oldLevel,
+        lapses: 0,
+        intervalDays: SRS_INTERVALS[Math.min(oldLevel, SRS_INTERVALS.length - 1)] || 1
+    };
+}
+
+function srsNext(card, grade) {
+    if (grade === 'again') {
+        card.lapses = (card.lapses || 0) + 1;
+        card.level = 0;
+        card.ease = Math.max(1.3, card.ease - 0.2);
+        card.intervalDays = 0;
+        card.due = Date.now() + 10 * 60 * 1000; // retry within this session
+        if (card.lapses >= LEECH_LAPSES) card.leech = true;
+        return card;
+    }
+    card.reps = (card.reps || 0) + 1;
+    var days;
+    if (card.level === 0) days = 1;
+    else if (card.level === 1) days = 3;
+    else days = Math.round((card.intervalDays || 1) * card.ease);
+    if (grade === 'easy') {
+        days = Math.round(days * 1.3);
+        card.ease = card.ease + 0.15;
+    }
+    days = Math.min(days, 180);
+    card.intervalDays = days;
+    card.level = (card.level || 0) + 1;
+    card.due = Date.now() + days * 24 * 60 * 60 * 1000;
+    return card;
+}
+
+function srsToday() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+}
+
+function srsDailyLoad() {
+    try { return JSON.parse(localStorage.getItem(SRS_DAILY_KEY) || '{}'); }
+    catch (e) { return {}; }
+}
+
+function srsDailySave(data) {
+    try { localStorage.setItem(SRS_DAILY_KEY, JSON.stringify(data)); } catch (e) {}
+}
+
+function srsTodayCounts() {
+    return srsDailyLoad()[srsToday()] || { new: 0, reviews: 0 };
+}
+
+function srsBumpToday(field) {
+    var data = srsDailyLoad();
+    var key = srsToday();
+    if (!data[key]) data[key] = { new: 0, reviews: 0 };
+    data[key][field] = (data[key][field] || 0) + 1;
+    srsDailySave(data);
+}
+
+function srsNewPerDay() {
+    if (typeof B1_KEY_DATES === 'undefined') return 10;
+    var today = srsToday();
+    if (today >= B1_KEY_DATES.newCardsTo0) return 0;
+    if (today >= B1_KEY_DATES.newCardsTo5) return 5;
+    return 10;
+}
+
+function srsReviewCap() { return 150; }
+
+function coreOnlyEnabled() {
+    return localStorage.getItem(CORE_ONLY_KEY) === '1';
+}
+
+function toggleCoreOnly() {
+    localStorage.setItem(CORE_ONLY_KEY, coreOnlyEnabled() ? '0' : '1');
+    startSession(document.getElementById('category-filter').value);
+}
+
+function speakOnFlipEnabled() {
+    var v = localStorage.getItem(SPEAK_ON_FLIP_KEY);
+    return v === null ? true : v === '1'; // default ON
+}
+
+function toggleSpeakOnFlip() {
+    localStorage.setItem(SPEAK_ON_FLIP_KEY, speakOnFlipEnabled() ? '0' : '1');
+}
+
+function gradeCard(grade) {
+    if (currentDeck.length === 0 || currentIndex >= currentDeck.length) return;
+    var word = currentDeck[currentIndex];
+    var wasNew = !wordProgress[word.id];
+    var prog = srsMigrateCard(wordProgress[word.id] || { level: 0, nextReview: 0 });
+    prog = srsNext(prog, grade);
     wordProgress[word.id] = prog;
-
     saveProgress();
-    currentIndex++;
-    showCurrentCard();
-}
+    srsBumpToday(wasNew ? 'new' : 'reviews');
+    updateIntroducedCounter();
 
-function markLearning() {
-    if (currentDeck.length === 0 || currentIndex >= currentDeck.length) return;
-    var word = currentDeck[currentIndex];
-
-    // Reset SRS level to 0
-    wordProgress[word.id] = { level: 0, nextReview: 0 };
-    saveProgress();
-
-    // Re-insert card later in deck
-    currentDeck.splice(currentIndex, 1);
-    var insertAt = currentIndex + Math.floor(Math.random() * Math.max(1, currentDeck.length - currentIndex)) + 1;
-    if (insertAt > currentDeck.length) insertAt = currentDeck.length;
-    currentDeck.splice(insertAt, 0, word);
-    showCurrentCard();
+    if (grade === 'again') {
+        // Re-insert the card later in this session for another attempt
+        currentDeck.splice(currentIndex, 1);
+        var insertAt = currentIndex + Math.floor(Math.random() * Math.max(1, currentDeck.length - currentIndex)) + 1;
+        if (insertAt > currentDeck.length) insertAt = currentDeck.length;
+        currentDeck.splice(insertAt, 0, word);
+        showCurrentCard();
+    } else {
+        currentIndex++;
+        showCurrentCard();
+    }
 }
 
 // ── Words Screen ────────────────────────────────────────────────
@@ -256,16 +487,16 @@ function renderWordList() {
     // Update progress stats
     var learnedTotal = getLearnedCount();
     document.getElementById('words-learned').textContent = learnedTotal;
-    document.getElementById('words-total').textContent = WORDS.length;
-    document.getElementById('words-progress').style.width = (learnedTotal / WORDS.length * 100) + '%';
+    document.getElementById('words-total').textContent = ALL_WORDS.length;
+    document.getElementById('words-progress').style.width = (learnedTotal / ALL_WORDS.length * 100) + '%';
 
     // Group by category, sorted alphabetically
-    var catIds = Object.keys(CATEGORIES).sort(function(a, b) {
-        return CATEGORIES[a].name.localeCompare(CATEGORIES[b].name);
+    var catIds = Object.keys(ALL_CATEGORIES).sort(function(a, b) {
+        return ALL_CATEGORIES[a].name.localeCompare(ALL_CATEGORIES[b].name);
     });
 
     catIds.forEach(function(catId) {
-        var catWords = WORDS.filter(function(w) { return w.category === catId; });
+        var catWords = ALL_WORDS.filter(function(w) { return w.category === catId; });
         if (catWords.length === 0) return;
 
         var group = document.createElement('div');
@@ -275,7 +506,7 @@ function renderWordList() {
 
         var header = document.createElement('div');
         header.className = 'category-header';
-        header.innerHTML = '<span>' + CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name +
+        header.innerHTML = '<span>' + ALL_CATEGORIES[catId].emoji + ' ' + ALL_CATEGORIES[catId].name +
             '</span><span class="category-count">' + learnedCount + '/' + catWords.length + '</span>';
         group.appendChild(header);
 
@@ -307,8 +538,8 @@ function renderWordList() {
                         cb.innerHTML = '';
                         it.classList.remove('learned');
                     } else {
-                        // Mark as learned: set level 1
-                        wordProgress[w.id] = { level: 1, nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000 };
+                        // Mark as learned: set to the level that actually counts as learned
+                        wordProgress[w.id] = { level: LEARNED_THRESHOLD, nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000 };
                         cb.classList.add('checked');
                         cb.innerHTML = '&#10003;';
                         it.classList.add('learned');
@@ -317,9 +548,9 @@ function renderWordList() {
                     // Update counters
                     var newLearnedTotal = getLearnedCount();
                     document.getElementById('words-learned').textContent = newLearnedTotal;
-                    document.getElementById('words-progress').style.width = (newLearnedTotal / WORDS.length * 100) + '%';
+                    document.getElementById('words-progress').style.width = (newLearnedTotal / ALL_WORDS.length * 100) + '%';
                     var catLearned = catWords.filter(function(cw) { return isWordLearned(cw.id); }).length;
-                    header.innerHTML = '<span>' + CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name +
+                    header.innerHTML = '<span>' + ALL_CATEGORIES[catId].emoji + ' ' + ALL_CATEGORIES[catId].name +
                         '</span><span class="category-count">' + catLearned + '/' + catWords.length + '</span>';
                 });
             })(word, checkbox, item);
@@ -332,9 +563,11 @@ function renderWordList() {
             if (word.type === 'noun' && word.gender) {
                 deClass += ' word-de-gender-' + word.gender;
             }
+            var isLeech = wordProgress[word.id] && wordProgress[word.id].leech;
             main.innerHTML = '<div><span class="' + deClass + '">' + word.de +
                 '</span> <span class="word-type-badge type-' + word.type + '">' + word.type +
-                '</span></div><span class="word-en">' + word.en + '</span>';
+                '</span>' + (isLeech ? ' <span title="Leech: 8+ lapses">🚩</span>' : '') +
+                '</div><span class="word-en">' + word.en + '</span>';
             row.appendChild(main);
 
             var expanded = document.createElement('div');
@@ -384,11 +617,11 @@ var hfSpeechSupported = false;
 
 function populateTestCategoryFilter() {
     var select = document.getElementById('test-category-filter');
-    var cats = Object.keys(CATEGORIES).sort();
+    var cats = Object.keys(ALL_CATEGORIES).sort();
     cats.forEach(function(catId) {
         var opt = document.createElement('option');
         opt.value = catId;
-        opt.textContent = CATEGORIES[catId].emoji + ' ' + CATEGORIES[catId].name;
+        opt.textContent = ALL_CATEGORIES[catId].emoji + ' ' + ALL_CATEGORIES[catId].name;
         select.appendChild(opt);
     });
     select.addEventListener('change', function() {
@@ -400,9 +633,9 @@ function startTest() {
     var category = document.getElementById('test-category-filter').value;
     var pool;
     if (category === 'all') {
-        pool = WORDS.slice();
+        pool = ALL_WORDS.slice();
     } else {
-        pool = WORDS.filter(function(w) { return w.category === category; });
+        pool = ALL_WORDS.filter(function(w) { return w.category === category; });
     }
 
     if (pool.length < 4) {
@@ -445,13 +678,15 @@ function generateQuestions(pool, count) {
         // Randomly choose direction: de->en or en->de
         var direction = Math.random() < 0.5 ? 'de_to_en' : 'en_to_de';
 
-        // Get distractors from same category
-        var sameCategory = pool.filter(function(w) { return w.id !== word.id && w.category === word.category; });
-        if (sameCategory.length < 3) {
-            // Fall back to random if category too small
-            sameCategory = pool.filter(function(w) { return w.id !== word.id; });
+        // Distractors: prefer same type AND category, then same category, then the whole pool
+        var pick = pool.filter(function(w) { return w.id !== word.id && w.category === word.category && w.type === word.type; });
+        if (pick.length < 3) {
+            pick = pool.filter(function(w) { return w.id !== word.id && w.category === word.category; });
         }
-        var distractors = shuffle(sameCategory).slice(0, 3);
+        if (pick.length < 3) {
+            pick = pool.filter(function(w) { return w.id !== word.id; });
+        }
+        var distractors = shuffle(pick).slice(0, 3);
 
         var options;
         if (direction === 'de_to_en') {
@@ -816,10 +1051,10 @@ function renderScenes() {
     var container = document.getElementById('scenes-content');
     container.innerHTML = '';
 
-    var themeIds = Object.keys(SCENARIO_THEMES);
+    var themeIds = Object.keys(ALL_SCENARIO_THEMES);
 
     themeIds.forEach(function(themeId) {
-        var themeScenarios = SCENARIOS.filter(function(s) { return s.theme === themeId; });
+        var themeScenarios = ALL_SCENARIOS.filter(function(s) { return s.theme === themeId; });
         if (themeScenarios.length === 0) return;
 
         var group = document.createElement('div');
@@ -827,7 +1062,7 @@ function renderScenes() {
 
         var header = document.createElement('div');
         header.className = 'scene-theme-header';
-        header.textContent = SCENARIO_THEMES[themeId].emoji + ' ' + SCENARIO_THEMES[themeId].name;
+        header.textContent = ALL_SCENARIO_THEMES[themeId].emoji + ' ' + ALL_SCENARIO_THEMES[themeId].name;
         group.appendChild(header);
 
         themeScenarios.forEach(function(scenario) {
@@ -896,7 +1131,7 @@ function renderGrammar() {
     var container = document.getElementById('grammar-content');
     container.innerHTML = '';
 
-    GRAMMAR_SECTIONS.forEach(function(section) {
+    ALL_GRAMMAR.forEach(function(section) {
         var sec = document.createElement('div');
         sec.className = 'grammar-section';
 
@@ -963,87 +1198,35 @@ function renderGrammar() {
     });
 }
 
-// ── Comics Screen ──────────────────────────────────────────────
-
-function renderComics() {
-    var container = document.getElementById('comics-content');
-    container.innerHTML = '';
-
-    COMICS.forEach(function(comic) {
-        var card = document.createElement('div');
-        card.className = 'comic-card';
-
-        var header = document.createElement('div');
-        header.className = 'comic-header';
-        header.innerHTML =
-            '<div><div class="comic-title">' + comic.title + '</div>' +
-            '<div class="comic-title-de">' + comic.titleDe + '</div></div>' +
-            '<span class="comic-chevron">&#9654;</span>';
-        header.addEventListener('click', function() {
-            card.classList.toggle('open');
-        });
-        card.appendChild(header);
-
-        var body = document.createElement('div');
-        body.className = 'comic-body';
-
-        // SVG illustration (composed from character helpers + scene background)
-        var illustration = document.createElement('div');
-        illustration.className = 'comic-illustration';
-        illustration.innerHTML = buildComicSvg(comic);
-        body.appendChild(illustration);
-
-        // Speech bubbles
-        var bubblesContainer = document.createElement('div');
-        bubblesContainer.className = 'comic-bubbles';
-
-        comic.bubbles.forEach(function(bubble) {
-            var bubbleEl = document.createElement('div');
-            bubbleEl.className = 'comic-bubble ' + (bubble.speaker === 'cat' ? 'bubble-cat' : 'bubble-dog');
-
-            var speakerLabel = bubble.speaker === 'cat' ? 'Katze' : 'Hund';
-            bubbleEl.innerHTML =
-                '<div class="bubble-speaker">' + speakerLabel + '</div>' +
-                '<div class="bubble-de">' + bubble.de + '</div>' +
-                '<div class="bubble-en">' + bubble.en + '</div>';
-
-            bubbleEl.addEventListener('click', function() {
-                bubbleEl.classList.toggle('show-translation');
-            });
-
-            bubblesContainer.appendChild(bubbleEl);
-        });
-
-        body.appendChild(bubblesContainer);
-
-        var hint = document.createElement('div');
-        hint.className = 'comic-hint';
-        hint.textContent = 'Tap bubbles to reveal English';
-        body.appendChild(hint);
-
-        card.appendChild(body);
-        container.appendChild(card);
-    });
-}
-
 // ── Progress / Storage ──────────────────────────────────────────
+// 'word-progress' is the single live key for the unified deck. The old
+// 'a1-word-progress' is seeded from once, then never written to again --
+// it stays on disk untouched, byte-for-byte, as a permanent backup.
+
+var WORD_PROGRESS_KEY = 'word-progress';
 
 function loadProgress() {
     try {
-        var saved = localStorage.getItem('a1-word-progress');
+        var saved = localStorage.getItem(WORD_PROGRESS_KEY);
         if (saved) {
             wordProgress = JSON.parse(saved);
-        } else {
-            // Migrate from old knownWords format
-            var oldSaved = localStorage.getItem('a1-known-words');
-            if (oldSaved) {
-                var oldIds = JSON.parse(oldSaved);
-                oldIds.forEach(function(id) {
-                    wordProgress[id] = { level: 3, nextReview: Date.now() + 7 * 24 * 60 * 60 * 1000 };
-                });
-                saveProgress();
-                localStorage.removeItem('a1-known-words');
-            }
+            return;
+        }
+        var legacy = localStorage.getItem('a1-word-progress');
+        if (legacy) {
+            wordProgress = JSON.parse(legacy);
+            saveProgress();
+            return;
+        }
+        // Migrate from the even older pre-SRS knownWords format
+        var oldSaved = localStorage.getItem('a1-known-words');
+        if (oldSaved) {
+            var oldIds = JSON.parse(oldSaved);
+            oldIds.forEach(function(id) {
+                wordProgress[id] = { level: 3, nextReview: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+            });
+            saveProgress();
+            localStorage.removeItem('a1-known-words');
         }
     } catch (e) {
         wordProgress = {};
@@ -1052,7 +1235,7 @@ function loadProgress() {
 
 function saveProgress() {
     try {
-        localStorage.setItem('a1-word-progress', JSON.stringify(wordProgress));
+        localStorage.setItem(WORD_PROGRESS_KEY, JSON.stringify(wordProgress));
     } catch (e) {}
 }
 

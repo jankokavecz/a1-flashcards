@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Goethe A1 Flashcards</title>
+    <title>Deutsch B1</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
@@ -13,8 +13,18 @@
 </head>
 <body>
     <div id="app">
-        <!-- Cards Screen (default, shown first) -->
-        <div id="cards-screen" class="screen active">
+        <!-- Plan Screen (default home tab, shown first) -->
+        <div id="plan-screen" class="screen active">
+            <header class="screen-header">
+                <h1>🗓️ Plan</h1>
+            </header>
+            <div class="plan-content" id="plan-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- Cards Screen -->
+        <div id="cards-screen" class="screen">
             <header class="screen-header">
                 <h1>Flashcards</h1>
                 <select id="category-filter">
@@ -22,6 +32,11 @@
                     <!-- populated by JS -->
                 </select>
             </header>
+            <div class="cards-toolbar">
+                <span class="cards-counters" id="cards-introduced-counter"></span>
+                <label><input type="checkbox" id="core-only-toggle" onchange="toggleCoreOnly()"> Core 800 only</label>
+                <label><input type="checkbox" id="speak-on-flip-toggle" onchange="toggleSpeakOnFlip()"> 🔊 Speak on flip</label>
+            </div>
             <div class="cards-content">
                 <div class="session-info">
                     <span id="card-counter">1 / 20</span>
@@ -33,12 +48,14 @@
                     <div class="flashcard" id="flashcard" onclick="flipCard()">
                         <div class="card-inner">
                             <div class="card-front">
+                                <button class="card-speaker-btn" onclick="event.stopPropagation(); speakCurrentWord()">🔊</button>
                                 <div class="card-type-badge" id="card-type"></div>
                                 <div class="card-level" id="card-level"></div>
                                 <div class="card-word" id="card-front-word"></div>
                                 <div class="card-hint" id="card-hint">Tap to flip</div>
                             </div>
                             <div class="card-back">
+                                <button class="card-speaker-btn" onclick="event.stopPropagation(); speakCurrentWord()">🔊</button>
                                 <div class="card-translation" id="card-translation"></div>
                                 <div class="card-example" id="card-example-de"></div>
                                 <div class="card-example-en" id="card-example-en"></div>
@@ -48,8 +65,9 @@
                     </div>
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-learning" onclick="markLearning()">Still Learning</button>
-                    <button class="btn btn-known" onclick="markKnown()">Got It ✓</button>
+                    <button class="btn btn-learning" onclick="gradeCard('again')">Again</button>
+                    <button class="btn btn-good" onclick="gradeCard('good')">Good</button>
+                    <button class="btn btn-known" onclick="gradeCard('easy')">Easy</button>
                 </div>
             </div>
         </div>
@@ -119,10 +137,20 @@
             </div>
         </div>
 
+        <!-- Tracks Screen -->
+        <div id="tracks-screen" class="screen">
+            <header class="screen-header">
+                <h1>🎧 Tracks</h1>
+            </header>
+            <div class="tracks-content" id="tracks-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- Grammar Screen -->
         <div id="grammar-screen" class="screen">
             <header class="screen-header">
-                <h1>A1 Grammar</h1>
+                <h1>Grammar</h1>
             </header>
             <div class="grammar-content" id="grammar-content">
                 <!-- populated by JS -->
@@ -132,7 +160,7 @@
         <!-- Exam Screen -->
         <div id="exam-screen" class="screen">
             <header class="screen-header">
-                <h1>🎓 Goethe A1 Exam</h1>
+                <h1>🎓 Exam</h1>
             </header>
             <div class="exam-content" id="exam-content">
                 <!-- populated by JS -->
@@ -149,37 +177,19 @@
             </div>
         </div>
 
-        <!-- Bottom Tab Bar -->
-        <nav class="tab-bar">
-            <button class="tab active" data-tab="cards" onclick="switchTab('cards')">
-                <span class="tab-icon">🃏</span>
-                <span class="tab-label">Cards</span>
-            </button>
-            <button class="tab" data-tab="words" onclick="switchTab('words')">
-                <span class="tab-icon">📖</span>
-                <span class="tab-label">Words</span>
-            </button>
-            <button class="tab" data-tab="test" onclick="switchTab('test')">
-                <span class="tab-icon">✅</span>
-                <span class="tab-label">Test</span>
-            </button>
-            <button class="tab" data-tab="scenes" onclick="switchTab('scenes')">
-                <span class="tab-icon">💬</span>
-                <span class="tab-label">Scenes</span>
-            </button>
-            <button class="tab" data-tab="grammar" onclick="switchTab('grammar')">
-                <span class="tab-icon">📐</span>
-                <span class="tab-label">Grammar</span>
-            </button>
-            <button class="tab" data-tab="exam" onclick="switchTab('exam')">
-                <span class="tab-icon">🎓</span>
-                <span class="tab-label">Exam</span>
-            </button>
-            <button class="tab" data-tab="calls" onclick="switchTab('calls')">
-                <span class="tab-icon">🗣️</span>
-                <span class="tab-label">Speak</span>
-            </button>
-        </nav>
+        <!-- Bottom Tab Bar -- populated by rebuildTabBar() in app.js -->
+        <nav class="tab-bar"></nav>
+
+        <!-- More sheet: every tab not in the primary bar -->
+        <div id="more-sheet" class="more-sheet">
+            <div class="more-sheet-backdrop" onclick="closeMoreSheet()"></div>
+            <div class="more-sheet-panel">
+                <div class="more-sheet-handle"></div>
+                <div class="more-sheet-list" id="more-sheet-list">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="words.js"></script>
@@ -187,6 +197,15 @@
     <script src="scenarios.js"></script>
     <script src="exam.js"></script>
     <script src="calls.js"></script>
+    <script src="b1-plan.js"></script>
+    <script src="b1-tracks.js"></script>
+    <script src="b1-exam-data.js"></script>
+    <script src="b1-words.js"></script>
+    <script src="b1-grammar.js"></script>
+    <script src="b1-scenes.js"></script>
+    <script src="b1-calls.js"></script>
+    <script src="plan.js"></script>
+    <script src="tracks.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

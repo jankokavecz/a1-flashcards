@@ -17,6 +17,144 @@ var EXAM_SECTIONS = {
     sprechen:  { id: 'sprechen',  emoji: '🗣️', titleDe: 'Sprechen', titleEn: 'Speaking' }
 };
 
+// ── Checkpoint quiz ──────────────────────────────────────────────
+// Needs no API key: a short vocab quiz drawn only from words already
+// introduced (so difficulty rises on its own as more words unlock),
+// scored and logged so a readiness trend can be shown.
+
+var CHECKPOINT_HISTORY_KEY = 'checkpoint-history';
+var checkpointQuestions = [];
+var checkpointIndex = 0;
+var checkpointCorrect = 0;
+
+function checkpointGetHistory() {
+    try { return JSON.parse(localStorage.getItem(CHECKPOINT_HISTORY_KEY) || '[]'); }
+    catch (e) { return []; }
+}
+
+function checkpointSaveAttempt(percentage, wordCount) {
+    var hist = checkpointGetHistory();
+    hist.push({ date: srsToday(), percentage: Math.round(percentage), wordCount: wordCount, timestamp: Date.now() });
+    while (hist.length > 100) hist.shift();
+    localStorage.setItem(CHECKPOINT_HISTORY_KEY, JSON.stringify(hist));
+}
+
+function checkpointReadiness() {
+    var hist = checkpointGetHistory().slice(-3);
+    if (!hist.length) return { text: 'not enough data', attempts: 0 };
+    var weights = [0.5, 0.3, 0.2].slice(0, hist.length);
+    var recent = hist.slice().reverse();
+    var wSum = 0, total = 0;
+    recent.forEach(function(a, i) { var w = weights[i] || 0.1; total += a.percentage * w; wSum += w; });
+    var avg = Math.round(total / wSum);
+    return { text: avg + '/100', attempts: hist.length, trend: recent[0].percentage >= (recent[1] ? recent[1].percentage : recent[0].percentage) };
+}
+
+function checkpointCardHtml() {
+    var hist = checkpointGetHistory();
+    var last = hist.length ? hist[hist.length - 1] : null;
+    var readiness = checkpointReadiness();
+    var introducedCount = 0;
+    for (var id in wordProgress) introducedCount++;
+
+    var subtitle = introducedCount < 10
+        ? 'Learn a few more cards first — checkpoints need at least 10 introduced words.'
+        : (last ? 'Last: ' + last.percentage + '% · ' + readiness.attempts + ' attempt' + (readiness.attempts === 1 ? '' : 's') + ' · readiness ' + readiness.text
+                : 'No attempts yet. Draws only from words you have already seen, so it gets harder as you learn more.');
+
+    return '<div class="checkpoint-card">' +
+        '<div class="checkpoint-card-top">' +
+            '<div class="checkpoint-card-emoji">📊</div>' +
+            '<div>' +
+                '<div class="checkpoint-card-title">Checkpoint quiz</div>' +
+                '<div class="checkpoint-card-sub">' + subtitle + '</div>' +
+            '</div>' +
+        '</div>' +
+        '<button class="btn btn-primary checkpoint-start-btn" id="checkpoint-start-btn" ' +
+            (introducedCount < 10 ? 'disabled' : '') + '>Start checkpoint</button>' +
+    '</div>';
+}
+
+function bindCheckpointCard() {
+    var btn = document.getElementById('checkpoint-start-btn');
+    if (btn) btn.addEventListener('click', checkpointStart);
+}
+
+function checkpointStart() {
+    var introduced = ALL_WORDS.filter(function(w) { return !!wordProgress[w.id]; });
+    if (introduced.length < 10) return;
+    var count = Math.min(12, introduced.length);
+    checkpointQuestions = generateQuestions(introduced, count);
+    checkpointIndex = 0;
+    checkpointCorrect = 0;
+    checkpointShowQuestion();
+}
+
+function checkpointShowQuestion() {
+    var container = document.getElementById('exam-content');
+    if (checkpointIndex >= checkpointQuestions.length) {
+        checkpointFinish();
+        return;
+    }
+    var q = checkpointQuestions[checkpointIndex];
+    container.innerHTML =
+        '<div class="exam-active">' +
+            examActiveHeader('📊 Checkpoint', (checkpointIndex + 1) + ' / ' + checkpointQuestions.length) +
+            '<div class="exam-question">' +
+                '<div class="exam-question-text">' + (q.direction === 'de_to_en' ? 'What does this mean?' : 'How do you say this in German?') + '</div>' +
+                '<div class="exam-context">' + q.prompt + '</div>' +
+                '<div class="exam-options" id="checkpoint-options"></div>' +
+            '</div>' +
+        '</div>';
+
+    var optsEl = document.getElementById('checkpoint-options');
+    q.options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'exam-option';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', function() { checkpointAnswer(opt.correct, btn, optsEl); });
+        optsEl.appendChild(btn);
+    });
+}
+
+function checkpointAnswer(isCorrect, clickedBtn, container) {
+    var allBtns = container.querySelectorAll('.exam-option');
+    allBtns.forEach(function(b) { b.style.pointerEvents = 'none'; });
+    if (isCorrect) {
+        checkpointCorrect++;
+        clickedBtn.classList.add('correct');
+    } else {
+        clickedBtn.classList.add('wrong');
+        var q = checkpointQuestions[checkpointIndex];
+        allBtns.forEach(function(b, idx) { if (q.options[idx].correct) b.classList.add('correct'); });
+    }
+    setTimeout(function() {
+        checkpointIndex++;
+        checkpointShowQuestion();
+    }, 900);
+}
+
+function checkpointFinish() {
+    var pct = Math.round((checkpointCorrect / checkpointQuestions.length) * 100);
+    var introducedCount = 0;
+    for (var id in wordProgress) introducedCount++;
+    checkpointSaveAttempt(pct, introducedCount);
+
+    var passed = pct >= 60;
+    var container = document.getElementById('exam-content');
+    container.innerHTML =
+        '<div class="exam-results">' +
+            '<div class="exam-results-header">📊 Checkpoint — Ergebnis</div>' +
+            '<div class="exam-results-score-box">' +
+                '<div class="exam-results-score ' + (passed ? 'passed' : 'failed') + '">' + pct + '%</div>' +
+                '<div class="exam-results-badge ' + (passed ? 'passed' : 'failed') + '">' + checkpointCorrect + ' / ' + checkpointQuestions.length + ' correct</div>' +
+            '</div>' +
+            '<div class="exam-results-actions">' +
+                '<button class="btn btn-primary" onclick="renderExamScreen()">Done</button>' +
+            '</div>' +
+        '</div>';
+}
+
 // ── History ────────────────────────────────────────────────────
 
 function examGetHistory() {
@@ -127,18 +265,23 @@ function initExam() {
 function renderExamScreen() {
     var container = document.getElementById('exam-content');
     if (!container) return;
+
+    var html = checkpointCardHtml();
+
     if (!examGetApiKey()) {
-        container.innerHTML =
-            '<div class="exam-no-key">' +
+        html += '<div class="exam-no-key">' +
                 '<div class="exam-no-key-icon">🔑</div>' +
-                '<p>Set your OpenAI API key in the <strong>🗣️ Speak</strong> tab first.</p>' +
+                '<p>Set your OpenAI API key in the <strong>🗣️ Speak</strong> tab for the full AI-graded Hören/Lesen/Schreiben/Sprechen practice below.</p>' +
             '</div>';
+        container.innerHTML = html;
         return;
     }
-    renderExamSectionList(container);
+
+    container.innerHTML = html + examSectionListHtml();
+    bindCheckpointCard();
 }
 
-function renderExamSectionList(container) {
+function examSectionListHtml() {
     var html = '<div class="exam-list-header">' +
         '<p class="exam-list-subtitle">Tap a section to practise</p>' +
     '</div>';
@@ -172,8 +315,7 @@ function renderExamSectionList(container) {
         '</div>';
     });
     html += '</div>';
-
-    container.innerHTML = html;
+    return html;
 }
 
 // ── SVG Chart ──────────────────────────────────────────────────

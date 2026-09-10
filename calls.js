@@ -2,6 +2,7 @@
 // Depends on: app.js (for stopHFListening, speechSynthesis patterns)
 
 var CALLS_SCENARIOS = [
+
   {
     id: 'restaurant',
     emoji: '🍽️',
@@ -121,6 +122,11 @@ var CALLS_SCENARIOS = [
   }
 ];
 
+// ALL_CALLS_SCENARIOS (CALLS_SCENARIOS + B1_CALLS_SCENARIOS) is defined in
+// app.js, which loads after b1-calls.js -- calls.js loads BEFORE it, so the
+// merge can't happen here at parse time; it's only read inside functions
+// below, which run after app.js has already set it up.
+
 // ── Calls State ────────────────────────────────────────────────
 var callsCurrentScenario = null;    // active scenario object
 var callsConversation = [];         // [{role, content}] for OpenAI
@@ -203,7 +209,8 @@ function callsDifficultyInstructions() {
     var n = callsGetCompletedCount();
     if (n <= 3) return 'Speak slowly and clearly. If the user makes a grammar mistake, understand them anyway and keep the conversation going. Use only simple A1 vocabulary.';
     if (n <= 8) return 'Speak at a natural pace. Occasionally ask the user to repeat if something is unclear. Use A1-A2 vocabulary.';
-    return 'Speak naturally. Do not simplify your language. If you do not understand, say so in German. Use natural conversational German.';
+    if (n <= 16) return 'Speak naturally at B1 pace. Use subordinate clauses (weil, dass, obwohl) and expect the user to explain reasons and opinions, not just facts.';
+    return 'Speak naturally. Do not simplify your language. If you do not understand, say so in German. Use natural conversational German at B1 level, including opinions, comparisons and negotiation.';
 }
 
 // ── Screen Rendering ───────────────────────────────────────────
@@ -242,12 +249,12 @@ function callsSubmitApiKey() {
 
 function renderCallsScenarioList(container) {
     var html = '<div class="calls-list-header">' +
-        '<p class="calls-list-subtitle">13 Goethe A1 scenarios · Tap to start</p>' +
+        '<p class="calls-list-subtitle">' + ALL_CALLS_SCENARIOS.length + ' scenarios · Tap to start</p>' +
         '<button class="calls-settings-btn" onclick="callsShowSettings()" title="API Key Settings">⚙️</button>' +
     '</div>';
 
     html += '<div class="calls-scenarios">';
-    CALLS_SCENARIOS.forEach(function(s) {
+    ALL_CALLS_SCENARIOS.forEach(function(s) {
         var typeIcon = s.type === 'phone' ? '📞' : '💬';
         html += '<div class="calls-scenario-card" onclick="callsStartScenario(\'' + s.id + '\')">' +
             '<div class="calls-scenario-emoji">' + s.emoji + '</div>' +
@@ -278,7 +285,7 @@ function callsShowSettings() {
 // ── Active Call ────────────────────────────────────────────────
 
 function callsStartScenario(scenarioId) {
-    callsCurrentScenario = CALLS_SCENARIOS.find(function(s) { return s.id === scenarioId; });
+    callsCurrentScenario = ALL_CALLS_SCENARIOS.find(function(s) { return s.id === scenarioId; });
     if (!callsCurrentScenario) return;
 
     callsConversation = [];
