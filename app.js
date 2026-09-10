@@ -77,10 +77,11 @@ var TAB_META = {
     scenes:  { icon: '💬', label: 'Scenes' },
     grammar: { icon: '📐', label: 'Grammar' },
     exam:    { icon: '🎓', label: 'Exam' },
-    calls:   { icon: '🗣️', label: 'Speak' }
+    calls:   { icon: '🗣️', label: 'Speak' },
+    log:     { icon: '📋', label: 'Log' }
 };
 var PRIMARY_TABS = ['plan', 'cards', 'test', 'tracks'];
-var ALL_TAB_IDS = ['plan', 'cards', 'words', 'test', 'tracks', 'scenes', 'grammar', 'exam', 'calls'];
+var ALL_TAB_IDS = ['plan', 'cards', 'words', 'test', 'tracks', 'scenes', 'grammar', 'exam', 'calls', 'log'];
 
 function buildTabButton(id) {
     var meta = TAB_META[id];
@@ -153,11 +154,13 @@ function switchTab(tabName) {
     if (activeBtn) activeBtn.classList.add('active');
 
     if (tabName === 'words') renderWordList();
+    if (tabName === 'grammar') renderGrammar();
     if (tabName === 'test' && testQuestions.length === 0) startTest();
     if (tabName === 'calls') renderCallsScreen();
     if (tabName === 'exam') renderExamScreen();
     if (tabName === 'plan' && typeof renderPlanScreen === 'function') renderPlanScreen();
     if (tabName === 'tracks' && typeof renderTracksScreen === 'function') renderTracksScreen();
+    if (tabName === 'log' && typeof renderLogScreen === 'function') renderLogScreen();
 }
 
 // ── Cards Logic ─────────────────────────────────────────────────
@@ -463,6 +466,7 @@ function gradeCard(grade) {
     wordProgress[word.id] = prog;
     saveProgress();
     srsBumpToday(wasNew ? 'new' : 'reviews');
+    if (typeof dailyLogRecord === 'function') dailyLogRecord(wasNew ? 'wordsNew' : 'wordsReview', word.id);
     updateIntroducedCounter();
 
     if (grade === 'again') {
@@ -480,6 +484,17 @@ function gradeCard(grade) {
 
 // ── Words Screen ────────────────────────────────────────────────
 
+var wordsFilterMode = 'all'; // 'all' | 'learned' -- a combined tracker of already-learned words for quick review
+
+function setWordsFilter(mode) {
+    wordsFilterMode = mode;
+    var allBtn = document.getElementById('words-filter-all');
+    var learnedBtn = document.getElementById('words-filter-learned');
+    if (allBtn) allBtn.classList.toggle('active', mode === 'all');
+    if (learnedBtn) learnedBtn.classList.toggle('active', mode === 'learned');
+    renderWordList();
+}
+
 function renderWordList() {
     var container = document.getElementById('word-list');
     container.innerHTML = '';
@@ -495,8 +510,16 @@ function renderWordList() {
         return ALL_CATEGORIES[a].name.localeCompare(ALL_CATEGORIES[b].name);
     });
 
+    if (wordsFilterMode === 'learned' && learnedTotal === 0) {
+        container.innerHTML = '<div class="plan-empty-state">No learned words yet — grade a few cards in Cards first.</div>';
+        return;
+    }
+
     catIds.forEach(function(catId) {
         var catWords = ALL_WORDS.filter(function(w) { return w.category === catId; });
+        if (wordsFilterMode === 'learned') {
+            catWords = catWords.filter(function(w) { return isWordLearned(w.id); });
+        }
         if (catWords.length === 0) return;
 
         var group = document.createElement('div');
@@ -1008,6 +1031,7 @@ function playConversation(scenario, btn, card) {
     currentSpeechCard = card;
     btn.textContent = '\u23F9 Stop';
     btn.classList.add('playing');
+    if (typeof dailyLogRecord === 'function') dailyLogRecord('scenes', scenario.title);
 
     var lines = scenario.lines.slice();
     var lineIndex = 0;
@@ -1127,9 +1151,50 @@ function renderScenes() {
 
 // ── Grammar Screen ──────────────────────────────────────────────
 
+// ── Grammar progress (continuous learning) ───────────────────────
+// Grammar isn't just a static reference: opening a chapter marks it
+// reviewed (localStorage + the day's log), and the checkpoint quiz
+// draws grammar questions only from chapters you've actually opened,
+// so it gets broader as you read more -- same shape as new-card growth.
+
+var GRAMMAR_PROGRESS_KEY = 'grammar-progress';
+
+function grammarLoadProgress() {
+    try { return JSON.parse(localStorage.getItem(GRAMMAR_PROGRESS_KEY) || '{}'); }
+    catch (e) { return {}; }
+}
+
+function grammarMarkViewed(chapterId) {
+    var data = grammarLoadProgress();
+    if (data[chapterId]) return;
+    data[chapterId] = { firstViewed: Date.now() };
+    localStorage.setItem(GRAMMAR_PROGRESS_KEY, JSON.stringify(data));
+    if (typeof dailyLogRecord === 'function') dailyLogRecord('grammar', chapterId);
+}
+
+function grammarViewedIds() {
+    return Object.keys(grammarLoadProgress());
+}
+
 function renderGrammar() {
     var container = document.getElementById('grammar-content');
     container.innerHTML = '';
+
+    var viewedCount = grammarViewedIds().length;
+    var progressEl = document.createElement('div');
+    progressEl.className = 'progress-summary grammar-progress-summary';
+    progressEl.innerHTML = '<span>' + viewedCount + '</span> / ' + ALL_GRAMMAR.length + ' chapters reviewed';
+    container.appendChild(progressEl);
+
+    var progressBarWrap = document.createElement('div');
+    progressBarWrap.className = 'progress-bar-container';
+    var progressBar = document.createElement('div');
+    progressBar.className = 'progress-fill';
+    progressBar.style.width = (ALL_GRAMMAR.length ? (viewedCount / ALL_GRAMMAR.length * 100) : 0) + '%';
+    progressBarWrap.appendChild(progressBar);
+    container.appendChild(progressBarWrap);
+
+    var viewedIds = grammarViewedIds();
 
     ALL_GRAMMAR.forEach(function(section) {
         var sec = document.createElement('div');
@@ -1137,10 +1202,22 @@ function renderGrammar() {
 
         var header = document.createElement('div');
         header.className = 'grammar-section-header';
+        var reviewedBadge = viewedIds.indexOf(section.id) !== -1 ? '<span class="grammar-reviewed-badge" title="Reviewed">&#10003;</span>' : '';
         header.innerHTML = '<span class="emoji">' + section.emoji +
-            '</span><span>' + section.title + '</span><span class="chevron">&#9654;</span>';
+            '</span><span>' + section.title + '</span>' + reviewedBadge + '<span class="chevron">&#9654;</span>';
         header.addEventListener('click', function() {
             sec.classList.toggle('open');
+            if (sec.classList.contains('open')) {
+                grammarMarkViewed(section.id);
+                if (!header.querySelector('.grammar-reviewed-badge')) {
+                    header.insertAdjacentHTML('beforeend', '');
+                    var badge = document.createElement('span');
+                    badge.className = 'grammar-reviewed-badge';
+                    badge.title = 'Reviewed';
+                    badge.innerHTML = '&#10003;';
+                    header.insertBefore(badge, header.querySelector('.chevron'));
+                }
+            }
         });
         sec.appendChild(header);
 

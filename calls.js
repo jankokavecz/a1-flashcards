@@ -516,6 +516,7 @@ function callsShowError(msg) {
 function callsShowFeedback() {
     callsStopAll();
     callsIncrementCompleted();
+    if (typeof dailyLogRecord === 'function' && callsCurrentScenario) dailyLogRecord('calls', callsCurrentScenario.title);
 
     var container = document.getElementById('calls-content');
     container.innerHTML =

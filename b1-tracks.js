@@ -6,9 +6,11 @@
 //
 // Loaded via <script> tag — all variables are global. ES5 only.
 //
-// AUDIO FILES are not in git. Drop the MP3s into flashcard-app/audio/ using
-// the `audio` filename on each track. A track with no file still shows its
-// transcript; the player area shows "audio not added yet".
+// Audio files live in flashcard-app/audio/, one per track (see each track's
+// `audio` field), generated via macOS `say` (Anna/de-DE + Samantha/en-US) +
+// ffmpeg -- see docs/plans for the generation script. A track whose file is
+// ever missing still shows its transcript; the player area falls back to
+// "audio not added yet" rather than breaking.
 //
 // Section block types mirror grammar.js's content blocks:
 //   { type:'phrases',  heading, rows:[{de,en,note}] }

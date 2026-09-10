@@ -83,6 +83,10 @@
             <div class="progress-bar-container">
                 <div id="words-progress" class="progress-fill"></div>
             </div>
+            <div class="words-filter-bar">
+                <button id="words-filter-all" class="words-filter-btn active" onclick="setWordsFilter('all')">All words</button>
+                <button id="words-filter-learned" class="words-filter-btn" onclick="setWordsFilter('learned')">Learned only</button>
+            </div>
             <div class="words-content" id="word-list">
                 <!-- populated by JS -->
             </div>
@@ -177,6 +181,16 @@
             </div>
         </div>
 
+        <!-- Daily Log Screen -->
+        <div id="log-screen" class="screen">
+            <header class="screen-header">
+                <h1>📋 Daily Log</h1>
+            </header>
+            <div class="log-content" id="log-content">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- Bottom Tab Bar -- populated by rebuildTabBar() in app.js -->
         <nav class="tab-bar"></nav>
 
@@ -206,6 +220,7 @@
     <script src="b1-calls.js"></script>
     <script src="plan.js"></script>
     <script src="tracks.js"></script>
+    <script src="log.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

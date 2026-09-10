@@ -1,4 +1,4 @@
-var CACHE = 'flashcards-v10';
+var CACHE = 'flashcards-v11';
 var FILES = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ var FILES = [
   './calls.js',
   './plan.js',
   './tracks.js',
+  './log.js',
   './b1-plan.js',
   './b1-tracks.js',
   './b1-exam-data.js',
@@ -21,6 +22,11 @@ var FILES = [
   './icon-192.png',
   './icon-512.png'
 ];
+// Audio files are NOT in this list on purpose: cache.addAll() below is
+// atomic, and MP3s aren't in git (see audio/ header comment), so requiring
+// them at install time would break the install for anyone without them.
+// They're cached opportunistically on first successful play instead --
+// see the fetch handler.
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
@@ -44,9 +50,17 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
+  var isAudio = e.request.url.indexOf('/audio/') !== -1;
   e.respondWith(
     caches.match(e.request).then(function(cached) {
-      return cached || fetch(e.request);
+      if (cached) return cached;
+      return fetch(e.request).then(function(response) {
+        if (isAudio && response && response.ok) {
+          var copy = response.clone();
+          caches.open(CACHE).then(function(cache) { cache.put(e.request, copy); });
+        }
+        return response;
+      });
     })
   );
 });

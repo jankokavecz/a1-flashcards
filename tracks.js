@@ -29,6 +29,7 @@ function tracksBumpPlay(id) {
     entry.last = Date.now();
     data[id] = entry;
     tracksSaveProgress(data);
+    if (typeof dailyLogRecord === 'function') dailyLogRecord('tracks', id);
     if (tracksCurrentId === id) tracksRenderDetail(id);
 }
 
