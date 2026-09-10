@@ -58,7 +58,22 @@ function init() {
     switchTab('plan');
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.register('./sw.js').then(function(reg) {
+            reg.update(); // check for a new version right away, don't wait for the browser's own throttled schedule
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') reg.update();
+            });
+        });
+        // sw.js's skipWaiting()+clients.claim() means a newly-installed worker
+        // takes control immediately -- reload once so the page's own JS
+        // actually matches what's now being served, instead of leaving the
+        // update stuck until the next manual reload.
+        var swRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+            if (swRefreshing) return;
+            swRefreshing = true;
+            window.location.reload();
+        });
     }
 }
 

@@ -1,4 +1,4 @@
-var CACHE = 'flashcards-v11';
+var CACHE = 'flashcards-v12';
 var FILES = [
   './',
   './index.html',
