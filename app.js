@@ -57,24 +57,61 @@ function init() {
     if (typeof renderTracksScreen === 'function') renderTracksScreen();
     switchTab('plan');
 
+    renderAppVersion();
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-            reg.update(); // check for a new version right away, don't wait for the browser's own throttled schedule
+        var hadController = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function(reg) {
+            reg.update().catch(function() {}); // offline: ignore
             document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'visible') reg.update();
+                if (document.visibilityState === 'visible') reg.update().catch(function() {}); // offline: ignore
             });
         });
-        // sw.js's skipWaiting()+clients.claim() means a newly-installed worker
-        // takes control immediately -- reload once so the page's own JS
-        // actually matches what's now being served, instead of leaving the
-        // update stuck until the next manual reload.
+        // With a network-first SW the page already runs the newest code on
+        // every online load; this reload only matters for the one-time hop
+        // from an old cache-first worker. Skip it on a first-ever install.
         var swRefreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', function() {
-            if (swRefreshing) return;
+            if (swRefreshing || !hadController) return;
             swRefreshing = true;
             window.location.reload();
         });
     }
+}
+
+function renderAppVersion() {
+    var el = document.getElementById('app-version');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'app-version';
+        el.className = 'app-version';
+        el.style.cssText = 'text-align:center;font-size:12px;opacity:.6;padding:12px 16px 90px';
+        var plan = document.getElementById('plan-screen');
+        if (plan) plan.appendChild(el);
+    }
+    el.innerHTML = 'Version ' + (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?') +
+        ' &middot; <button type="button" id="force-update-btn" onclick="forceUpdate()" style="font:inherit;color:inherit;text-decoration:underline;background:none;border:0;padding:0">Check for updates</button>';
+}
+
+// Unregister the SW, drop the cached app shell (NOT localStorage -- progress
+// is untouched; audio cache is kept too), then reload from the network.
+function forceUpdate() {
+    var btn = document.getElementById('force-update-btn');
+    if (btn) btn.textContent = 'Updating…';
+    var jobs = [];
+    if ('serviceWorker' in navigator) {
+        jobs.push(navigator.serviceWorker.getRegistrations().then(function(regs) {
+            return Promise.all(regs.map(function(r) { return r.unregister(); }));
+        }));
+    }
+    if (window.caches) {
+        jobs.push(caches.keys().then(function(keys) {
+            return Promise.all(keys.filter(function(k) { return k !== 'deutsch-b1-audio'; })
+                .map(function(k) { return caches.delete(k); }));
+        }));
+    }
+    Promise.all(jobs).catch(function() {}).then(function() {
+        window.location.replace(window.location.pathname + '?v=' + Date.now());
+    });
 }
 
 document.addEventListener('DOMContentLoaded', init);

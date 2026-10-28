@@ -1,0 +1,1 @@
+var APP_VERSION = '2026-10-28.f7ea663';
