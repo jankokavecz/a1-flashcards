@@ -46,12 +46,22 @@ function networkFirst(req) {
     }
     return resp;
   });
+  var offline = net.then(function() { return false; }, function() { return true; });
   var timeout = new Promise(function(resolve) { setTimeout(resolve, NETWORK_TIMEOUT_MS); });
-  var fromCache = function() { return caches.match(cacheKey, { ignoreSearch: req.mode === 'navigate' }); };
   return Promise.race([net.catch(function() { return null; }), timeout.then(function() { return null; })])
     .then(function(resp) {
       if (resp) return resp;
-      return fromCache().then(function(c) { return c || net; });
+      // Slow network: only an exact cached copy may stand in. Deployed pages
+      // load 'app.js?v=<version>', so this never pairs files of two versions.
+      return caches.match(cacheKey, { ignoreSearch: req.mode === 'navigate' }).then(function(exact) {
+        if (exact) return exact;
+        // No exact copy: wait for the network. Offline, any cached copy of the
+        // path will do (the precache holds './app.js' without '?v=').
+        return offline.then(function(isOffline) {
+          if (!isOffline) return net;
+          return caches.match(cacheKey, { ignoreSearch: true }).then(function(c) { return c || net; });
+        });
+      });
     });
 }
 
@@ -59,16 +69,62 @@ function networkFirst(req) {
 // Cache Storage refuses to store. So fetch the WHOLE file once (no Range),
 // keep the 200 in AUDIO_CACHE, and answer every Range request with a 206
 // sliced from it (iOS Safari will not play media from a SW without 206s).
-function audioResponse(req) {
-  var url = req.url.split('#')[0];
+//
+// A cached file is never revalidated, so a replaced MP3 gets a new URL
+// instead: tracks.js adds ?v=N (TRACK_AUDIO_REV). The cache is keyed by the
+// full URL, so a new revision misses, is fetched once, and once it is stored
+// the older copies of the same file are deleted. Until then -- e.g. offline
+// -- the older copy is played rather than nothing.
+var audioPending = {};    // url -> the one in-flight download of that file
+
+function audioDropOtherRevisions(cache, url) {
+  var path = new URL(url).pathname;
+  return cache.keys().then(function(reqs) {
+    return Promise.all(reqs.filter(function(r) {
+      return r.url !== url && new URL(r.url).pathname === path;
+    }).map(function(r) { return cache.delete(r); }));
+  });
+}
+
+// Parallel Range requests for a file that is not cached yet share one
+// download. Each caller gets its own clone of the response.
+function audioFetchOnce(cache, url) {
+  if (!audioPending[url]) {
+    var done = function() { delete audioPending[url]; };
+    audioPending[url] = fetch(url, { cache: 'no-cache' }).then(function(full) {
+      if (full.status === 200) {
+        // Stays pending until stored, so a later request finds it in the cache.
+        cache.put(url, full.clone()).then(function() {
+          return audioDropOtherRevisions(cache, url);
+        }).catch(function() {}).then(done);
+      } else {
+        done();
+      }
+      return full;
+    });
+    audioPending[url].catch(done);
+  }
+  return audioPending[url].then(function(full) { return full.clone(); });
+}
+
+function audioWhole(url) {
   return caches.open(AUDIO_CACHE).then(function(cache) {
     return cache.match(url).then(function(hit) {
-      return hit || fetch(url, { cache: 'no-cache' }).then(function(full) {
-        if (full.status === 200) cache.put(url, full.clone()).catch(function() {});
-        return full;
+      if (hit) return hit;
+      var older = function() { return cache.match(url, { ignoreSearch: true }); };
+      return audioFetchOnce(cache, url).then(function(full) {
+        if (full.status === 200) return full;
+        return older().then(function(old) { return old || full; });
+      }, function(err) {
+        return older().then(function(old) { if (old) return old; throw err; });
       });
     });
-  }).then(function(full) {
+  });
+}
+
+function audioResponse(req) {
+  var url = req.url.split('#')[0];
+  return audioWhole(url).then(function(full) {
     var range = req.headers.get('range');
     if (!range || full.status !== 200) return full;
     return full.arrayBuffer().then(function(buf) {
@@ -76,10 +132,15 @@ function audioResponse(req) {
       var size = buf.byteLength;
       var start = m[1] ? parseInt(m[1], 10) : 0;
       var end = m[2] ? Math.min(parseInt(m[2], 10), size - 1) : size - 1;
-      return new Response(buf.slice(start, end + 1), { status: 206, statusText: 'Partial Content', headers: {
-        'Content-Type': full.headers.get('Content-Type') || 'audio/mpeg',
-        'Content-Range': 'bytes ' + start + '-' + end + '/' + size,
-        'Content-Length': String(end - start + 1), 'Accept-Ranges': 'bytes' } });
+      if (!m[1] && m[2]) { start = Math.max(0, size - parseInt(m[2], 10)); end = size - 1; }   // 'bytes=-N': the last N bytes
+      var headers = { 'Content-Type': full.headers.get('Content-Type') || 'audio/mpeg', 'Accept-Ranges': 'bytes' };
+      if (start >= size || start > end) {
+        headers['Content-Range'] = 'bytes */' + size;
+        return new Response(null, { status: 416, statusText: 'Range Not Satisfiable', headers: headers });
+      }
+      headers['Content-Range'] = 'bytes ' + start + '-' + end + '/' + size;
+      headers['Content-Length'] = String(end - start + 1);
+      return new Response(buf.slice(start, end + 1), { status: 206, statusText: 'Partial Content', headers: headers });
     });
   });
 }
@@ -89,6 +150,7 @@ self.addEventListener('fetch', function(e) {
   if (req.method !== 'GET') return;                       // OpenAI POSTs etc: browser default
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;        // cross-origin: browser default
+  if (url.search.indexOf('check=') !== -1) return;       // 'Check for updates' probe: network only, never the cache
   if (url.pathname.indexOf('/audio/') !== -1) { e.respondWith(audioResponse(req)); return; }
   if (/\.png$/.test(url.pathname)) {
     e.respondWith(caches.match(req).then(function(c) { return c || fetch(req); }));

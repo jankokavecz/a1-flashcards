@@ -1,7 +1,10 @@
 {
   "name": "Deutsch B1 by March",
   "short_name": "Deutsch B1",
+  "description": "Goethe B1 prep: daily flashcards, grammar, listening tracks and mock exams.",
+  "id": "./index.html",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",

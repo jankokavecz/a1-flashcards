@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#1a1a2e">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2026-10-28.1348.59b3bb7">
 </head>
 <body>
     <div id="app">
@@ -28,16 +28,26 @@
             <header class="screen-header">
                 <h1>Flashcards</h1>
                 <select id="category-filter">
-                    <option value="all">All Categories</option>
-                    <option value="mydeck">📚 My Deck (learned so far)</option>
+                    <option value="all">All topics</option>
                     <!-- populated by JS -->
                 </select>
             </header>
+            <div class="cards-mode-bar" id="cards-mode-bar">
+                <div class="seg" id="cards-mode-seg">
+                    <button type="button" data-mode="daily" onclick="setCardsMode('daily')">Today</button>
+                    <button type="button" data-mode="mydeck" onclick="setCardsMode('mydeck')">📚 My Deck <span class="seg-count" id="cards-mydeck-count"></span></button>
+                </div>
+            </div>
+            <div class="cards-practice-banner hidden" id="cards-practice-banner">
+                <span id="cards-practice-label"></span>
+                <button type="button" onclick="exitPracticeSession()">✕ Done</button>
+            </div>
             <div class="cards-toolbar">
-                <span class="cards-counters" id="cards-introduced-counter"></span>
-                <label><input type="checkbox" id="core-only-toggle" onchange="toggleCoreOnly()"> Core 800 only</label>
+                <button type="button" class="cards-counters" id="cards-introduced-counter" onclick="openMyWords({state:'learned', sort:'learned'})"></button>
+                <label title="New words come only from A1 and the B1 core list; reviews are not affected"><input type="checkbox" id="core-only-toggle" onchange="toggleCoreOnly()"> New: core only</label>
                 <label><input type="checkbox" id="speak-on-flip-toggle" onchange="toggleSpeakOnFlip()"> 🔊 Speak on flip</label>
             </div>
+            <div class="cards-mode-note" id="cards-mode-note"></div>
             <div class="cards-content">
                 <div class="session-info">
                     <span id="card-counter">1 / 20</span>
@@ -52,7 +62,7 @@
                                 <button class="card-speaker-btn" onclick="event.stopPropagation(); speakCurrentWord()">🔊</button>
                                 <div class="card-type-badge" id="card-type"></div>
                                 <div class="card-level" id="card-level"></div>
-                                <div class="card-word" id="card-front-word"></div>
+                                <div class="card-word" id="card-front-word" lang="de"></div>
                                 <div class="card-hint" id="card-hint">Tap to flip</div>
                             </div>
                             <div class="card-back">
@@ -76,20 +86,10 @@
         <!-- Words Screen -->
         <div id="words-screen" class="screen">
             <header class="screen-header">
-                <h1>Word List</h1>
-                <div class="progress-summary">
-                    <span id="words-learned">0</span> / <span id="words-total">643</span> learned
-                </div>
+                <h1>📖 My Words</h1>
             </header>
-            <div class="progress-bar-container">
-                <div id="words-progress" class="progress-fill"></div>
-            </div>
-            <div class="words-filter-bar">
-                <button id="words-filter-all" class="words-filter-btn active" onclick="setWordsFilter('all')">All words</button>
-                <button id="words-filter-learned" class="words-filter-btn" onclick="setWordsFilter('learned')">Learned only</button>
-            </div>
-            <div class="words-content" id="word-list">
-                <!-- populated by JS -->
+            <div class="mywords-content" id="mywords-content">
+                <!-- populated by renderMyWords() in app.js -->
             </div>
         </div>
 
@@ -192,6 +192,16 @@
             </div>
         </div>
 
+        <!-- Settings Screen: version, updates, backup -->
+        <div id="settings-screen" class="screen">
+            <header class="screen-header">
+                <h1>⚙️ Settings</h1>
+            </header>
+            <div class="settings-content" id="settings-content">
+                <!-- populated by renderSettings() in app.js -->
+            </div>
+        </div>
+
         <!-- Bottom Tab Bar -- populated by rebuildTabBar() in app.js -->
         <nav class="tab-bar"></nav>
 
@@ -203,26 +213,37 @@
                 <div class="more-sheet-list" id="more-sheet-list">
                     <!-- populated by JS -->
                 </div>
+                <div class="more-sheet-version" id="more-sheet-version"></div>
+            </div>
+        </div>
+
+        <!-- Word detail sheet (My Words) -->
+        <div id="word-sheet" class="more-sheet word-sheet">
+            <div class="more-sheet-backdrop" onclick="closeWordSheet()"></div>
+            <div class="more-sheet-panel word-sheet-panel">
+                <div class="more-sheet-handle"></div>
+                <button type="button" class="word-sheet-close" onclick="closeWordSheet()" aria-label="Close">✕</button>
+                <div class="word-sheet-body" id="word-sheet-body"></div>
             </div>
         </div>
     </div>
 
-    <script src="words.js"></script>
-    <script src="grammar.js"></script>
-    <script src="scenarios.js"></script>
-    <script src="exam.js"></script>
-    <script src="calls.js"></script>
-    <script src="b1-plan.js"></script>
-    <script src="b1-tracks.js"></script>
-    <script src="b1-exam-data.js"></script>
-    <script src="b1-words.js"></script>
-    <script src="b1-grammar.js"></script>
-    <script src="b1-scenes.js"></script>
-    <script src="b1-calls.js"></script>
-    <script src="plan.js"></script>
-    <script src="tracks.js"></script>
-    <script src="log.js"></script>
-    <script src="version.js"></script>
-    <script src="app.js"></script>
+    <script src="version.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="words.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="grammar.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="scenarios.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="exam.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="calls.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-plan.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-tracks.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-exam-data.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-words.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-grammar.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-scenes.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="b1-calls.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="plan.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="tracks.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="log.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="app.js?v=2026-10-28.1348.59b3bb7"></script>
 </body>
 </html>

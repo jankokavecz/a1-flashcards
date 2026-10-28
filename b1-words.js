@@ -1,12 +1,15 @@
 // b1-words.js — extension of the Goethe A1 wordlist with B1-level vocabulary
 // Source: the real Goethe-Zertifikat B1 Wortliste (2016, Goethe-Institut/OSD/
-// Universitaet Freiburg), the official cumulative A1-A2-B1 word list. Extracted
-// from the source PDF and filtered for extraction confidence (entries the parser
-// could not verify against their own example sentence were dropped rather than
-// risk a wrong gender or a mismatched example). German fields (de, gender, plural,
-// conjugation, example.de) come directly from the source; en/example.en/category
-// are translations added on top. Same schema as words.js. Loaded via <script>
-// tag -- all variables are global. ES5 only.
+// Universitaet Freiburg), the official cumulative A1-A2-B1 word list. German fields
+// (de, gender, plural, conjugation, example.de) come from the source PDF; PDF-extraction
+// damage (merged neighbour entries, page footers, cut-off sentences) was repaired against
+// the PDF, and a few examples were written where the source sentence belonged to the
+// other gender form. en/example.en/category are translations added on top.
+// Extra fields: level "B1"; freq 1 = roughly the 800 most frequent/useful B1 words,
+// 2 = the rest (an estimate from general German word frequency, not corpus-derived);
+// region "A" (Austria) / "CH" (Switzerland) on words not used in Germany.
+// Ids are permanent (progress is keyed by id). Loaded via <script> tag -- all
+// variables are global. ES5 only.
 
 var B1_WORDS = [
   {
@@ -19,42 +22,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Emilia ist in einer ganz ähnlichen Situation wie ich.", en: "Emilia is in a very similar situation to me." }
   },
   {
     id: 644,
     de: "alternativ",
-    en: "alternative",
+    en: "alternative (adjective)",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir brauchen alternative Energien.", en: "We need alternative energy sources." }
   },
   {
     id: 645,
     de: "die Angabe",
-    en: "detail, piece of information",
+    en: "detail / piece of information",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Angaben",
     conjugation: null,
     lesson: 0,
     category: "communication",
-    example: { de: "Angaben: Name, Adresse, Geburtsdatum.", en: "Details: name, address, date of birth." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Wir brauchen von Ihnen folgende Angaben: Name, Adresse, Geburtsdatum.", en: "We need the following details from you: name, address, date of birth." }
   },
   {
     id: 646,
     de: "die Anleitung",
-    en: "instructions, manual",
+    en: "instructions / manual",
     type: "noun",
     gender: "f",
     plural: "die Anleitungen",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "In der Anleitung steht, dass bei diesem Spiel der Älteste beginnt.", en: "The instructions say that in this game the oldest player starts." }
   },
   {
@@ -67,30 +78,36 @@ var B1_WORDS = [
     conjugation: { "er": "stellt an", "präteritum": "stellte an", "perfekt": "hat angestellt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Können Sie bitte die Heizung anstellen?", en: "Could you please turn on the heating?" }
   },
   {
     id: 648,
     de: "die Art",
-    en: "kind, type, species",
+    en: "kind / type / species",
     type: "noun",
     gender: "f",
     plural: "die Arten",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Zoo haben sie 34 verschiedene Arten von Vögeln.", en: "At the zoo they have 34 different species of birds." }
   },
   {
     id: 649,
     de: "der Auftrag",
-    en: "order, commission",
+    en: "order / commission",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Aufträge",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme im Auftrag von Frau Müller und soll Ihnen diesen Brief geben.", en: "I am here on behalf of Mrs. Müller and am supposed to give you this letter." }
   },
   {
@@ -103,6 +120,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie hoch sind Ihre Ausgaben in einem Monat?", en: "How high are your expenses in a month?" }
   },
   {
@@ -115,6 +134,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Tut mir leid. Wir haben ausschließlich Nichtraucherzimmer.", en: "I'm sorry. We only have non-smoking rooms." }
   },
   {
@@ -127,6 +148,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Zigaretten bekommst du am Automaten.", en: "You can get cigarettes from the vending machine." }
   },
   {
@@ -139,6 +162,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Tochter möchte gern Ballett tanzen.", en: "My daughter would like to do ballet dancing." }
   },
   {
@@ -151,6 +176,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Bringst du bitte Batterien für die Kamera mit?", en: "Could you please bring batteries for the camera?" }
   },
   {
@@ -160,9 +187,11 @@ var B1_WORDS = [
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: { "er": "bedankt", "präteritum": "bedankte", "perfekt": "hat bedankt" },
+    conjugation: { "er": "bedankt sich", "präteritum": "bedankte sich", "perfekt": "hat sich bedankt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte mich noch einmal sehr herzlich für Ihre Hilfe bedanken.", en: "I would like to thank you once again very warmly for your help." }
   },
   {
@@ -175,6 +204,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Ergebnis ist befriedigend.", en: "The result is satisfactory." }
   },
   {
@@ -187,18 +218,22 @@ var B1_WORDS = [
     conjugation: { "er": "behandelt", "präteritum": "behandelte", "perfekt": "hat behandelt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Welcher Arzt hat Sie bis jetzt behandelt?", en: "Which doctor has treated you so far?" }
   },
   {
     id: 658,
     de: "beliebt",
-    en: "popular",
+    en: "popular / well-liked",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Spiel ist bei Jugendlichen sehr beliebt.", en: "This game is very popular among young people." }
   },
   {
@@ -211,30 +246,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin jederzeit bereit, dir zu helfen.", en: "I am ready to help you at any time." }
   },
   {
     id: 660,
     de: "beschränken",
-    en: "to limit, to restrict",
+    en: "to limit / to restrict",
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: null,
+    conjugation: { "er": "beschränkt", "präteritum": "beschränkte", "perfekt": "hat beschränkt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Teilnehmerzahl für den Kurs ist beschränkt.", en: "The number of participants for the course is limited." }
   },
   {
     id: 661,
     de: "bestehen",
-    en: "to consist of, to pass (an exam)",
+    en: "to consist of / to pass (an exam)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "besteht", "präteritum": "bestand", "perfekt": "hat bestanden" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Modul Lesen besteht aus fünf Teilen.", en: "The reading module consists of five parts." }
   },
   {
@@ -247,6 +288,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Wenn Sie betrunken Auto fahren, verlieren Sie Ihren Führerschein.", en: "If you drive drunk, you will lose your driver's license." }
   },
   {
@@ -259,6 +302,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Möchten Sie Obst? Die Birnen sind heute besonders schön.", en: "Would you like some fruit? The pears are especially nice today." }
   },
   {
@@ -271,6 +316,8 @@ var B1_WORDS = [
     conjugation: { "er": "blitzt", "präteritum": "blitzte", "perfekt": "hat geblitzt" },
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Gestern Abend gab es ein Gewitter. Es hat furchtbar geblitzt und gedonnert.", en: "Yesterday evening there was a thunderstorm. There was terrible lightning and thunder." }
   },
   {
@@ -279,22 +326,26 @@ var B1_WORDS = [
     en: "mailbox",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Briefkästen",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Hol bitte mal die Zeitung aus dem Briefkasten.", en: "Please get the newspaper from the mailbox." }
   },
   {
     id: 666,
     de: "die Büchse",
-    en: "can, tin",
+    en: "can / tin",
     type: "noun",
     gender: "f",
     plural: "die Büchsen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe noch eine Büchse Bohnen.", en: "I still have a can of beans." }
   },
   {
@@ -307,30 +358,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich hole mir schnell etwas aus der Cafeteria.", en: "I'll quickly grab something from the cafeteria." }
   },
   {
     id: 668,
     de: "dabei",
-    en: "with it, in doing so",
+    en: "with it / in doing so",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Was hast du dir dabei gedacht?", en: "What were you thinking when you did that?" }
   },
   {
     id: 669,
     de: "danach",
-    en: "afterwards",
+    en: "after that / afterwards",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Zuerst gehen wir einkaufen, danach grillen wir auf unserem Balkon.", en: "First we'll go shopping, afterwards we'll grill on our balcony." }
   },
   {
@@ -343,31 +400,37 @@ var B1_WORDS = [
     conjugation: { "er": "dekoriert", "präteritum": "dekorierte", "perfekt": "hat dekoriert" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Hilfst du mir, den Tisch für die Party zu dekorieren?", en: "Will you help me decorate the table for the party?" }
   },
   {
     id: 671,
     de: "dicht",
-    en: "tight, sealed",
+    en: "tight / sealed",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Unsere Fenster sind nicht dicht. Es zieht immer.", en: "Our windows aren't sealed properly. There's always a draft." }
   },
   {
     id: 672,
     de: "die Direktorin",
-    en: "(female) director",
+    en: "director (female)",
     type: "noun",
     gender: "f",
     plural: "die Direktorinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Ich möchte gern mit dem Direktor sprechen.", en: "I would like to speak with the director." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Ich möchte gern mit der Direktorin sprechen.", en: "I would like to speak with the director." }
   },
   {
     id: 673,
@@ -379,6 +442,8 @@ var B1_WORDS = [
     conjugation: { "er": "dreht", "präteritum": "drehte", "perfekt": "hat gedreht" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Drehen Sie zum Einschalten den Schalter nach rechts.", en: "Turn the switch to the right to switch it on." }
   },
   {
@@ -391,30 +456,36 @@ var B1_WORDS = [
     conjugation: { "er": "duzt", "präteritum": "duzte", "perfekt": "hat geduzt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Wollen wir Du zueinander sagen? Ja, wir können uns gern duzen?", en: "Shall we say 'du' to each other? Yes, we can gladly use the informal 'du'." }
   },
   {
     id: 675,
     de: "eher",
-    en: "rather, sooner",
+    en: "rather / sooner",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich stehe meist eher auf als mein Mann.", en: "I usually get up earlier than my husband." }
   },
   {
     id: 676,
     de: "einfach",
-    en: "simple; one-way",
+    en: "simple / one-way",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Hin und zurück? – Nein, bitte nur einfach.", en: "Round trip? – No, just one-way, please." }
   },
   {
@@ -427,6 +498,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 1,
     example: { de: "Bei einem höheren Einkommen muss man mehr Steuern zahlen.", en: "With a higher income you have to pay more tax." }
   },
   {
@@ -439,6 +512,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe den Brief als Einschreiben geschickt.", en: "I sent the letter as a registered letter." }
   },
   {
@@ -451,7 +526,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
-    example: { de: "Wir kochen nicht mit Gas, sondern elektrisch. Elektroz.B. Elektrogeschäft, Elektroingenieur, Elektroherd", en: "We don't cook with gas, but electrically. Elektro- e.g. electrical appliance store, electrical engineer, electric stove" }
+    level: "B1",
+    freq: 2,
+    example: { de: "Wir kochen nicht mit Gas, sondern elektrisch.", en: "We don't cook with gas, but with electricity." }
   },
   {
     id: 680,
@@ -463,54 +540,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Alle meine Enkel gehen schon zur Schule.", en: "All my grandchildren already go to school." }
   },
   {
     id: 681,
     de: "entstehen",
-    en: "to come into being, to arise",
+    en: "to come into being / to arise",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "entsteht", "präteritum": "entstand", "perfekt": "ist entstanden" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier entsteht ein neues Einkaufszentrum.", en: "A new shopping center is being built here." }
   },
   {
     id: 682,
     de: "ergänzen",
-    en: "to complete, to add",
+    en: "to complete / to add",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "ergänzt", "präteritum": "ergänzte", "perfekt": "hat ergänzt" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Ergänzen Sie bitte die fehlenden Angaben.", en: "Please fill in the missing details." }
   },
   {
     id: 683,
     de: "erleichtern",
-    en: "to relieve, to make easier",
+    en: "to relieve / to make easier",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erleichtert", "präteritum": "erleichterte", "perfekt": "hat erleichtert" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin erleichtert, dass alles so gut geklappt hat.", en: "I am relieved that everything went so well." }
   },
   {
     id: 684,
     de: "erstellen",
-    en: "to create, to draw up",
+    en: "to create / to draw up",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erstellt", "präteritum": "erstellte", "perfekt": "hat erstellt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Erstellen Sie bitte eine Liste mit allen Informationen, die Sie brauchen.", en: "Please create a list of all the information you need." }
   },
   {
@@ -523,6 +610,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Getränke kosten extra.", en: "The drinks cost extra." }
   },
   {
@@ -535,42 +624,51 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Was würden Sie in diesem Fall tun?", en: "What would you do in this case?" }
   },
   {
     id: 687,
     de: "der Fehler",
-    en: "mistake, error",
+    en: "mistake / error",
     type: "noun",
     gender: "m",
     plural: "die Fehler",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich glaube, da haben Sie einen Fehler gemacht.", en: "I think you made a mistake there." }
   },
   {
     id: 688,
     de: "fett",
-    en: "fatty, greasy",
+    en: "fatty / greasy",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Wurst ist mir zu fett.", en: "The sausage is too fatty for me." }
   },
   {
     id: 689,
     de: "der Fleischhauer",
-    en: "butcher",
+    en: "butcher (Austrian)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Fleischhauer",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Dieser Fleischhauer macht sehr gute Wurst.", en: "This butcher makes very good sausage." }
   },
   {
@@ -583,18 +681,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieses Medikament mit viel Flüssigkeit einnehmen.", en: "Take this medication with plenty of liquid." }
   },
   {
     id: 691,
     de: "die Forschung",
-    en: "research",
+    en: "research (scientific)",
     type: "noun",
     gender: "f",
     plural: "die Forschungen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Er arbeitet in der Forschung.", en: "He works in research." }
   },
   {
@@ -607,30 +709,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Endlich ist hier Frieden!", en: "Finally there is peace here!" }
   },
   {
     id: 693,
     de: "führen",
-    en: "to lead, to guide",
+    en: "to lead / to guide",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "führt", "präteritum": "führte", "perfekt": "hat geführt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Lehrer führt seine Schüler durch das Museum.", en: "The teacher leads his students through the museum." }
   },
   {
     id: 694,
     de: "gar",
-    en: "done, cooked",
+    en: "done / cooked",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kartoffeln sind noch nicht gar.", en: "The potatoes aren't done yet." }
   },
   {
@@ -643,6 +751,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Spiel ist nicht für Kinder unter drei Jahren geeignet.", en: "This game is not suitable for children under three years old." }
   },
   {
@@ -655,42 +765,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Das kann ich dir nicht sagen. Das ist ein Geheimnis.", en: "I can't tell you that. It's a secret." }
   },
   {
     id: 697,
     de: "genauso",
-    en: "just as, exactly the same",
+    en: "just as / exactly the same",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Katarina sieht genauso aus wie ihre Schwester.", en: "Katarina looks exactly like her sister." }
   },
   {
     id: 698,
     de: "geschehen",
-    en: "to happen",
+    en: "to happen / to take place",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "geschieht", "präteritum": "geschah", "perfekt": "ist geschehen" },
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Vielen Dank für Ihre Hilfe. – Gern geschehen.", en: "Thank you very much for your help. – You're welcome." }
   },
   {
     id: 699,
     de: "gespannt",
-    en: "curious, eager to know",
+    en: "curious / eager to know",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin gespannt, wer bei diesem Spiel gewinnt.", en: "I'm curious who will win this game." }
   },
   {
@@ -703,42 +821,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Es wird gleich ein Gewitter geben.", en: "There's going to be a thunderstorm soon." }
   },
   {
     id: 701,
     de: "das Gleis",
-    en: "railway track, platform",
+    en: "railway track / platform",
     type: "noun",
     gender: "n",
     plural: "die Gleise",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zug fährt heute von Gleis 7 ab.", en: "The train departs from platform 7 today." }
   },
   {
     id: 702,
     de: "gründen",
-    en: "to found, to establish",
+    en: "to found / to establish",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "gründet", "präteritum": "gründete", "perfekt": "hat gegründet" },
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Frau Bauer hat eine eigene Firma gegründet.", en: "Ms. Bauer founded her own company." }
   },
   {
     id: 703,
     de: "der Hafen",
-    en: "harbor, port",
+    en: "harbor / port",
     type: "noun",
     gender: "m",
     plural: "die Häfen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn du in Hamburg bist, musst du dir unbedingt den Hafen ansehen.", en: "If you're in Hamburg, you must definitely see the harbor." }
   },
   {
@@ -751,6 +877,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte ein Bild aufhängen. Hast du einen Hammer für mich?", en: "I want to hang up a picture. Do you have a hammer for me?" }
   },
   {
@@ -763,6 +891,8 @@ var B1_WORDS = [
     conjugation: { "er": "heiratet", "präteritum": "heiratete", "perfekt": "hat geheiratet" },
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Freunde heiraten nächsten Monat in Italien.", en: "Our friends are getting married in Italy next month." }
   },
   {
@@ -775,6 +905,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir waren mit unserer Klasse im Historischen Museum.", en: "We went with our class to the Historical Museum." }
   },
   {
@@ -787,6 +919,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben eine hübsche Wohnung gefunden.", en: "We found a pretty apartment." }
   },
   {
@@ -799,19 +933,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Es ist Zeit für einen kleinen Imbiss.", en: "It's time for a small snack." }
   },
   {
     id: 709,
     de: "innen",
-    en: "inside",
+    en: "on the inside",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
-    example: { de: "Der Lichtschalter ist innen links. inner- Wir müssen Sie untersuchen. Es kann sein, dass Sie innere Verletzungen haben.", en: "The light switch is on the inside, on the left. inner- We need to examine you. It's possible you have internal injuries." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Der Lichtschalter ist innen links.", en: "The light switch is on the inside, on the left." }
   },
   {
     id: 710,
@@ -823,6 +961,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte intensiv Deutsch lernen.", en: "I want to learn German intensively." }
   },
   {
@@ -835,18 +975,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du jemals von dem Problem gehört? – Nein, nie.", en: "Have you ever heard of the problem? – No, never." }
   },
   {
     id: 712,
     de: "die Kabine",
-    en: "cabin, booth",
+    en: "cabin / booth",
     type: "noun",
     gender: "f",
     plural: "die Kabinen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Um zu wählen, gehen Sie bitte in diese Kabine.", en: "To vote, please go into this booth." }
   },
   {
@@ -859,30 +1003,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "In unserer Kantine kann man günstig essen.", en: "In our canteen you can eat cheaply." }
   },
   {
     id: 714,
     de: "die Katastrophe",
-    en: "catastrophe, disaster",
+    en: "catastrophe / disaster",
     type: "noun",
     gender: "f",
     plural: "die Katastrophen",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Urlaub war eine Katastrophe. Es hat nur geregnet.", en: "The vacation was a disaster. It just rained the whole time." }
   },
   {
     id: 715,
     de: "die Kiste",
-    en: "box, crate",
+    en: "box / crate",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Kisten",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe zwei Kisten Bier gekauft.", en: "I bought two crates of beer." }
   },
   {
@@ -895,18 +1045,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Sohn schreibt bei Klassenarbeiten immer gute Noten.", en: "My son always gets good grades on class tests." }
   },
   {
     id: 717,
     de: "klug",
-    en: "clever, smart",
+    en: "clever / smart",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich halte sie für klug.", en: "I consider her clever." }
   },
   {
@@ -919,6 +1073,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Er schreibt viel zu kompliziert.", en: "He writes far too complicatedly." }
   },
   {
@@ -931,54 +1087,65 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe wenig Kontakt zu meinen Kollegen.", en: "I have little contact with my colleagues." }
   },
   {
     id: 720,
     de: "der Korridor",
-    en: "corridor, hallway",
+    en: "corridor / hallway",
     type: "noun",
     gender: "m",
     plural: "die Korridore",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir warten draußen im Korridor.", en: "We are waiting outside in the corridor." }
   },
   {
     id: 721,
     de: "das Kreuz",
-    en: "cross, mark",
+    en: "cross / mark",
     type: "noun",
     gender: "n",
     plural: "die Kreuze",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Was bedeutet dieses Kreuz hier?", en: "What does this cross mean here?" }
   },
   {
     id: 722,
     de: "kündigen",
-    en: "to quit, to resign, to terminate",
+    en: "to quit / to resign / to terminate",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kündigt", "präteritum": "kündigte", "perfekt": "hat gekündigt" },
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich war mit meiner Stelle nicht zufrieden und habe gekündigt.", en: "I wasn't happy with my job, so I quit." }
   },
   {
     id: 723,
     de: "das Kuvert",
-    en: "envelope",
+    en: "envelope (Austrian)",
     type: "noun",
     gender: "n",
     plural: "die Kuverts",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Ich hätte gern 50 Kuverts und Briefmarken dazu.", en: "I would like 50 envelopes and stamps to go with them." }
   },
   {
@@ -991,18 +1158,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Heute geht es mir besser, aber gestern hatte ich richtig schlechte Laune.", en: "I'm feeling better today, but yesterday I was in a really bad mood." }
   },
   {
     id: 725,
     de: "der Leser",
-    en: "reader",
+    en: "reader (male)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Leser",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich werde einen Leserbrief schreiben.", en: "I will write a letter to the editor." }
   },
   {
@@ -1015,6 +1186,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Zum Hauptbahnhof können Sie mit der Linie 8 fahren.", en: "You can take line 8 to the main train station." }
   },
   {
@@ -1027,6 +1200,8 @@ var B1_WORDS = [
     conjugation: { "er": "löst", "präteritum": "löste", "perfekt": "hat gelöst" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen dieses Problem lösen.", en: "We need to solve this problem." }
   },
   {
@@ -1039,6 +1214,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Das machen wir nächstes Mal.", en: "We'll do that next time." }
   },
   {
@@ -1051,6 +1228,8 @@ var B1_WORDS = [
     conjugation: { "er": "markiert", "präteritum": "markierte", "perfekt": "hat markiert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier ist unser Hotel. Ich markiere Ihnen auf dem Plan den Weg zum Bahnhof.", en: "Here is our hotel. I'll mark the way to the train station for you on the map." }
   },
   {
@@ -1063,6 +1242,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Mehrheit der Menschen in Deutschland besitzt ein Handy.", en: "The majority of people in Germany own a mobile phone." }
   },
   {
@@ -1075,6 +1256,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Kommst du mit zur Automobilmesse?", en: "Are you coming with me to the car show?" }
   },
   {
@@ -1087,6 +1270,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Frauen sind in unserer Firma in der Minderheit.", en: "Women are in the minority in our company." }
   },
   {
@@ -1099,6 +1284,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben eine Wohnung mitten in der Stadt.", en: "We have an apartment right in the middle of the city." }
   },
   {
@@ -1111,18 +1298,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Bei Vollmond kann ich nicht schlafen.", en: "I can't sleep during a full moon." }
   },
   {
     id: 735,
     de: "nachdenken",
-    en: "to think, to reflect",
+    en: "to think / to reflect",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "denkt nach", "präteritum": "dachte nach", "perfekt": "hat nachgedacht" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich weiß nicht, was ich machen soll. Ich muss nachdenken.", en: "I don't know what to do. I need to think about it." }
   },
   {
@@ -1135,18 +1326,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Kannst du mir den Nagel in die Wand schlagen?", en: "Can you hammer the nail into the wall for me?" }
   },
   {
     id: 737,
     de: "nennen",
-    en: "to call, to name",
+    en: "to call / to name",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "nennt", "präteritum": "nannte", "perfekt": "hat genannt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Freund heißt Alexander, aber alle nennen ihn Alex.", en: "My friend's name is Alexander, but everyone calls him Alex." }
   },
   {
@@ -1159,6 +1354,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Zigarette? - Danke, ich rauche nicht.", en: "Cigarette? – No thanks, I don't smoke." }
   },
   {
@@ -1171,18 +1368,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Fehler zu machen ist doch ganz normal.", en: "Making mistakes is quite normal." }
   },
   {
     id: 740,
     de: "nützen",
-    en: "to be of use, to help",
+    en: "to be of use / to help",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "nützt", "präteritum": "nützte", "perfekt": "hat genützt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe jeden Tag eine Tablette genommen. Aber es hat nichts genützt.", en: "I took a pill every day. But it didn't help at all." }
   },
   {
@@ -1195,6 +1396,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei der Schiffskatastrophe gab es viele Opfer.", en: "There were many victims in the shipping disaster." }
   },
   {
@@ -1207,7 +1410,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Das Original ist für Sie. Wir bekommen die Kopie. original Ich muss das originale Dokument abgeben.", en: "The original is for you. We get the copy. original I have to hand in the original document." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Das Original ist für Sie. Wir bekommen die Kopie.", en: "The original is for you. We get the copy." }
   },
   {
     id: 743,
@@ -1219,30 +1424,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Zum Geburtstag habe ich von meinem Mann ein Parfüm bekommen.", en: "For my birthday I got perfume from my husband." }
   },
   {
     id: 744,
     de: "pauschal",
-    en: "flat-rate, package (deal)",
+    en: "flat-rate / package (deal)",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie haben die Reise pauschal gebucht.", en: "You booked the trip as a package deal." }
   },
   {
     id: 745,
     de: "pflegen",
-    en: "to care for, to nurse",
+    en: "to care for / to nurse",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "pflegt", "präteritum": "pflegte", "perfekt": "hat gepflegt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Mutter ist sehr krank. Ich muss sie pflegen.", en: "My mother is very ill. I have to take care of her." }
   },
   {
@@ -1255,30 +1466,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Es war zuerst so schön. Plötzlich hat es angefangen zu regnen.", en: "At first it was so nice. Suddenly it started to rain." }
   },
   {
     id: 747,
     de: "prima",
-    en: "great, excellent",
+    en: "great / excellent",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Mit diesen Leuten verstehe ich mich prima.", en: "I get along great with these people." }
   },
   {
     id: 748,
     de: "das Programm",
-    en: "program, TV guide",
+    en: "program / TV guide",
     type: "noun",
     gender: "n",
     plural: "die Programme",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du schon ins Programm geguckt? Gibt es heute im Fernsehen einen schönen Film?", en: "Have you already checked the TV guide? Is there a good movie on TV today?" }
   },
   {
@@ -1291,6 +1508,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Für diese Arbeit haben Sie gute Qualifikationen.", en: "You have good qualifications for this job." }
   },
   {
@@ -1303,18 +1522,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte den Rasen nicht betreten!", en: "Please do not walk on the lawn!" }
   },
   {
     id: 751,
     de: "rechtzeitig",
-    en: "on time, timely",
+    en: "on time / timely",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte weck mich rechtzeitig. Ich muss pünktlich sein.", en: "Please wake me up on time. I need to be punctual." }
   },
   {
@@ -1327,42 +1550,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "In der Rhein-Main-Region sind die Mieten sehr hoch.", en: "In the Rhine-Main region, rents are very high." }
   },
   {
     id: 753,
     de: "reinigen",
-    en: "to clean",
+    en: "to clean / to dry-clean",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "reinigt", "präteritum": "reinigte", "perfekt": "hat gereinigt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte diesen Anzug reinigen lassen.", en: "I would like to have this suit cleaned." }
   },
   {
     id: 754,
     de: "die Reportage",
-    en: "report, documentary",
+    en: "report / documentary",
     type: "noun",
     gender: "f",
     plural: "die Reportagen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du die Reportage über Afrika gesehen?", en: "Did you see the documentary about Africa?" }
   },
   {
     id: 755,
     de: "das Rind",
-    en: "cattle, beef",
+    en: "cattle / beef",
     type: "noun",
     gender: "n",
     plural: "die Rinder",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich esse nur Fleisch vom Rind.", en: "I only eat beef." }
   },
   {
@@ -1375,6 +1606,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Nehmen Sie bitte Rücksicht auf die anderen Gäste.", en: "Please be considerate of the other guests." }
   },
   {
@@ -1387,18 +1620,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Salbe gibt es nur auf Rezept.", en: "This ointment is only available by prescription." }
   },
   {
     id: 758,
     de: "schade",
-    en: "a pity, a shame",
+    en: "a pity / a shame",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kann leider nicht mitkommen. – Das ist aber schade!", en: "Unfortunately I can't come along. – That's a shame!" }
   },
   {
@@ -1411,6 +1648,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Film war toll. Die Schauspieler waren sehr gut.", en: "The movie was great. The actors were very good." }
   },
   {
@@ -1423,6 +1662,8 @@ var B1_WORDS = [
     conjugation: { "er": "schimpft", "präteritum": "schimpfte", "perfekt": "hat geschimpft" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Arzt hat mit mir geschimpft, weil ich zu wenig Sport mache.", en: "The doctor scolded me because I don't exercise enough." }
   },
   {
@@ -1435,6 +1676,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier kannst du nicht parken. Die Straße ist zu schmal.", en: "You can't park here. The street is too narrow." }
   },
   {
@@ -1447,18 +1690,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe Schmerzen in der rechten Schulter.", en: "I have pain in my right shoulder." }
   },
   {
     id: 763,
     de: "die Sehenswürdigkeit",
-    en: "sight, tourist attraction",
+    en: "sight / tourist attraction",
     type: "noun",
     gender: "f",
     plural: "die Sehenswürdigkeiten",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Welche Sehenswürdigkeiten gibt es hier?", en: "What sights are there here?" }
   },
   {
@@ -1467,11 +1714,13 @@ var B1_WORDS = [
     en: "seminar",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Seminare",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Ich möchte dieses Seminar unbedingt besuchen. Ich hole schnell ein paar Semmeln zum Frühstück.", en: "I definitely want to attend this seminar. I'll quickly grab a few bread rolls for breakfast." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Ich möchte dieses Seminar unbedingt besuchen.", en: "I definitely want to attend this seminar." }
   },
   {
     id: 765,
@@ -1483,6 +1732,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Es gibt keine sichtbaren Verletzungen. Aber wir müssen das Bein trotzdem untersuchen.", en: "There are no visible injuries. But we still need to examine the leg." }
   },
   {
@@ -1495,6 +1746,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf dem Berg war es so kalt. Es hat sogar geschneit.", en: "It was so cold on the mountain. It even snowed." }
   },
   {
@@ -1507,54 +1760,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Das System ist nicht sozial.", en: "The system is not social." }
   },
   {
     id: 768,
     de: "der Spieler",
-    en: "player",
+    en: "player (male)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Spieler",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Beim Fußball gibt es elf Spieler.", en: "In football there are eleven players." }
   },
   {
     id: 769,
     de: "spüren",
-    en: "to feel, to sense",
+    en: "to feel / to sense",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "spürt", "präteritum": "spürte", "perfekt": "hat gespürt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Wo tut es weh? Spüren Sie das hier?", en: "Where does it hurt? Do you feel this here?" }
   },
   {
     id: 770,
     de: "die Station",
-    en: "station, stop",
+    en: "station / stop",
     type: "noun",
     gender: "f",
     plural: "die Stationen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie müssen an der nächsten Station aussteigen.", en: "You have to get off at the next stop." }
   },
   {
     id: 771,
     de: "die Stelle",
-    en: "place, spot",
+    en: "place / spot",
     type: "noun",
     gender: "f",
     plural: "die Stellen",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir treffen uns hier an dieser Stelle.", en: "We'll meet here at this spot." }
   },
   {
@@ -1567,18 +1830,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ihr Stil ist sehr elegant.", en: "Your style is very elegant." }
   },
   {
     id: 773,
     de: "stören",
-    en: "to disturb, to bother",
+    en: "to disturb / to bother",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stört", "präteritum": "störte", "perfekt": "hat gestört" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Darf ich Sie einen Augenblick stören?", en: "May I bother you for a moment?" }
   },
   {
@@ -1591,18 +1858,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Zu Gast im Studio sind heute ...", en: "Our guests in the studio today are ..." }
   },
   {
     id: 775,
     de: "sympathisch",
-    en: "likeable, nice",
+    en: "likeable / nice",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich finde unsere neue Kollegin sehr sympathisch.", en: "I find our new colleague very likeable." }
   },
   {
@@ -1615,6 +1886,8 @@ var B1_WORDS = [
     conjugation: { "er": "tankt", "präteritum": "tankte", "perfekt": "hat getankt" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen unbedingt tanken. Wir haben fast kein Benzin mehr.", en: "We really need to get gas. We have almost no fuel left." }
   },
   {
@@ -1627,6 +1900,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie hört schlecht, sie ist schon fast taub.", en: "She hears poorly, she is almost deaf already." }
   },
   {
@@ -1639,19 +1914,23 @@ var B1_WORDS = [
     conjugation: { "er": "testet", "präteritum": "testete", "perfekt": "hat getestet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Testen Sie unsere Angebote kostenlos.", en: "Try our offers for free." }
   },
   {
     id: 779,
     de: "der Tierpark",
-    en: "zoo, animal park",
+    en: "zoo / animal park",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Tierparks",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Kindern in den Tierpark gehen?", en: "Shall the children go to the zoo?" }
+    level: "B1",
+    freq: 2,
+    example: { de: "Wollen wir am Samstag mit den Kindern in den Tierpark gehen?", en: "Shall we go to the zoo with the children on Saturday?" }
   },
   {
     id: 780,
@@ -1663,30 +1942,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Großeltern sind schon lange tot.", en: "My grandparents have been dead for a long time." }
   },
   {
     id: 781,
     de: "treu",
-    en: "loyal, faithful",
+    en: "loyal / faithful",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Herr Maier ist ein treuer Kunde von uns.", en: "Mr. Maier is a loyal customer of ours." }
   },
   {
     id: 782,
     de: "der Typ",
-    en: "guy, type",
+    en: "guy / type",
     type: "noun",
     gender: "m",
     plural: "die Typen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Nachbar ist ein netter Typ.", en: "My neighbor is a nice guy." }
   },
   {
@@ -1699,6 +1984,8 @@ var B1_WORDS = [
     conjugation: { "er": "überrascht", "präteritum": "überraschte", "perfekt": "hat überrascht" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin ganz überrascht, dass die Wohnung so billig ist.", en: "I am quite surprised that the apartment is so cheap." }
   },
   {
@@ -1711,30 +1998,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Übrigens, kennst du schon die neuen Nachbarn?", en: "By the way, do you already know the new neighbors?" }
   },
   {
     id: 785,
     de: "umso",
-    en: "the more, all the more",
+    en: "the more / all the more",
     type: "conjunction",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 2,
     example: { de: "Je früher wir dort sind, umso besser sind unsere Chancen auf einen guten Sitzplatz.", en: "The earlier we are there, the better our chances of getting a good seat." }
   },
   {
     id: 786,
     de: "unheimlich",
-    en: "creepy, eerie",
+    en: "creepy / eerie",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich mag dieses Haus nicht. Es sieht unheimlich aus.", en: "I don't like this house. It looks creepy." }
   },
   {
@@ -1743,11 +2036,13 @@ var B1_WORDS = [
     en: "difference",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Unterschiede",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Unterschied ist? Welche Fahrkarte ist günstiger?", en: "What's the difference? Which ticket is cheaper?" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Können Sie mir sagen, was der Unterschied ist? Welche Fahrkarte ist günstiger?", en: "Can you tell me what the difference is? Which ticket is cheaper?" }
   },
   {
     id: 788,
@@ -1759,18 +2054,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Kennt man schon die Unfallursache?", en: "Is the cause of the accident already known?" }
   },
   {
     id: 789,
     de: "verbieten",
-    en: "to forbid, to prohibit",
+    en: "to forbid / to prohibit",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verbietet", "präteritum": "verbot", "perfekt": "hat verboten" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich werde meinen Kindern das Rauchen verbieten.", en: "I will forbid my children to smoke." }
   },
   {
@@ -1783,6 +2082,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe vergeblich versucht dich anzurufen.", en: "I tried in vain to call you." }
   },
   {
@@ -1795,6 +2096,8 @@ var B1_WORDS = [
     conjugation: { "er": "verhindert", "präteritum": "verhinderte", "perfekt": "hat verhindert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir konnten den Unfall nicht verhindern.", en: "We couldn't prevent the accident." }
   },
   {
@@ -1807,18 +2110,22 @@ var B1_WORDS = [
     conjugation: { "er": "vermeidet", "präteritum": "vermied", "perfekt": "hat vermieden" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Arzt sagt, ich soll Stress vermeiden.", en: "The doctor says I should avoid stress." }
   },
   {
     id: 793,
     de: "die Versammlung",
-    en: "assembly, meeting",
+    en: "assembly / meeting",
     type: "noun",
     gender: "f",
     plural: "die Versammlungen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Minister hielt bei der Versammlung eine Rede.", en: "The minister gave a speech at the assembly." }
   },
   {
@@ -1831,6 +2138,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie beide müssen den Vertrag unterschreiben.", en: "Both of you have to sign the contract." }
   },
   {
@@ -1843,6 +2152,8 @@ var B1_WORDS = [
     conjugation: { "er": "verzeiht", "präteritum": "verzieh", "perfekt": "hat verziehen" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Das werde ich ihm nie verzeihen können.", en: "I will never be able to forgive him for that." }
   },
   {
@@ -1855,6 +2166,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Arzt sagt, ich soll viele Vitamine essen.", en: "The doctor says I should eat lots of vitamins." }
   },
   {
@@ -1867,6 +2180,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Er hat mich vorgestern angerufen.", en: "He called me the day before yesterday." }
   },
   {
@@ -1879,18 +2194,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Vorteil von dieser Wohnung ist, dass sie direkt im Zentrum liegt.", en: "The advantage of this apartment is that it's right in the center." }
   },
   {
     id: 799,
     de: "wahnsinnig",
-    en: "crazy, insane",
+    en: "crazy / insane",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Du fährst viel zu schnell. Bist du wahnsinnig?!", en: "You're driving way too fast. Are you crazy?!" }
   },
   {
@@ -1903,6 +2222,8 @@ var B1_WORDS = [
     conjugation: { "er": "warnt", "präteritum": "warnte", "perfekt": "hat gewarnt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich warne Sie. Der Hund ist gefährlich.", en: "I'm warning you. The dog is dangerous." }
   },
   {
@@ -1915,6 +2236,8 @@ var B1_WORDS = [
     conjugation: { "er": "wendet", "präteritum": "wendete", "perfekt": "hat gewendet" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie müssen zurückfahren, aber hier dürfen Sie nicht wenden.", en: "You need to drive back, but you're not allowed to turn around here." }
   },
   {
@@ -1927,18 +2250,22 @@ var B1_WORDS = [
     conjugation: { "er": "widerspricht", "präteritum": "widersprach", "perfekt": "hat widersprochen" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Da muss ich Ihnen widersprechen.", en: "I have to disagree with you there." }
   },
   {
     id: 803,
     de: "wirken",
-    en: "to have an effect, to work",
+    en: "to have an effect / to work",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "wirkt", "präteritum": "wirkte", "perfekt": "hat gewirkt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Tabletten haben nicht gewirkt.", en: "The pills didn't work." }
   },
   {
@@ -1951,6 +2278,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Kann ich nach Hause gehen? Ich fühle mich nicht wohl.", en: "Can I go home? I don't feel well." }
   },
   {
@@ -1963,6 +2292,8 @@ var B1_WORDS = [
     conjugation: { "er": "zahlt", "präteritum": "zahlte", "perfekt": "hat gezahlt" },
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Herr Ober, zahlen bitte!", en: "Waiter, the check please!" }
   },
   {
@@ -1975,18 +2306,22 @@ var B1_WORDS = [
     conjugation: { "er": "zeltet", "präteritum": "zeltete", "perfekt": "hat gezeltet" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe noch nie gezeltet.", en: "I have never been camping." }
   },
   {
     id: 807,
     de: "das Zeugnis",
-    en: "certificate, report card",
+    en: "certificate / report card",
     type: "noun",
     gender: "n",
     plural: "die Zeugnisse",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn Sie die Prüfung schaffen, bekommen Sie ein Zeugnis.", en: "If you pass the exam, you will receive a certificate." }
   },
   {
@@ -1999,18 +2334,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Am Sonntag gehen wir mit den Kindern in den Zoo.", en: "On Sunday we're going to the zoo with the kids." }
   },
   {
     id: 809,
     de: "zunächst",
-    en: "first of all, initially",
+    en: "first of all / initially",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Zunächst möchte ich alle begrüßen!", en: "First of all, I would like to welcome everyone!" }
   },
   {
@@ -2023,6 +2362,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich glaube, es hat keinen Zweck, sich zu bewerben. Der Job ist sicher schon weg.", en: "I don't think there's any point in applying. The job is surely already gone." }
   },
   {
@@ -2035,42 +2376,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Stadt sollte eine Aktion für Familien planen.", en: "The city should plan a campaign/event for families." }
   },
   {
     id: 812,
     de: "die Alternative",
-    en: "alternative",
+    en: "alternative (noun) / option",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Alternativen",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "gute Alternative zum Flugzeug.", en: "a good alternative to the airplane." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Auf dieser Strecke ist der Zug eine gute Alternative zum Flugzeug.", en: "On this route the train is a good alternative to the plane." }
   },
   {
     id: 813,
     de: "der Angehörige",
-    en: "the relative / family member",
+    en: "relative (male) / family member",
     type: "noun",
     gender: "m",
     plural: "die Angehörigen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Arzt darf nur Familienangehörigen Auskunft geben.", en: "The doctor may only give information to family members." }
   },
   {
     id: 814,
     de: "anmelden",
-    en: "to register / sign up",
+    en: "to register / to sign up",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "meldet an", "präteritum": "meldete an", "perfekt": "hat angemeldet" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Für diesen Kurs müssen Sie sich unbedingt vorher anmelden.", en: "You definitely have to register for this course beforehand." }
   },
   {
@@ -2083,6 +2432,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie schon einen Antrag für das Wohngeld ausgefüllt?", en: "Have you already filled out an application for housing benefit?" }
   },
   {
@@ -2095,18 +2446,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe einen interessanten Artikel gelesen.", en: "I read an interesting article." }
   },
   {
     id: 817,
     de: "aufwärts",
-    en: "upward, uphill",
+    en: "upward / uphill",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie müssen gute Schuhe anziehen. Der Weg geht immer aufwärts.", en: "You need to wear good shoes. The path always goes upward." }
   },
   {
@@ -2115,35 +2470,41 @@ var B1_WORDS = [
     en: "exit",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Ausgänge",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Wo ist der Ausgang bitte?", en: "Where is the exit, please?" }
   },
   {
     id: 819,
     de: "außen",
-    en: "outside, from the outside",
+    en: "outside / from the outside",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben das Schloss nur von außen gesehen.", en: "We only saw the castle from the outside." }
   },
   {
     id: 820,
     de: "der Autor",
-    en: "author",
+    en: "author (male)",
     type: "noun",
     gender: "m",
     plural: "die Autoren",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Diese Autorin hat in diesem Jahr schon zwei Bücher geschrieben.", en: "This author has already written two books this year." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Dieser Autor hat in diesem Jahr schon zwei Bücher geschrieben.", en: "This author has already written two books this year." }
   },
   {
     id: 821,
@@ -2155,54 +2516,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte geben Sie Ihre Bankleitzahl an.", en: "Please provide your bank sort code." }
   },
   {
     id: 822,
     de: "der Bau",
-    en: "building, construction",
+    en: "building / construction",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Bauten",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Unser Haus ist ein Altbau.", en: "Our house is an old building." }
   },
   {
     id: 823,
     de: "bedienen",
-    en: "to serve, to attend to (a customer)",
+    en: "to serve / to attend to (a customer)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "bedient", "präteritum": "bediente", "perfekt": "hat bedient" },
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Werden Sie schon bedient?", en: "Are you already being served?" }
   },
   {
     id: 824,
     de: "begegnen",
-    en: "to meet, to encounter (by chance)",
+    en: "to meet / to encounter (by chance)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "begegnet", "präteritum": "begegnete", "perfekt": "ist begegnet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sind wir uns nicht schon mal irgendwann begegnet?", en: "Haven't we met somewhere before?" }
   },
   {
     id: 825,
     de: "behaupten",
-    en: "to claim, to assert",
+    en: "to claim / to assert",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "behauptet", "präteritum": "behauptete", "perfekt": "hat behauptet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Er behauptet, unsere Meinung sei nicht wichtig.", en: "He claims our opinion isn't important." }
   },
   {
@@ -2215,18 +2586,22 @@ var B1_WORDS = [
     conjugation: { "er": "bemerkt", "präteritum": "bemerkte", "perfekt": "hat bemerkt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe nicht bemerkt, dass das Fenster offen ist.", en: "I didn't notice that the window is open." }
   },
   {
     id: 827,
     de: "bereits",
-    en: "already",
+    en: "already (formal)",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte melde dich bei Frau Kaiser. Sie hat bereits dreimal angerufen.", en: "Please contact Mrs. Kaiser. She has already called three times." }
   },
   {
@@ -2239,6 +2614,8 @@ var B1_WORDS = [
     conjugation: { "er": "beschreibt", "präteritum": "beschrieb", "perfekt": "hat beschrieben" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Kannst du mir den Weg zum Flughafen beschreiben?", en: "Can you describe the way to the airport for me?" }
   },
   {
@@ -2251,6 +2628,8 @@ var B1_WORDS = [
     conjugation: { "er": "bestellt", "präteritum": "bestellte", "perfekt": "hat bestellt" },
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben Pizza bestellt.", en: "We ordered pizza." }
   },
   {
@@ -2263,18 +2642,22 @@ var B1_WORDS = [
     conjugation: { "er": "bewegt", "präteritum": "bewegte", "perfekt": "hat bewegt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kann mich vor Schmerzen kaum noch bewegen.", en: "I can hardly move anymore because of the pain." }
   },
   {
     id: 831,
     de: "bisher",
-    en: "so far, until now",
+    en: "so far / until now",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Bisher ist alles in Ordnung.", en: "So far everything is fine." }
   },
   {
@@ -2287,6 +2670,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Sohn ist blond.", en: "My son is blond." }
   },
   {
@@ -2299,6 +2684,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe nur Kleingeld in meiner Brieftasche.", en: "I only have small change in my wallet." }
   },
   {
@@ -2311,18 +2698,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Buffet ist eröffnet!", en: "The buffet is open!" }
   },
   {
     id: 835,
     de: "die Chance",
-    en: "chance, opportunity",
+    en: "chance / opportunity",
     type: "noun",
     gender: "f",
     plural: "die Chancen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Mann hat gute Chancen, die Stelle zu bekommen.", en: "My husband has a good chance of getting the job." }
   },
   {
@@ -2335,18 +2726,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen das Dach reparieren lassen.", en: "We have to have the roof repaired." }
   },
   {
     id: 837,
     de: "daneben",
-    en: "next to it, right beside",
+    en: "next to it / right beside",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Du weißt doch, wo die Post ist. Gleich daneben ist die Bank.", en: "You know where the post office is, right? Right next to it is the bank." }
   },
   {
@@ -2359,6 +2754,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "In dieser Stadt gibt es viele berühmte Denkmäler.", en: "There are many famous monuments in this city." }
   },
   {
@@ -2371,18 +2768,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein Dieb hat mir auf dem Markt die Tasche gestohlen.", en: "A thief stole my bag at the market." }
   },
   {
     id: 840,
     de: "diskutieren",
-    en: "to discuss",
+    en: "to discuss / to debate",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "diskutiert", "präteritum": "diskutierte", "perfekt": "hat diskutiert" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben lange diskutiert, wie wir das Büro einrichten sollen.", en: "We discussed for a long time how we should furnish the office." }
   },
   {
@@ -2395,18 +2796,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Nimmst du etwa Drogen?", en: "Are you taking drugs or something?" }
   },
   {
     id: 842,
     de: "eben",
-    en: "just, just now",
+    en: "just / just now",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin eben erst angekommen.", en: "I only just arrived." }
   },
   {
@@ -2419,18 +2824,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie ist ein ehrlicher Mensch.", en: "She is an honest person." }
   },
   {
     id: 844,
     de: "die Einfahrt",
-    en: "driveway, entrance",
+    en: "driveway / entrance",
     type: "noun",
     gender: "f",
     plural: "die Einfahrten",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Da parkt wieder jemand vor unserer Einfahrt.", en: "Someone is parking in front of our driveway again." }
   },
   {
@@ -2443,18 +2852,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe diese Oper leider nur einmal gesehen.", en: "Unfortunately I have only seen this opera once." }
   },
   {
     id: 846,
     de: "einsetzen",
-    en: "to deploy, to assign, to use",
+    en: "to deploy / to assign / to use",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "setzt ein", "präteritum": "setzte ein", "perfekt": "hat eingesetzt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich glaube, wir müssen jemanden einsetzen, der sich um die Organisation kümmert.", en: "I think we need to assign someone who takes care of the organization." }
   },
   {
@@ -2467,6 +2880,8 @@ var B1_WORDS = [
     conjugation: { "er": "empfängt", "präteritum": "empfing", "perfekt": "hat empfangen" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir können mit unserem Fernseher über 30 Programme empfangen.", en: "With our TV we can receive more than 30 channels." }
   },
   {
@@ -2479,7 +2894,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
-    example: { de: "Alle meine Enkel gehen schon zur Schule.", en: "All my grandchildren already go to school." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Meine Enkelin geht schon zur Schule.", en: "My granddaughter already goes to school." }
   },
   {
     id: 849,
@@ -2491,6 +2908,8 @@ var B1_WORDS = [
     conjugation: { "er": "entwickelt", "präteritum": "entwickelte", "perfekt": "hat entwickelt" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Unser Sohn entwickelt sich gut in der Schule.", en: "Our son is developing well at school." }
   },
   {
@@ -2503,42 +2922,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein so gutes Ergebnis hat uns alle überrascht.", en: "Such a good result surprised us all." }
   },
   {
     id: 851,
     de: "die Ermäßigung",
-    en: "discount, reduction",
+    en: "discount / reduction",
     type: "noun",
     gender: "f",
     plural: "die Ermäßigungen",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Es gibt eine Ermäßigung für Kinder und Senioren.", en: "There is a discount for children and senior citizens." }
   },
   {
     id: 852,
     de: "erwachsen",
-    en: "grown-up, adult",
+    en: "grown-up / adult",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kinder sind schon fast erwachsen.", en: "The children are almost grown up already." }
   },
   {
     id: 853,
     de: "extrem",
-    en: "extreme, extremely",
+    en: "extreme / extremely",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Prüfung war extrem schwer.", en: "The exam was extremely difficult." }
   },
   {
@@ -2551,6 +2978,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Rechnung ist Énde des Monats fällig.", en: "The bill is due at the end of the month." }
   },
   {
@@ -2563,30 +2992,36 @@ var B1_WORDS = [
     conjugation: { "er": "feiert", "präteritum": "feierte", "perfekt": "hat gefeiert" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben gestern Karls Geburtstag gefeiert.", en: "We celebrated Karl's birthday yesterday." }
   },
   {
     id: 856,
     de: "feucht",
-    en: "damp, moist",
+    en: "damp / moist",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Wäsche ist noch feucht.", en: "The laundry is still damp." }
   },
   {
     id: 857,
     de: "fleißig",
-    en: "hardworking, diligent",
+    en: "hardworking / diligent",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Pamela ist wirklich fleißig. Sie macht immer ihre Hausaufgaben.", en: "Pamela is really hardworking. She always does her homework." }
   },
   {
@@ -2599,30 +3034,36 @@ var B1_WORDS = [
     conjugation: { "er": "folgt", "präteritum": "folgte", "perfekt": "ist gefolgt" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Es folgen die Nachrichten.", en: "The news is coming up next." }
   },
   {
     id: 859,
     de: "die Fortbildung",
-    en: "further training, continuing education",
+    en: "further training / continuing education",
     type: "noun",
     gender: "f",
     plural: "die Fortbildungen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Fortbildung, die ich machen will, ist sehr teuer.", en: "The further training course I want to take is very expensive." }
   },
   {
     id: 860,
     de: "frieren",
-    en: "to freeze, to be cold",
+    en: "to freeze / to be cold",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "friert", "präteritum": "fror", "perfekt": "hat gefroren" },
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn Sie frieren, mache ich das Fenster wieder zu.", en: "If you're cold, I'll close the window again." }
   },
   {
@@ -2635,18 +3076,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie haben Ihren Schirm verloren. Da fragen Sie am besten im Fundbüro.", en: "You've lost your umbrella. You'd best ask at the lost-and-found office." }
   },
   {
     id: 862,
     de: "die Garderobe",
-    en: "cloakroom, wardrobe",
+    en: "cloakroom / wardrobe",
     type: "noun",
     gender: "f",
     plural: "die Garderoben",
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Mäntel bitte an der Garderobe abgeben.", en: "Please leave your coats at the cloakroom." }
   },
   {
@@ -2659,7 +3104,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Betreten der Baustelle auf eigene Gefahr. gefährlich1. Achtung, hier ist eine gefährliche Kurve!", en: "Entering the construction site is at your own risk. dangerous1. Watch out, there's a dangerous curve here!" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Betreten der Baustelle auf eigene Gefahr.", en: "Enter the construction site at your own risk." }
   },
   {
     id: 864,
@@ -2671,30 +3118,36 @@ var B1_WORDS = [
     conjugation: { "er": "gehört", "präteritum": "gehörte", "perfekt": "hat gehört" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Gehört Ihnen das Haus?", en: "Does this house belong to you?" }
   },
   {
     id: 865,
     de: "genehmigen",
-    en: "to approve, to authorize",
+    en: "to approve / to authorize",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "genehmigt", "präteritum": "genehmigte", "perfekt": "hat genehmigt" },
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Chef hat mir sechs Wochen Urlaub genehmigt.", en: "My boss approved six weeks of vacation for me." }
   },
   {
     id: 866,
     de: "das Geschenk",
-    en: "gift, present",
+    en: "gift / present",
     type: "noun",
     gender: "n",
     plural: "die Geschenke",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Vielen Dank für das Geschenk.", en: "Thank you very much for the gift." }
   },
   {
@@ -2707,6 +3160,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Herr Müller ist gerade in einem Gespräch.", en: "Mr. Müller is currently in a conversation/meeting." }
   },
   {
@@ -2719,6 +3174,8 @@ var B1_WORDS = [
     conjugation: { "er": "gewöhnt", "präteritum": "gewöhnte", "perfekt": "hat gewöhnt/ist gewöhnt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben uns an das Leben hier gewöhnt.", en: "We have gotten used to life here." }
   },
   {
@@ -2731,6 +3188,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Glaubst du an Gott?", en: "Do you believe in God?" }
   },
   {
@@ -2743,6 +3202,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie haben Ihre Stelle gekündigt. Aus welchem Grund?", en: "You quit your job. For what reason?" }
   },
   {
@@ -2755,18 +3216,22 @@ var B1_WORDS = [
     conjugation: { "er": "hagelt", "präteritum": "hagelte", "perfekt": "hat gehagelt" },
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei Gewitter kann es auch hageln.", en: "During a thunderstorm it can also hail." }
   },
   {
     id: 872,
     de: "handeln",
-    en: "to trade, to deal (in goods)",
+    en: "to trade / to deal (in goods)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "handelt", "präteritum": "handelte", "perfekt": "hat gehandelt" },
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 1,
     example: { de: "Herr Huber hat ein kleines Geschäft. Er handelt mit Obst und Gemüse.", en: "Mr. Huber has a small shop. He trades in fruit and vegetables." }
   },
   {
@@ -2779,6 +3244,8 @@ var B1_WORDS = [
     conjugation: { "er": "heizt", "präteritum": "heizte", "perfekt": "hat geheizt" },
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir heizen mit Öl.", en: "We heat with oil." }
   },
   {
@@ -2791,6 +3258,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe keine Zeit mehr für meine Hobbys.", en: "I no longer have time for my hobbies." }
   },
   {
@@ -2803,6 +3272,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf diesem Hügel machen wir eine Pause.", en: "We'll take a break on this hill." }
   },
   {
@@ -2815,6 +3286,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Im dritten Stock ist die Firma Schmidt & Co, Import und Export.", en: "On the third floor is the company Schmidt & Co, import and export." }
   },
   {
@@ -2827,6 +3300,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich würde dieses Mal gern auf einer Insel Ferien machen.", en: "This time I'd like to spend my vacation on an island." }
   },
   {
@@ -2839,30 +3314,37 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben in der Sprachschule ein interkulturelles Fest gefeiert.", en: "We celebrated an intercultural festival at the language school." }
   },
   {
     id: 879,
     de: "jeweils",
-    en: "each time, respectively",
+    en: "each time / respectively",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Kurs findet jeweils montags und donnerstags um 18 Uhr statt.", en: "The course takes place every Monday and Thursday at 6 pm." }
   },
   {
     id: 880,
     de: "das Kaffeehaus",
-    en: "coffee house, café",
+    en: "coffee house / café (Austrian)",
     type: "noun",
     gender: "n",
     plural: "die Kaffeehäuser",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Hier in der Nähe ist ein Kaffeehaus. Lass uns einen Kaffee trinken.", en: "There's a coffee house nearby. Let's have a coffee." }
   },
   {
@@ -2875,30 +3357,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Die Lehrerin hat gesagt, wir sollen zwei Kapitel im Buch wiederholen. WORTLISTE 53", en: "The teacher said we should review two chapters in the book. WORTLISTE 53" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Die Lehrerin hat gesagt, wir sollen zwei Kapitel im Buch wiederholen.", en: "The teacher said we should review two chapters in the book." }
   },
   {
     id: 882,
     de: "kaum",
-    en: "hardly, barely",
+    en: "hardly / barely",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kann Sie kaum verstehen. Bitte sprechen Sie lauter.", en: "I can hardly understand you. Please speak louder." }
   },
   {
     id: 883,
     de: "das Kissen",
-    en: "cushion, pillow",
+    en: "cushion / pillow",
     type: "noun",
     gender: "n",
     plural: "die Kissen",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ohne Kopfkissen kann ich nicht schlafen.", en: "I can't sleep without a pillow." }
   },
   {
@@ -2911,18 +3399,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Tochter möchte Klavier spielen lernen.", en: "My daughter wants to learn to play the piano." }
   },
   {
     id: 885,
     de: "knapp",
-    en: "scarce, tight",
+    en: "scarce / tight",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Mach schnell. Die Zeit ist knapp.", en: "Hurry up. Time is short." }
   },
   {
@@ -2935,6 +3427,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Alle wollen etwas anderes. Wir müssen einen Kompromiss finden.", en: "Everyone wants something different. We have to find a compromise." }
   },
   {
@@ -2947,6 +3441,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte ein Konto eröffnen.", en: "I would like to open an account." }
   },
   {
@@ -2959,6 +3455,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "In dem Film tragen die Leute bunte Kostüme.", en: "In the movie, the people wear colorful costumes." }
   },
   {
@@ -2971,6 +3469,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Es herrscht noch immer Krieg in diesem Land.", en: "There is still war in this country." }
   },
   {
@@ -2983,6 +3483,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich verstehe nichts von moderner Kunst.", en: "I don't understand anything about modern art." }
   },
   {
@@ -2995,6 +3497,8 @@ var B1_WORDS = [
     conjugation: { "er": "lächelt", "präteritum": "lächelte", "perfekt": "hat gelächelt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Schauen Sie in die Kamera. Bitte lächeln!", en: "Look into the camera. Please smile!" }
   },
   {
@@ -3007,19 +3511,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte achten Sie auch auf die Lautsprecher-Ansagen am Bahnhof.", en: "Please also pay attention to the loudspeaker announcements at the station." }
   },
   {
     id: 893,
     de: "die Leserin",
-    en: "the (female) reader",
+    en: "reader (female)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Leserinnen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
-    example: { de: "Ich werde einen Leserbrief schreiben.", en: "I will write a letter to the editor." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine Leserin hat einen Brief an die Zeitung geschrieben.", en: "A reader wrote a letter to the newspaper." }
   },
   {
     id: 894,
@@ -3031,6 +3539,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Es ist sehr kalt. Meine Lippen sind ganz trocken.", en: "It's very cold. My lips are completely dry." }
   },
   {
@@ -3043,42 +3553,50 @@ var B1_WORDS = [
     conjugation: { "er": "lügt", "präteritum": "log", "perfekt": "hat gelogen" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Du sollst nicht lügen.", en: "You must not lie." }
   },
   {
     id: 896,
     de: "der Maler",
-    en: "painter",
+    en: "painter (male)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Maler",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Picasso ist vielleicht der bekannteste Maler der Welt.", en: "Picasso is perhaps the most famous painter in the world." }
   },
   {
     id: 897,
     de: "die Marmelade",
-    en: "jam, marmalade",
+    en: "jam / marmalade",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Marmeladen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Bring bitte noch ein Glas Marmelade mit.", en: "Please bring another jar of jam." }
   },
   {
     id: 898,
     de: "meinetwegen",
-    en: "for all I care, as far as I'm concerned",
+    en: "for all I care / as far as I'm concerned",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Meinetwegen kannst du heute das Auto haben.", en: "As far as I'm concerned, you can have the car today." }
   },
   {
@@ -3091,6 +3609,8 @@ var B1_WORDS = [
     conjugation: { "er": "misst", "präteritum": "maß", "perfekt": "hat gemessen" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie schon Fieber gemessen?", en: "Have you taken your temperature yet?" }
   },
   {
@@ -3103,18 +3623,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein guter Fernsehapparat kostet mindestens 500 Euro.", en: "A good television set costs at least 500 euros." }
   },
   {
     id: 901,
     de: "mittlerweile",
-    en: "meanwhile, by now",
+    en: "meanwhile / by now",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 2,
     example: { de: "Am Anfang war die Arbeit schwer. Mittlerweile habe ich mich daran gewöhnt.", en: "At first the work was hard. By now I've gotten used to it." }
   },
   {
@@ -3127,6 +3651,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe mir einen größeren Monitor gekauft. Das ist besser für meine Augen.", en: "I bought myself a bigger monitor. It's better for my eyes." }
   },
   {
@@ -3139,6 +3665,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Nachfrage für dieses Produkt ist groß.", en: "The demand for this product is high." }
   },
   {
@@ -3151,7 +3679,9 @@ var B1_WORDS = [
     conjugation: { "er": "nähert sich", "präteritum": "näherte sich", "perfekt": "hat sich genähert" },
     lesson: 0,
     category: "movement_verbs",
-    example: { de: "Er nähert sich dem Unfallort ganz langsam. WORTLISTE 65", en: "He is approaching the scene of the accident very slowly. WORTLISTE 65" }
+    level: "B1",
+    freq: 2,
+    example: { de: "Er nähert sich dem Unfallort ganz langsam.", en: "He is approaching the scene of the accident very slowly." }
   },
   {
     id: 905,
@@ -3163,6 +3693,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Er leidet an einer Nervenkrankheit.", en: "He suffers from a nerve disease." }
   },
   {
@@ -3175,18 +3707,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Tasche ist ein Geschenk von meiner Nichte.", en: "The bag is a gift from my niece." }
   },
   {
     id: 907,
     de: "die Note",
-    en: "grade, mark (school)",
+    en: "grade / mark (school)",
     type: "noun",
     gender: "f",
     plural: "die Noten",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Eva hat immer sehr gute Noten in Mathematik.", en: "Eva always gets very good grades in math." }
   },
   {
@@ -3199,6 +3735,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Obwohl meine Kollegin krank ist, geht sie arbeiten.", en: "Although my colleague is sick, she goes to work." }
   },
   {
@@ -3211,18 +3749,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 2,
     example: { de: "Glaubst du, dass du den Job bekommst. – Ja, ich bin ganz optimistisch.", en: "Do you think you'll get the job? – Yes, I'm quite optimistic." }
   },
   {
     id: 910,
     de: "der Ort",
-    en: "place, location",
+    en: "place / location",
     type: "noun",
     gender: "m",
     plural: "die Orte",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Vergessen Sie Ort und Datum nicht.", en: "Don't forget the place and date." }
   },
   {
@@ -3235,6 +3777,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Letzte Woche war ich auf einer Geburtstagsparty.", en: "Last week I was at a birthday party." }
   },
   {
@@ -3247,18 +3791,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Das muss dir nicht peinlich sein.", en: "That doesn't have to be embarrassing for you." }
   },
   {
     id: 913,
     de: "die Pflicht",
-    en: "duty, obligation",
+    en: "duty / obligation",
     type: "noun",
     gender: "f",
     plural: "die Pflichten",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Als Autofahrer müssen Sie eine Versicherung haben. Das ist Pflicht.", en: "As a driver, you must have insurance. That's mandatory." }
   },
   {
@@ -3271,6 +3819,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Musik ist bei Jugendlichen populär.", en: "This music is popular among young people." }
   },
   {
@@ -3283,6 +3833,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier meine Nummer im Büro und meine private Nummer.", en: "Here's my office number and my private number." }
   },
   {
@@ -3295,6 +3847,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Staat fördert Projekte für Kinder und Jugendliche.", en: "The state funds projects for children and young people." }
   },
   {
@@ -3307,30 +3861,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Für mich ist nicht nur der Preis wichtig, sondern auch die Qualität.", en: "For me, not only the price is important, but also the quality." }
   },
   {
     id: 918,
     de: "raten",
-    en: "to advise, to guess",
+    en: "to advise / to guess",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "rät", "präteritum": "riet", "perfekt": "hat geraten" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte billig Urlaub machen. Was raten Sie mir?", en: "I want to go on a cheap vacation. What do you advise me?" }
   },
   {
     id: 919,
     de: "reden",
-    en: "to talk, to speak",
+    en: "to talk / to speak",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "redet", "präteritum": "redete", "perfekt": "hat geredet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Worüber habt ihr gestern geredet?", en: "What did you talk about yesterday?" }
   },
   {
@@ -3343,6 +3903,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn ich reich wäre, würde ich eine Weltreise machen.", en: "If I were rich, I would take a trip around the world." }
   },
   {
@@ -3355,18 +3917,22 @@ var B1_WORDS = [
     conjugation: { "er": "reist", "präteritum": "reiste", "perfekt": "ist gereist" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich reise gern nach Spanien.", en: "I like to travel to Spain." }
   },
   {
     id: 922,
     de: "der Rest",
-    en: "the rest, remainder",
+    en: "rest / remainder",
     type: "noun",
     gender: "m",
     plural: "die Reste",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier sind 100 Euro. Den Rest gebe ich dir später.", en: "Here's 100 euros. I'll give you the rest later." }
   },
   {
@@ -3379,18 +3945,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe meinen Ring verloren.", en: "I lost my ring." }
   },
   {
     id: 924,
     de: "das Rüebli",
-    en: "carrot (Swiss German)",
+    en: "carrot (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Rüebli",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Hasen fressen gern Rüebli.", en: "Rabbits like to eat carrots." }
   },
   {
@@ -3403,18 +3974,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie arbeitet als Friseurin in einem Salon.", en: "She works as a hairdresser in a salon." }
   },
   {
     id: 926,
     de: "schaden",
-    en: "to harm, to hurt",
+    en: "to harm / to hurt",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "schadet", "präteritum": "schadete", "perfekt": "hat geschadet" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein kleines Glas Wein kann nicht schaden.", en: "A small glass of wine can't hurt." }
   },
   {
@@ -3427,7 +4002,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Der Film war toll. Die Schauspieler waren sehr gut.", en: "The movie was great. The actors were very good." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Der Film war toll. Die Schauspielerin war sehr gut.", en: "The film was great. The actress was very good." }
   },
   {
     id: 928,
@@ -3439,6 +4016,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte, ein Brötchen mit Schinken.", en: "A roll with ham, please." }
   },
   {
@@ -3451,6 +4030,8 @@ var B1_WORDS = [
     conjugation: { "er": "schmeckt", "präteritum": "schmeckte", "perfekt": "hat geschmeckt" },
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Hat es Ihnen geschmeckt?", en: "Did you enjoy the meal?" }
   },
   {
@@ -3463,6 +4044,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Gibst du mir bitte eine Schüssel für den Salat?", en: "Can you give me a bowl for the salad, please?" }
   },
   {
@@ -3475,30 +4058,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier gibt es keine Seife.", en: "There's no soap here." }
   },
   {
     id: 932,
     de: "der Sender",
-    en: "(broadcast) station, channel",
+    en: "(broadcast) station / channel",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Sender",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich höre im Radio am liebsten Sender mit moderner Musik.", en: "On the radio, I like listening to stations with modern music the most." }
   },
   {
     id: 933,
     de: "siegen",
-    en: "to win, to be victorious",
+    en: "to win / to be victorious",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "siegt", "präteritum": "siegte", "perfekt": "hat gesiegt" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Mannschaft siegte mit 2:0.", en: "The team won 2:0." }
   },
   {
@@ -3511,31 +4100,37 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Solange Sie Fieber haben, dürfen Sie auf keinen Fall arbeiten gehen.", en: "As long as you have a fever, you must not go to work under any circumstances." }
   },
   {
     id: 935,
     de: "spannend",
-    en: "exciting, thrilling",
+    en: "exciting / thrilling",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Spiel war spannend bis zur letzten Minute.", en: "The game was exciting until the last minute." }
   },
   {
     id: 936,
     de: "die Spielerin",
-    en: "(female) player",
+    en: "player (female)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Spielerinnen",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Beim Fußball gibt es elf Spieler.", en: "In football there are eleven players." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Sie ist die beste Spielerin in unserer Mannschaft.", en: "She is the best player on our team." }
   },
   {
     id: 937,
@@ -3547,6 +4142,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte am Samstag ins Stadion gehen. Da spielt meine Mannschaft.", en: "I'd like to go to the stadium on Saturday. My team is playing there." }
   },
   {
@@ -3559,54 +4156,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Die Statistik zeigt, dass jeder zweite ein Fahrrad besitzt. statistisch Die statistischen Ergebnisse zeigen eine gute Entwicklung.", en: "The statistics show that every second person owns a bicycle. statistical: The statistical results show a good development." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Statistik zeigt, dass jeder zweite ein Fahrrad besitzt.", en: "The statistics show that every second person owns a bicycle." }
   },
   {
     id: 939,
     de: "stellen",
-    en: "to put, to place",
+    en: "to put / to place",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stellt", "präteritum": "stellte", "perfekt": "hat gestellt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Stell das Bier in den Kühlschrank!", en: "Put the beer in the fridge!" }
   },
   {
     id: 940,
     de: "still",
-    en: "quiet, still",
+    en: "quiet / still",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Sei doch mal einen Moment still!", en: "Be quiet for a moment!" }
   },
   {
     id: 941,
     de: "die Strafe",
-    en: "penalty, fine",
+    en: "penalty / fine",
     type: "noun",
     gender: "f",
     plural: "die Strafen",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Schwarzfahren kostet 60 Euro Strafe. strafbar Was du da machst, ist strafbar.", en: "Fare-dodging costs a 60 euro fine. punishable: What you're doing there is punishable." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Schwarzfahren kostet 60 Euro Strafe.", en: "Fare-dodging costs a 60 euro fine." }
   },
   {
     id: 942,
     de: "stumm",
-    en: "mute, silent",
+    en: "mute / silent",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Stell bitte dein Handy leise oder auf stumm.", en: "Please set your phone to quiet or silent." }
   },
   {
@@ -3619,6 +4226,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Welches Betriebssystem hast du?", en: "Which operating system do you have?" }
   },
   {
@@ -3631,6 +4240,8 @@ var B1_WORDS = [
     conjugation: { "er": "tanzt", "präteritum": "tanzte", "perfekt": "hat getanzt" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf der Hochzeit haben wir viel getanzt.", en: "We danced a lot at the wedding." }
   },
   {
@@ -3643,6 +4254,8 @@ var B1_WORDS = [
     conjugation: { "er": "taucht", "präteritum": "tauchte", "perfekt": "ist/hat getaucht" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte im Urlaub wieder tauchen gehen.", en: "I want to go diving again on vacation." }
   },
   {
@@ -3655,30 +4268,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Lesen Sie den Text.", en: "Read the text." }
   },
   {
     id: 947,
     de: "der Tipp",
-    en: "tip, hint",
+    en: "tip / hint",
     type: "noun",
     gender: "m",
     plural: "die Tipps",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Kannst du mir einen Tipp geben? Wo finde ich billige Möbel?", en: "Can you give me a tip? Where can I find cheap furniture?" }
   },
   {
     id: 948,
     de: "total",
-    en: "totally, completely",
+    en: "totally / completely",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Film war total langweilig.", en: "The movie was totally boring." }
   },
   {
@@ -3691,6 +4310,8 @@ var B1_WORDS = [
     conjugation: { "er": "trocknet", "präteritum": "trocknete", "perfekt": "hat/ist getrocknet" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe mir die Haare getrocknet.", en: "I dried my hair." }
   },
   {
@@ -3703,6 +4324,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe überall gesucht, aber meine Brille ist weg.", en: "I looked everywhere, but my glasses are gone." }
   },
   {
@@ -3711,35 +4334,41 @@ var B1_WORDS = [
     en: "surprise",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Überraschungen",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Das ist ja eine Überraschung. Ich dachte, du bist im Urlaub.", en: "What a surprise! I thought you were on vacation." }
   },
   {
     id: 952,
     de: "das Ufer",
-    en: "shore, bank",
+    en: "shore / bank",
     type: "noun",
     gender: "n",
     plural: "die Ufer",
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Er schwimmt ans Ufer zurück.", en: "He swims back to the shore." }
   },
   {
     id: 953,
     de: "umsonst",
-    en: "for free, in vain",
+    en: "for free / in vain",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
-    example: { de: "Ich musste nichts bezahlen. Die Reparatur war umsonst. WORTLISTE 89", en: "I didn't have to pay anything. The repair was free. WORTLISTE 89" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich musste nichts bezahlen. Die Reparatur war umsonst.", en: "I didn't have to pay anything. The repair was free." }
   },
   {
     id: 954,
@@ -3751,6 +4380,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "In der Schule, die sie besucht, trägt man Uniformen.", en: "At the school she attends, people wear uniforms." }
   },
   {
@@ -3763,6 +4394,8 @@ var B1_WORDS = [
     conjugation: { "er": "unterschreibt", "präteritum": "unterschrieb", "perfekt": "hat unterschrieben" },
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Unterschreiben Sie bitte hier unten rechts.", en: "Please sign here at the bottom right." }
   },
   {
@@ -3775,19 +4408,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 2,
     example: { de: "Ursprünglich wollte ich in einem Restaurant arbeiten. Aber dann bin ich Busfahrerin geworden.", en: "Originally I wanted to work in a restaurant. But then I became a bus driver." }
   },
   {
     id: 957,
     de: "verbinden",
-    en: "to bandage; to connect",
+    en: "to bandage / to connect",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verbindet", "präteritum": "verband", "perfekt": "hat verbunden" },
     lesson: 0,
     category: "health",
-    example: { de: "Wir müssen die Wunde sofort verbinden. WORTLISTE 91", en: "We have to bandage the wound immediately. WORTLISTE 91" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Wir müssen die Wunde sofort verbinden.", en: "We have to bandage the wound immediately." }
   },
   {
     id: 958,
@@ -3799,6 +4436,8 @@ var B1_WORDS = [
     conjugation: { "er": "vergisst", "präteritum": "vergaß", "perfekt": "hat vergessen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe den Termin ganz vergessen.", en: "I completely forgot the appointment." }
   },
   {
@@ -3807,11 +4446,13 @@ var B1_WORDS = [
     en: "means of transport",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Verkehrsmittel",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
-    example: { de: "mit öffentlichen Verkehrsmitteln fahren.", en: "to travel by public transport." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Es gibt kaum Parkplätze. Sie sollten mit öffentlichen Verkehrsmitteln fahren.", en: "There are hardly any parking spaces. You should use public transport." }
   },
   {
     id: 960,
@@ -3823,18 +4464,22 @@ var B1_WORDS = [
     conjugation: { "er": "vermisst", "präteritum": "vermisste", "perfekt": "hat vermisst" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich vermisse meine Familie.", en: "I miss my family." }
   },
   {
     id: 961,
     de: "versäumen",
-    en: "to miss (a deadline), to fail to do",
+    en: "to miss (a deadline) / to fail to do",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "versäumt", "präteritum": "versäumte", "perfekt": "hat versäumt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Tut mir leid, ich habe die Anmeldefrist versäumt.", en: "I'm sorry, I missed the registration deadline." }
   },
   {
@@ -3847,18 +4492,22 @@ var B1_WORDS = [
     conjugation: { "er": "vertraut", "präteritum": "vertraute", "perfekt": "hat vertraut" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kenne dich gut. Ich vertraue dir.", en: "I know you well. I trust you." }
   },
   {
     id: 963,
     de: "verzichten",
-    en: "to do without, to forgo",
+    en: "to do without / to forgo",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verzichtet", "präteritum": "verzichtete", "perfekt": "hat verzichtet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich verzichte heute auf den Kaffee.", en: "I'll do without coffee today." }
   },
   {
@@ -3871,30 +4520,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Im Sommer spiele ich gern Volleyball.", en: "In summer I like to play volleyball." }
   },
   {
     id: 965,
     de: "vorher",
-    en: "before, beforehand",
+    en: "before / beforehand",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme mit ins Café. Vorher muss ich aber noch zur Bank.", en: "I'll come along to the café. But before that I still need to go to the bank." }
   },
   {
     id: 966,
     de: "der Vortrag",
-    en: "talk, lecture, presentation",
+    en: "talk / lecture / presentation",
     type: "noun",
     gender: "m",
     plural: "die Vorträge",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Ihr Vortrag war sehr interessant.", en: "Your presentation was very interesting." }
   },
   {
@@ -3907,6 +4562,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Was ich sage, ist wahr.", en: "What I'm saying is true." }
   },
   {
@@ -3919,18 +4576,22 @@ var B1_WORDS = [
     conjugation: { "er": "weckt", "präteritum": "weckte", "perfekt": "hat geweckt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Können Sie mich morgen früh um sechs wecken?", en: "Can you wake me up tomorrow morning at six?" }
   },
   {
     id: 969,
     de: "wenigstens",
-    en: "at least",
+    en: "at least (that much)",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe keinen Hunger. – Ach, essen Sie wenigstens ein Stück Kuchen.", en: "I'm not hungry. – Oh, at least eat a piece of cake." }
   },
   {
@@ -3943,6 +4604,8 @@ var B1_WORDS = [
     conjugation: { "er": "wiederholt", "präteritum": "wiederholte", "perfekt": "hat wiederholt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich wiederhole: Die Nummer ist 3487.", en: "I repeat: the number is 3487." }
   },
   {
@@ -3955,18 +4618,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Du glaubst mir nicht? Es ist aber wirklich so.", en: "You don't believe me? But it's really true." }
   },
   {
     id: 972,
     de: "worüber",
-    en: "about what, what...about",
+    en: "about what / what ... about",
     type: "pronoun",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "pronouns",
+    level: "B1",
+    freq: 1,
     example: { de: "Worüber lachen Sie?", en: "What are you laughing about?" }
   },
   {
@@ -3979,6 +4646,8 @@ var B1_WORDS = [
     conjugation: { "er": "zählt", "präteritum": "zählte", "perfekt": "hat gezählt" },
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte zählen Sie das Wechselgeld sofort nach.", en: "Please count the change right away." }
   },
   {
@@ -3991,18 +4660,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir suchen eine Zweizimmerwohnung in zentraler Lage.", en: "We are looking for a two-room apartment in a central location." }
   },
   {
     id: 975,
     de: "das Ziel",
-    en: "goal, target",
+    en: "goal / target",
     type: "noun",
     gender: "n",
     plural: "die Ziele",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich will die Prüfung unbedingt schaffen. Das ist mein Ziel.", en: "I definitely want to pass the exam. That's my goal." }
   },
   {
@@ -4015,18 +4688,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer war zuerst? – Der Herr hier.", en: "Who was first? – This gentleman here." }
   },
   {
     id: 977,
     de: "zurzeit",
-    en: "at the moment, currently",
+    en: "at the moment / currently",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Zurzeit ist kein Zimmer frei.", en: "No room is available at the moment." }
   },
   {
@@ -4039,6 +4716,8 @@ var B1_WORDS = [
     conjugation: { "er": "zweifelt", "präteritum": "zweifelte", "perfekt": "hat gezweifelt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich zweifle nicht daran, dass Sie recht haben.", en: "I have no doubt that you are right." }
   },
   {
@@ -4051,6 +4730,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin sehr aktiv und mache viel Sport.", en: "I am very active and do a lot of sports." }
   },
   {
@@ -4063,30 +4744,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Dort an der Ampel kannst du über die Straße gehen.", en: "You can cross the street there at the traffic light." }
   },
   {
     id: 981,
     de: "die Angehörige",
-    en: "relative, family member",
+    en: "relative (female) / family member",
     type: "noun",
     gender: "f",
     plural: "die Angehörigen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
-    example: { de: "Der Arzt darf nur Familienangehörigen Auskunft geben.", en: "The doctor may only give information to family members." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine Angehörige des Patienten wartet draußen.", en: "A relative of the patient is waiting outside." }
   },
   {
     id: 982,
     de: "die Annonce",
-    en: "advertisement",
+    en: "advertisement (in a newspaper)",
     type: "noun",
     gender: "f",
     plural: "die Annoncen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe alle Annoncen gelesen, aber die Wohnungen sind zu teuer.", en: "I read all the ads, but the apartments are too expensive." }
   },
   {
@@ -4099,6 +4786,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei dem Treffen waren alle Mitglieder anwesend.", en: "All members were present at the meeting." }
   },
   {
@@ -4111,18 +4800,22 @@ var B1_WORDS = [
     conjugation: { "er": "atmet", "präteritum": "atmete", "perfekt": "hat geatmet" },
     lesson: 0,
     category: "basic_verbs",
-    example: { de: "Er hat eine Erkältung und kann nicht durch die Nase atmen. der Atem Bitte den Atem anhalten.", en: "He has a cold and can't breathe through his nose. Breath: please hold your breath." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Er hat eine Erkältung und kann nicht durch die Nase atmen.", en: "He has a cold and can't breathe through his nose." }
   },
   {
     id: 985,
     de: "der Augenblick",
-    en: "moment",
+    en: "instant / moment",
     type: "noun",
     gender: "m",
     plural: "die Augenblicke",
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich wollte gerade parken. In dem Augenblick ist ein Wagen aus der Ausfahrt gekommen.", en: "I was just about to park. At that moment a car came out of the driveway." }
   },
   {
@@ -4135,6 +4828,8 @@ var B1_WORDS = [
     conjugation: { "er": "geht aus", "präteritum": "ging aus", "perfekt": "ist ausgegangen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Plötzlich ist das Licht ausgegangen.", en: "Suddenly the light went out." }
   },
   {
@@ -4147,30 +4842,37 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Außer Lisa hat sich niemand um die Stelle beworben.", en: "Except for Lisa, nobody applied for the position." }
   },
   {
     id: 988,
     de: "die Autorin",
-    en: "female author",
+    en: "author (female)",
     type: "noun",
     gender: "f",
     plural: "die Autorinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Autorin hat in diesem Jahr schon zwei Bücher geschrieben.", en: "This author has already written two books this year." }
   },
   {
     id: 989,
     de: "die Bankomat-Karte",
-    en: "debit card (ATM card)",
+    en: "debit card / ATM card (Austrian)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Bankomat-Karten",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Sie können auch mit Bankomat-Karte zahlen.", en: "You can also pay with a debit card." }
   },
   {
@@ -4183,6 +4885,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir kaufen unser Gemüse beim Bauern.", en: "We buy our vegetables from the farmer." }
   },
   {
@@ -4195,6 +4899,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Bedienungsanleitung verstehe ich nicht.", en: "I don't understand the instruction manual." }
   },
   {
@@ -4207,6 +4913,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Es war ein tolles Konzert. Ich bin begeistert.", en: "It was a great concert. I'm thrilled." }
   },
   {
@@ -4219,6 +4927,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie erhalten ein Schreiben von der zuständigen Behörde.", en: "You will receive a letter from the responsible authority." }
   },
   {
@@ -4228,9 +4938,11 @@ var B1_WORDS = [
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: { "er": "bemüht", "präteritum": "bemühte", "perfekt": "hat bemüht" },
+    conjugation: { "er": "bemüht sich", "präteritum": "bemühte sich", "perfekt": "hat sich bemüht" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Er hat sich sehr bemüht, etwas Gutes zu kochen.", en: "He made a great effort to cook something good." }
   },
   {
@@ -4243,19 +4955,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Zugspitze ist der höchste Berg in Deutschland.", en: "The Zugspitze is the highest mountain in Germany." }
   },
   {
     id: 996,
     de: "sich beschweren",
-    en: "to complain",
+    en: "to complain (make a complaint)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beschwert sich", "präteritum": "beschwerte sich", "perfekt": "hat sich beschwert" },
     lesson: 0,
     category: "communication",
-    example: { de: "Wo können wir uns beschweren? WORTLISTE 25", en: "Where can we complain?" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Wo können wir uns beschweren?", en: "Where can we complain?" }
   },
   {
     id: 997,
@@ -4267,6 +4983,8 @@ var B1_WORDS = [
     conjugation: { "er": "bestraft", "präteritum": "bestrafte", "perfekt": "hat bestraft" },
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Zu schnelles Fahren wird streng bestraft.", en: "Speeding is severely punished." }
   },
   {
@@ -4279,30 +4997,36 @@ var B1_WORDS = [
     conjugation: { "er": "beweist", "präteritum": "bewies", "perfekt": "hat bewiesen" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir können beweisen, dass Sie bei Rot über die Ampel gefahren sind.", en: "We can prove that you drove through the traffic light on red." }
   },
   {
     id: 999,
     de: "bitten",
-    en: "to ask, to request",
+    en: "to ask / to request",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "bittet", "präteritum": "bat", "perfekt": "hat gebeten" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Darf ich Sie bitten, kurz zuzuhören?", en: "May I ask you to listen for a moment?" }
   },
   {
     id: 1000,
     de: "bloß",
-    en: "just, merely",
+    en: "just / merely",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte nichts kaufen. Ich möchte mich bloß umsehen.", en: "I don't want to buy anything. I just want to look around." }
   },
   {
@@ -4315,6 +5039,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich brauche eine neue Brille.", en: "I need new glasses." }
   },
   {
@@ -4327,42 +5053,51 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Er steht gern auf der Bühne.", en: "He likes standing on stage." }
   },
   {
     id: 1003,
     de: "der Coiffeur",
-    en: "hairdresser",
+    en: "hairdresser (Swiss)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Coiffeure",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Du siehst toll aus! Wer ist dein Coiffeur?", en: "You look great! Who is your hairdresser?" }
   },
   {
     id: 1004,
     de: "dafür",
-    en: "for it, for that",
+    en: "for it / for that",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Schwester interessiert sich für Politik. Ich interessiere mich nicht dafür.", en: "My sister is interested in politics. I'm not interested in it." }
   },
   {
     id: 1005,
     de: "darstellen",
-    en: "to portray, to depict",
+    en: "to portray / to depict",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stellt dar", "präteritum": "stellte dar", "perfekt": "hat dargestellt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Er konnte das Problem sehr gut darstellen.", en: "He was able to present the problem very well." }
   },
   {
@@ -4375,6 +5110,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Nach dem Essen gab es noch ein leckeres Dessert.", en: "After the meal there was still a delicious dessert." }
   },
   {
@@ -4387,6 +5124,8 @@ var B1_WORDS = [
     conjugation: { "er": "dient", "präteritum": "diente", "perfekt": "hat gedient" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Solche Kontakte dienen der Verbesserung der internationalen Beziehungen.", en: "Such contacts serve to improve international relations." }
   },
   {
@@ -4399,6 +5138,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Firma transportiert Waren auch über große Distanzen.", en: "This company also transports goods over long distances." }
   },
   {
@@ -4411,18 +5152,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Waschmittel bekommst du in der Drogerie.", en: "You can get detergent at the drugstore." }
   },
   {
     id: 1010,
     de: "ebenfalls",
-    en: "likewise, also",
+    en: "likewise / also",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich wünsche Ihnen ein schönes Wochenende. – Danke, ebenfalls.", en: "I wish you a nice weekend. – Thanks, likewise." }
   },
   {
@@ -4435,6 +5180,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir wollten eigentlich Freunde besuchen, aber dann sind wir doch zu Hause geblieben.", en: "We actually wanted to visit friends, but then we stayed home after all." }
   },
   {
@@ -4447,7 +5194,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Das Wetter hat Einfluss auf die Gesundheit der Menschen. WORTLISTE 33", en: "The weather has an influence on people's health." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Das Wetter hat Einfluss auf die Gesundheit der Menschen.", en: "The weather has an influence on people's health." }
   },
   {
     id: 1013,
@@ -4459,6 +5208,8 @@ var B1_WORDS = [
     conjugation: { "er": "nimmt ein", "präteritum": "nahm ein", "perfekt": "hat eingenommen" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie muss ich die Tropfen einnehmen?", en: "How do I need to take the drops?" }
   },
   {
@@ -4471,6 +5222,8 @@ var B1_WORDS = [
     conjugation: { "er": "stellt ein", "präteritum": "stellte ein", "perfekt": "hat eingestellt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Firma wird in diesem Jahr drei neue Leute einstellen.", en: "The company will hire three new people this year." }
   },
   {
@@ -4479,10 +5232,12 @@ var B1_WORDS = [
     en: "reception",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Empfänge",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin mit dem Fernseher nicht zufrieden. Der Empfang ist sehr schlecht.", en: "I'm not happy with the TV. The reception is very poor." }
   },
   {
@@ -4495,42 +5250,50 @@ var B1_WORDS = [
     conjugation: { "er": "entdeckt", "präteritum": "entdeckte", "perfekt": "hat entdeckt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe in deinem Brief noch ein paar Fehler entdeckt.", en: "I discovered a few more mistakes in your letter." }
   },
   {
     id: 1017,
     de: "das Ereignis",
-    en: "event",
+    en: "event / occurrence",
     type: "noun",
     gender: "n",
     plural: "die Ereignisse",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Alle Zeitungen haben über diese Ereignisse berichtet.", en: "All the newspapers reported on these events." }
   },
   {
     id: 1018,
     de: "sich erholen",
-    en: "to recover, to relax",
+    en: "to recover / to relax",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erholt sich", "präteritum": "erholte sich", "perfekt": "hat sich erholt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Urlaub habe ich mich sehr gut erholt.", en: "I recovered very well on vacation." }
   },
   {
     id: 1019,
     de: "ernähren",
-    en: "to feed, to nourish",
+    en: "to feed / to nourish",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "ernährt", "präteritum": "ernährte", "perfekt": "hat ernährt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie ernähre ich mich richtig?", en: "How do I eat properly?" }
   },
   {
@@ -4543,6 +5306,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Erwachsene zahlen 5 Euro, für Kinder ist der Eintritt frei.", en: "Adults pay 5 euros, admission is free for children." }
   },
   {
@@ -4555,18 +5320,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich arbeite in einer Autofabrik.", en: "I work in a car factory." }
   },
   {
     id: 1022,
     de: "falls",
-    en: "in case, if",
+    en: "in case / if",
     type: "conjunction",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Falls es regnet, machen wir kein Picknick.", en: "If it rains, we won't have a picnic." }
   },
   {
@@ -4579,6 +5348,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf diesem Feld wächst Gemüse.", en: "Vegetables grow in this field." }
   },
   {
@@ -4591,6 +5362,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Lars hat eine gute Figur.", en: "Lars has a good figure." }
   },
   {
@@ -4603,19 +5376,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Arbeitszeit ist flexibel.", en: "My working hours are flexible." }
   },
   {
     id: 1026,
     de: "die Folge",
-    en: "consequence, result",
+    en: "consequence / result",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Folgen",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "folgend1. Mehr Informationen auf den folgenden Seiten.", en: "More information on the following pages." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Die Folgen des Unfalls waren schlimm.", en: "The consequences of the accident were bad." }
   },
   {
     id: 1027,
@@ -4627,6 +5404,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe beim Deutschlernen große Fortschritte gemacht.", en: "I have made great progress learning German." }
   },
   {
@@ -4639,6 +5418,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Brot ist noch ganz frisch.", en: "The bread is still quite fresh." }
   },
   {
@@ -4651,6 +5432,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Dennis hat furchtbare Schmerzen.", en: "Dennis is in terrible pain." }
   },
   {
@@ -4663,6 +5446,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "In diesem Gebäude sind nur Büros.", en: "There are only offices in this building." }
   },
   {
@@ -4675,18 +5460,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Er wurde zu fünf Jahren Gefängnis verurteilt.", en: "He was sentenced to five years in prison." }
   },
   {
     id: 1032,
     de: "die Geldbörse",
-    en: "wallet, purse",
+    en: "wallet / purse",
     type: "noun",
     gender: "f",
     plural: "die Geldbörsen",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe nur Kleingeld in meiner Geldbörse.", en: "I only have small change in my wallet." }
   },
   {
@@ -4699,30 +5488,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
     example: { de: "In diesem Haus wohnen drei Generationen zusammen.", en: "Three generations live together in this house." }
   },
   {
     id: 1034,
     de: "die Geschichte",
-    en: "history, story",
+    en: "history / story",
     type: "noun",
     gender: "f",
     plural: "die Geschichten",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich interessiere mich nicht für Geschichte.", en: "I'm not interested in history." }
   },
   {
     id: 1035,
     de: "das Getränk",
-    en: "drink, beverage",
+    en: "drink / beverage",
     type: "noun",
     gender: "n",
     plural: "die Getränke",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Besorgst du bitte die Getränke?", en: "Could you get the drinks, please?" }
   },
   {
@@ -4735,18 +5530,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Er hat die Gewohnheit, morgens zuerst die Post zu erledigen.", en: "He has the habit of dealing with the mail first thing in the morning." }
   },
   {
     id: 1037,
     de: "die Grafik",
-    en: "graphic, chart",
+    en: "graphic / chart",
     type: "noun",
     gender: "f",
     plural: "die Grafiken",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Grafik zeigt die Temperaturen im letzten Jahr.", en: "The chart shows the temperatures over the last year." }
   },
   {
@@ -4759,18 +5558,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte die Wohnung gründlich reinigen, bevor der Besuch kommt.", en: "I want to clean the apartment thoroughly before the guests arrive." }
   },
   {
     id: 1039,
     de: "halb",
-    en: "half",
+    en: "half (adjective)",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Treffen wir uns um halb neun?", en: "Shall we meet at half past eight?" }
   },
   {
@@ -4783,6 +5586,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Bett im Hotel war mir zu hart.", en: "The bed in the hotel was too hard for me." }
   },
   {
@@ -4795,6 +5600,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Er spielt gern den Helden.", en: "He likes to play the hero." }
   },
   {
@@ -4807,6 +5614,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Berg ist fast 3000 m hoch.", en: "The mountain is almost 3000 m high." }
   },
   {
@@ -4819,6 +5628,8 @@ var B1_WORDS = [
     conjugation: { "er": "hupt", "präteritum": "hupte", "perfekt": "hat gehupt" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier ist ein Krankenhaus. Hier darfst du nicht hupen.", en: "There's a hospital here. You're not allowed to honk here." }
   },
   {
@@ -4831,18 +5642,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 2,
     example: { de: "Du kannst die Datei öffnen, indem du hier klickst.", en: "You can open the file by clicking here." }
   },
   {
     id: 1045,
     de: "das Inserat",
-    en: "advertisement",
+    en: "classified ad",
     type: "noun",
     gender: "n",
     plural: "die Inserate",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Was kostet ein Inserat in der Zeitung?", en: "How much does an ad in the newspaper cost?" }
   },
   {
@@ -4855,19 +5670,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "countries_languages",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Teilnehmenden in unserem Kurs sind ganz international: Silvana kommt aus Italien, Conchi aus Spanien, Yin aus China …", en: "The participants in our course are truly international: Silvana comes from Italy, Conchi from Spain, Yin from China …" }
   },
   {
     id: 1047,
     de: "der Journalist",
-    en: "journalist",
+    en: "journalist (male)",
     type: "noun",
     gender: "m",
     plural: "die Journalisten",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Meine Tochter möchte Journalistin werden.", en: "My daughter wants to become a journalist." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Mein Sohn möchte Journalist werden.", en: "My son wants to become a journalist." }
   },
   {
     id: 1048,
@@ -4879,6 +5698,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Zum Frühstück trinke ich immer einen Kakao.", en: "I always drink a cocoa for breakfast." }
   },
   {
@@ -4891,42 +5712,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Waschmaschine ist kaputt.", en: "Our washing machine is broken." }
   },
   {
     id: 1050,
     de: "der Keller",
-    en: "cellar, basement",
+    en: "cellar / basement",
     type: "noun",
     gender: "m",
     plural: "die Keller",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Unser Keller ist nicht besonders groß.", en: "Our basement isn't particularly big." }
   },
   {
     id: 1051,
     de: "klagen",
-    en: "to complain",
+    en: "to complain / to moan",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "klagt", "präteritum": "klagte", "perfekt": "hat geklagt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie klagt über Kopfschmerzen.", en: "She complains of headaches." }
   },
   {
     id: 1052,
     de: "kleben",
-    en: "to stick, to glue",
+    en: "to stick / to glue",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "klebt", "präteritum": "klebte", "perfekt": "hat geklebt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Briefmarke klebt nicht mehr.", en: "The stamp no longer sticks." }
   },
   {
@@ -4939,6 +5768,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Gehen wir noch in eine Kneipe ein Bier trinken?", en: "Shall we go to a pub for a beer?" }
   },
   {
@@ -4951,42 +5782,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Konferenz findet in Raum 19 statt.", en: "The conference takes place in room 19." }
   },
   {
     id: 1055,
     de: "kontrollieren",
-    en: "to check, to control",
+    en: "to check / to control",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kontrolliert", "präteritum": "kontrollierte", "perfekt": "hat kontrolliert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Beim Auto müssen Sie regelmäßig das Öl kontrollieren.", en: "You have to check the oil regularly in the car." }
   },
   {
     id: 1056,
     de: "die Kraft",
-    en: "strength, power",
+    en: "strength / power",
     type: "noun",
     gender: "f",
     plural: "die Kräfte",
     conjugation: null,
     lesson: 0,
     category: "body",
-    example: { de: "Für diese Arbeit braucht man viel Kraft. kräftig1. Der Mann ist kräftig. Er macht viel Sport und isst viel.", en: "You need a lot of strength for this work. Strong: the man is strong. He does a lot of sport and eats a lot." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Für diese Arbeit braucht man viel Kraft.", en: "You need a lot of strength for this work." }
   },
   {
     id: 1057,
     de: "kriegen",
-    en: "to get, to receive",
+    en: "to get / to receive",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kriegt", "präteritum": "kriegte", "perfekt": "hat gekriegt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie meinen Brief gekriegt?", en: "Did you get my letter?" }
   },
   {
@@ -4999,18 +5838,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich mag kein künstliches Licht.", en: "I don't like artificial light." }
   },
   {
     id: 1059,
     de: "der Laden",
-    en: "shop",
+    en: "shop / store",
     type: "noun",
     gender: "m",
     plural: "die Läden",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Kleid habe ich in einem Laden im Zentrum gekauft.", en: "I bought this dress in a shop in the center." }
   },
   {
@@ -5023,6 +5866,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Essen war sehr lecker.", en: "The food was very delicious." }
   },
   {
@@ -5031,10 +5876,12 @@ var B1_WORDS = [
     en: "encyclopedia",
     type: "noun",
     gender: "n",
-    plural: "die LexikonLexika",
+    plural: "die Lexika",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir könnten im Lexikon nachsehen.", en: "We could look it up in the encyclopedia." }
   },
   {
@@ -5047,6 +5894,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Was brauchen wir für die Party? – Mach doch eine Einkaufsliste.", en: "What do we need for the party? – Just make a shopping list." }
   },
   {
@@ -5059,19 +5908,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe einen lustigen Film gesehen.", en: "I watched a funny movie." }
   },
   {
     id: 1064,
     de: "die Malerin",
-    en: "female painter",
+    en: "painter (female)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Malerinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Picasso ist vielleicht der bekannteste Maler der Welt.", en: "Picasso is perhaps the most famous painter in the world." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Frida Kahlo ist eine bekannte Malerin aus Mexiko.", en: "Frida Kahlo is a famous painter from Mexico." }
   },
   {
     id: 1065,
@@ -5083,6 +5936,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe eine neue Kaffeemaschine.", en: "I have a new coffee machine." }
   },
   {
@@ -5095,6 +5950,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin der Meinung, dass du recht hast.", en: "I'm of the opinion that you're right." }
   },
   {
@@ -5107,6 +5964,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieser Tisch hier ist ganz aus Metall.", en: "This table here is made entirely of metal." }
   },
   {
@@ -5119,6 +5978,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Da ist nur ein minimaler Unterschied.", en: "There is only a minimal difference." }
   },
   {
@@ -5131,6 +5992,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie findest du die neue Mode?", en: "What do you think of the new fashion?" }
   },
   {
@@ -5143,30 +6006,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Motor ist kaputt. Das Auto fährt nicht mehr.", en: "The engine is broken. The car doesn't run anymore." }
   },
   {
     id: 1071,
     de: "nachher",
-    en: "afterwards",
+    en: "later on / afterwards",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich rufe nachher nochmal an.", en: "I'll call again afterwards." }
   },
   {
     id: 1072,
     de: "das Nahrungsmittel",
-    en: "food, foodstuff",
+    en: "food / foodstuff",
     type: "noun",
     gender: "n",
     plural: "die Nahrungsmittel",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "In diesen Ländern fehlen vor allem Nahrungsmittel.", en: "In these countries, food is mostly what's lacking." }
   },
   {
@@ -5179,18 +6048,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Warten macht mich ganz nervös.", en: "The waiting makes me really nervous." }
   },
   {
     id: 1074,
     de: "der Nichtraucher",
-    en: "non-smoker",
+    en: "non-smoker (male)",
     type: "noun",
     gender: "m",
     plural: "die Nichtraucher",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "In unserer Familie sind alle Nichtraucher.", en: "Everyone in our family is a non-smoker." }
   },
   {
@@ -5200,9 +6073,11 @@ var B1_WORDS = [
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: null,
+    conjugation: { "er": "notiert", "präteritum": "notierte", "perfekt": "hat notiert" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe mir den Termin notiert.", en: "I noted down the appointment." }
   },
   {
@@ -5215,6 +6090,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "In der Stadt fahre ich immer mit öffentlichen Verkehrsmitteln.", en: "In the city I always travel by public transport." }
   },
   {
@@ -5227,6 +6104,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf unserer Hochzeit hat ein kleines Orchester gespielt.", en: "A small orchestra played at our wedding." }
   },
   {
@@ -5239,30 +6118,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieses Schiff fährt über den Atlantischen Ozean.", en: "This ship crosses the Atlantic Ocean." }
   },
   {
     id: 1079,
     de: "der Passagier",
-    en: "passenger",
+    en: "passenger (male)",
     type: "noun",
     gender: "m",
     plural: "die Passagiere",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Passagiere Schulz und Kaufmann sollen bitte zur Information kommen.", en: "Passengers Schulz and Kaufmann please come to the information desk." }
   },
   {
     id: 1080,
     de: "die Pension",
-    en: "guesthouse, boarding house",
+    en: "guesthouse / boarding house",
     type: "noun",
     gender: "f",
     plural: "die Pensionen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Im Urlaub haben wir in einer kleinen Pension gewohnt.", en: "On vacation we stayed in a small guesthouse." }
   },
   {
@@ -5275,7 +6160,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Am Sonntag machen wir ein Picknick. Der Arzt hat mir neue Pillen verschrieben.", en: "On Sunday we're having a picnic. The doctor prescribed me new pills." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Am Sonntag machen wir ein Picknick.", en: "On Sunday we're having a picnic." }
   },
   {
     id: 1082,
@@ -5287,6 +6174,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte, eine große Portion Sahne!", en: "A large portion of cream, please!" }
   },
   {
@@ -5299,30 +6188,37 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Eintritt pro Person: zwei Euro.", en: "Admission per person: two euros." }
   },
   {
     id: 1084,
     de: "der Prospekt",
-    en: "brochure",
+    en: "brochure / leaflet",
     type: "noun",
     gender: "m",
     plural: "die Prospekte",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte schicken Sie mir einen Prospekt von Ihrem Hotel.", en: "Please send me a brochure of your hotel." }
   },
   {
     id: 1085,
     de: "das Quartier",
-    en: "neighborhood, district",
+    en: "neighborhood / district (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Quartiere",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Wir wohnen in einem schönen Quartier.", en: "We live in a nice neighborhood." }
   },
   {
@@ -5335,6 +6231,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier links sehen Sie das Rathaus.", en: "Here on the left you see the city hall." }
   },
   {
@@ -5347,6 +6245,8 @@ var B1_WORDS = [
     conjugation: { "er": "reduziert", "präteritum": "reduzierte", "perfekt": "hat reduziert" },
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben jetzt unsere Preise reduziert.", en: "We have now reduced our prices." }
   },
   {
@@ -5359,6 +6259,8 @@ var B1_WORDS = [
     conjugation: { "er": "reicht", "präteritum": "reichte", "perfekt": "hat gereicht" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich nehme nur eine Suppe. Das reicht mir.", en: "I'll just have a soup. That's enough for me." }
   },
   {
@@ -5371,18 +6273,22 @@ var B1_WORDS = [
     conjugation: { "er": "reitet", "präteritum": "ritt", "perfekt": "ist geritten" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Möchtest du gerne reiten lernen?", en: "Would you like to learn to ride?" }
   },
   {
     id: 1090,
     de: "retten",
-    en: "to save, to rescue",
+    en: "to save / to rescue",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "rettet", "präteritum": "rettete", "perfekt": "hat gerettet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Arzt konnte das Kind noch retten.", en: "The doctor was still able to save the child." }
   },
   {
@@ -5395,30 +6301,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich nehme keinen Kredit auf. Das Risiko ist mir zu hoch.", en: "I'm not taking out a loan. The risk is too high for me." }
   },
   {
     id: 1092,
     de: "die Runde",
-    en: "round, lap",
+    en: "round / lap",
     type: "noun",
     gender: "f",
     plural: "die Runden",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich laufe jeden Tag fünf Runden im Park.", en: "I run five laps in the park every day." }
   },
   {
     id: 1093,
     de: "sämtliche",
-    en: "all",
+    en: "all (formal) / entire",
     type: "pronoun",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "pronouns",
+    level: "B1",
+    freq: 2,
     example: { de: "Sämtliche Fenster müssen geschlossen bleiben.", en: "All windows must remain closed." }
   },
   {
@@ -5427,22 +6339,26 @@ var B1_WORDS = [
     en: "damage",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Schäden",
     conjugation: null,
     lesson: 0,
     category: "business_economy",
-    example: { de: "Jetzt muss ich den Schaden der Versicherung melden. schädlich Rauchen ist schädlich für die Gesundheit.", en: "Now I have to report the damage to the insurance company. Harmful: smoking is harmful to your health." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich hatte einen Unfall mit dem Auto. Jetzt muss ich den Schaden der Versicherung melden.", en: "I had an accident with the car. Now I have to report the damage to the insurance company." }
   },
   {
     id: 1095,
     de: "die Scheibe",
-    en: "slice, pane",
+    en: "slice / pane",
     type: "noun",
     gender: "f",
     plural: "die Scheiben",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Fünf Scheiben Käse, bitte.", en: "Five slices of cheese, please." }
   },
   {
@@ -5451,10 +6367,12 @@ var B1_WORDS = [
     en: "umbrella",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Schirme",
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 1,
     example: { de: "Es regnet. Hast du einen Schirm dabei?", en: "It's raining. Do you have an umbrella with you?" }
   },
   {
@@ -5463,11 +6381,13 @@ var B1_WORDS = [
     en: "painkiller",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Schmerzmittel",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "verschreibe Ihnen ein Schmerzmittel.", en: "I'll prescribe you a painkiller." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Sie haben Zahnschmerzen? Ich verschreibe Ihnen ein Schmerzmittel.", en: "You have toothache? I'll prescribe you a painkiller." }
   },
   {
     id: 1098,
@@ -5479,18 +6399,22 @@ var B1_WORDS = [
     conjugation: { "er": "schüttelt", "präteritum": "schüttelte", "perfekt": "hat geschüttelt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Flasche muss man vor dem Öffnen schütteln.", en: "You have to shake the bottle before opening it." }
   },
   {
     id: 1099,
     de: "der Sekretär",
-    en: "secretary",
+    en: "secretary (male)",
     type: "noun",
     gender: "m",
     plural: "die Sekretäre",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Der neue Sekretär hat sich gestern vorgestellt.", en: "The new secretary introduced himself yesterday." }
   },
   {
@@ -5503,6 +6427,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ziehen Sie bitte eine senkrechte Linie.", en: "Please draw a vertical line." }
   },
   {
@@ -5511,22 +6437,26 @@ var B1_WORDS = [
     en: "victory",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Siege",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "freuen uns über den Sieg.", en: "We are happy about the victory." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Unsere Mannschaft hat gewonnen. Wir freuen uns über den Sieg.", en: "Our team won. We are happy about the victory." }
   },
   {
     id: 1102,
     de: "sonst",
-    en: "otherwise, else",
+    en: "otherwise / else",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben sie sonst noch einen Wunsch? – Nein, danke. Das ist alles.", en: "Do you have any other requests? – No thanks, that's all." }
   },
   {
@@ -5539,6 +6469,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie spät ist es?", en: "What time is it?" }
   },
   {
@@ -5547,22 +6479,26 @@ var B1_WORDS = [
     en: "toy",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Spielzeuge",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Kinder vor allem Spielzeug.", en: "Children want toys most of all." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Zu Weihnachten wünschen sich die Kinder vor allem Spielzeug.", en: "For Christmas the children mainly want toys." }
   },
   {
     id: 1105,
     de: "stammen",
-    en: "to originate, to come from",
+    en: "to originate / to come from",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stammt", "präteritum": "stammte", "perfekt": "hat gestammt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich stamme aus einer kleinen Stadt an der Donau.", en: "I come from a small town on the Danube." }
   },
   {
@@ -5575,6 +6511,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Kann ich diese Woche statt Donnerstag am Freitag kommen?", en: "Can I come on Friday instead of Thursday this week?" }
   },
   {
@@ -5587,6 +6525,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Poststempel trägt das Datum von letzter Woche. Das Paket war lange unterwegs.", en: "The postmark shows last week's date. The package was in transit for a long time." }
   },
   {
@@ -5599,6 +6539,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe dich sofort an der Stimme erkannt.", en: "I recognized you immediately by your voice." }
   },
   {
@@ -5607,11 +6549,13 @@ var B1_WORDS = [
     en: "parking ticket",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Strafzettel",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "geparkt und sofort einen Strafzettel bekommen.", en: "...parked there and immediately got a parking ticket." }
+    level: "B1",
+    freq: 2,
+    example: { de: "So ein Pech! Ich habe einmal falsch geparkt und sofort einen Strafzettel bekommen.", en: "What bad luck! I parked in the wrong place just once and immediately got a parking ticket." }
   },
   {
     id: 1110,
@@ -5623,6 +6567,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Radio haben sie Regen und Sturm angesagt.", en: "They announced rain and storms on the radio." }
   },
   {
@@ -5635,6 +6581,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "In dieser Szene des Films stirbt der Held.", en: "In this scene of the movie, the hero dies." }
   },
   {
@@ -5647,18 +6595,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie viel Taschengeld bekommst du im Monat?", en: "How much pocket money do you get a month?" }
   },
   {
     id: 1113,
     de: "tauschen",
-    en: "to exchange, to swap",
+    en: "to exchange / to swap",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "tauscht", "präteritum": "tauschte", "perfekt": "hat getauscht" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich würde meinen Kuchen gegen dein Brot tauschen.", en: "I would trade my cake for your bread." }
   },
   {
@@ -5671,6 +6623,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben im Kurs viel über das Thema Umwelt gesprochen.", en: "In the course we talked a lot about the topic of the environment." }
   },
   {
@@ -5683,6 +6637,8 @@ var B1_WORDS = [
     conjugation: { "er": "tippt", "präteritum": "tippte", "perfekt": "hat getippt" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie schnell kannst du tippen?", en: "How fast can you type?" }
   },
   {
@@ -5695,18 +6651,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Eine große Hochzeit mit vielen Leuten ist bei uns Tradition.", en: "A big wedding with lots of people is a tradition for us." }
   },
   {
     id: 1117,
     de: "das Trottoir",
-    en: "sidewalk, pavement",
+    en: "sidewalk / pavement (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Trottoirs",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Das Velofahren auf dem Trottoir ist nicht erlaubt.", en: "Cycling on the sidewalk is not allowed." }
   },
   {
@@ -5719,6 +6680,8 @@ var B1_WORDS = [
     conjugation: { "er": "überfährt", "präteritum": "überfuhr", "perfekt": "hat überfahren" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Gestern hat ein Autofahrer einen Hund überfahren.", en: "Yesterday a driver ran over a dog." }
   },
   {
@@ -5731,6 +6694,8 @@ var B1_WORDS = [
     conjugation: { "er": "überredet", "präteritum": "überredete", "perfekt": "hat überredet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Zuerst wollte ich nicht, aber mein Bruder hat mich überredet, einen Englischkurs zu machen.", en: "At first I didn't want to, but my brother persuaded me to take an English course." }
   },
   {
@@ -5743,6 +6708,8 @@ var B1_WORDS = [
     conjugation: { "er": "umarmt", "präteritum": "umarmte", "perfekt": "hat umarmt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Lass dich zum Abschied umarmen.", en: "Let me give you a hug goodbye." }
   },
   {
@@ -5755,6 +6722,8 @@ var B1_WORDS = [
     conjugation: { "er": "zieht sich um", "präteritum": "zog sich um", "perfekt": "hat sich umgezogen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bevor wir zur Party gehen, möchte ich mich umziehen.", en: "Before we go to the party, I want to get changed." }
   },
   {
@@ -5767,6 +6736,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme drei Tage nach Hamburg und suche eine günstige Unterkunft.", en: "I'm coming to Hamburg for three days and I'm looking for cheap accommodation." }
   },
   {
@@ -5779,30 +6750,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf dem Schreiben fehlt die Unterschrift.", en: "The signature is missing on the letter." }
   },
   {
     id: 1124,
     de: "das Urteil",
-    en: "verdict, judgment",
+    en: "verdict / judgment",
     type: "noun",
     gender: "n",
     plural: "die Urteile",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Dein Urteil ist für mich sehr wichtig.", en: "Your judgment is very important to me." }
   },
   {
     id: 1125,
     de: "verbrauchen",
-    en: "to consume",
+    en: "to use up / to consume",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verbraucht", "präteritum": "verbrauchte", "perfekt": "hat verbraucht" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie viel Benzin verbraucht dein Auto?", en: "How much fuel does your car use?" }
   },
   {
@@ -5815,6 +6792,8 @@ var B1_WORDS = [
     conjugation: { "er": "vergleicht", "präteritum": "verglich", "perfekt": "hat verglichen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Vergleichen Sie die Angebote.", en: "Compare the offers." }
   },
   {
@@ -5823,10 +6802,12 @@ var B1_WORDS = [
     en: "publishing house",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Verlage",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Von welchem Verlag ist dieses Buch?", en: "Which publisher is this book from?" }
   },
   {
@@ -5839,6 +6820,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Du suchst ein Zimmer? Dann frag bei der Vermittlung am Bahnhof nach.", en: "You're looking for a room? Then ask at the agency at the train station." }
   },
   {
@@ -5851,18 +6834,22 @@ var B1_WORDS = [
     conjugation: { "er": "verschiebt", "präteritum": "verschob", "perfekt": "hat verschoben" },
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Leider muss ich den Termin verschieben.", en: "Unfortunately I have to postpone the appointment." }
   },
   {
     id: 1130,
     de: "der Vertreter",
-    en: "representative",
+    en: "representative (male)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Vertreter",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Elternvertreter treffen sich morgen Abend in der Schule.", en: "The parent representatives are meeting tomorrow evening at school." }
   },
   {
@@ -5875,6 +6862,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe den Film auf Video aufgenommen.", en: "I recorded the movie on video." }
   },
   {
@@ -5887,18 +6876,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Das halte ich für völlig ausgeschlossen.", en: "I consider that completely out of the question." }
   },
   {
     id: 1133,
     de: "vorhin",
-    en: "earlier, a moment ago",
+    en: "earlier / a moment ago",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Vorhin hat Heidrun angerufen. Du sollst sie zurückrufen.", en: "Heidrun called earlier. You should call her back." }
   },
   {
@@ -5911,6 +6904,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie ist die Vorwahl von Hamburg?", en: "What is the area code for Hamburg?" }
   },
   {
@@ -5923,18 +6918,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Während ich arbeite, höre ich oft Musik.", en: "While I work, I often listen to music." }
   },
   {
     id: 1136,
     de: "der Weg",
-    en: "way, path",
+    en: "way / path",
     type: "noun",
     gender: "m",
     plural: "die Wege",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieser Weg ist sehr breit und angenehm.", en: "This path is very wide and pleasant." }
   },
   {
@@ -5947,6 +6946,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich sehe gern Werbung im Fernsehen.", en: "I like watching advertising on TV." }
   },
   {
@@ -5959,19 +6960,23 @@ var B1_WORDS = [
     conjugation: { "er": "wiegt", "präteritum": "wog", "perfekt": "hat gewogen" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie viel wiegst du?", en: "How much do you weigh?" }
   },
   {
     id: 1139,
     de: "der Wirt",
-    en: "innkeeper",
+    en: "innkeeper (male) / landlord",
     type: "noun",
     gender: "m",
     plural: "die Wirte",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Ich kenne die Wirtin von diesem Lokal. Sie ist sehr nett.", en: "I know the landlady of this place. She's very nice." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Ich kenne den Wirt von diesem Lokal. Er ist sehr nett.", en: "I know the landlord of this pub. He is very nice." }
   },
   {
     id: 1140,
@@ -5983,6 +6988,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "pronouns",
+    level: "B1",
+    freq: 1,
     example: { de: "Kann ich Herrn Meier sprechen? – Worum geht es denn?", en: "Can I speak to Mr. Meier? – What is it about?" }
   },
   {
@@ -5995,6 +7002,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Um das Fahrrad zu reparieren, brauchst du eine Zange.", en: "To repair the bike, you need pliers." }
   },
   {
@@ -6007,18 +7016,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Zentrum gibt es fast keine Parkplätze.", en: "There are almost no parking spaces in the center." }
   },
   {
     id: 1143,
     de: "ziemlich",
-    en: "quite, rather",
+    en: "quite / rather",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin schon ziemlich müde. Ich gehe ins Bett.", en: "I'm already quite tired. I'm going to bed." }
   },
   {
@@ -6031,18 +7044,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "So ein Zufall, dass ich dich hier treffe.", en: "What a coincidence that I'm meeting you here." }
   },
   {
     id: 1145,
     de: "zusätzlich",
-    en: "additional, additionally",
+    en: "additional / additionally",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie müssen in Zukunft eine Stunde zusätzlich arbeiten.", en: "In the future you will have to work an additional hour." }
   },
   {
@@ -6055,30 +7072,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Da ist ohne Zweifel die beste Lösung.", en: "That is without doubt the best solution." }
   },
   {
     id: 1147,
     de: "aktuell",
-    en: "current, topical",
+    en: "current / topical",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Umweltschutz ist ein aktuelles Thema.", en: "Environmental protection is a current topic." }
   },
   {
     id: 1148,
     de: "das Amt",
-    en: "the office, authority",
+    en: "office / authority",
     type: "noun",
     gender: "n",
     plural: "die Ämter",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Arbeitsamt befindet sich neben dem Busbahnhof.", en: "The employment office is next to the bus station." }
   },
   {
@@ -6091,54 +7114,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir wünschen Ihnen eine angenehme Reise.", en: "We wish you a pleasant journey." }
   },
   {
     id: 1150,
     de: "die Anrede",
-    en: "the salutation, form of address",
+    en: "salutation / form of address",
     type: "noun",
     gender: "f",
     plural: "die Anreden",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Du darfst im Brief die Anrede nicht vergessen.", en: "You mustn't forget the salutation in the letter." }
   },
   {
     id: 1151,
     de: "der Anwalt",
-    en: "the lawyer",
+    en: "lawyer",
     type: "noun",
     gender: "m",
     plural: "die Anwälte",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich werde das nicht bezahlen. Ich möchte zuerst mit meinem Anwalt sprechen.", en: "I won't pay that. I want to speak with my lawyer first." }
   },
   {
     id: 1152,
     de: "der Aufenthalt",
-    en: "the stay, stopover",
+    en: "stay / stopover",
     type: "noun",
     gender: "m",
     plural: "die Aufenthalte",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zug hat in München nur 20 Minuten Aufenthalt.", en: "The train only stops for 20 minutes in Munich." }
   },
   {
     id: 1153,
     de: "die Ausbildung",
-    en: "the training, education",
+    en: "training / education",
     type: "noun",
     gender: "f",
     plural: "die Ausbildungen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe meine Ausbildung abgeschlossen.", en: "I have completed my training." }
   },
   {
@@ -6151,18 +7184,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Essen und Unterkunft waren ausgezeichnet.", en: "The food and accommodation were excellent." }
   },
   {
     id: 1155,
     de: "außerdem",
-    en: "besides, in addition",
+    en: "besides / in addition",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Möchten Sie außerdem noch etwas?", en: "Would you like anything else?" }
   },
   {
@@ -6175,42 +7212,50 @@ var B1_WORDS = [
     conjugation: { "er": "bäckt/backt", "präteritum": "backte", "perfekt": "hat gebacken" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn du kommst, backe ich einen Kuchen.", en: "If you come, I'll bake a cake." }
   },
   {
     id: 1157,
     de: "die Bar",
-    en: "the bar",
+    en: "bar",
     type: "noun",
     gender: "f",
     plural: "die Bars",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Setzen wir uns doch an die Bar!", en: "Let's sit at the bar!" }
   },
   {
     id: 1158,
     de: "beachten",
-    en: "to pay attention to, observe",
+    en: "to pay attention to / to observe",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beachtet", "präteritum": "beachtete", "perfekt": "hat beachtet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte beachten Sie die Ansagen am Bahnsteig.", en: "Please pay attention to the announcements on the platform." }
   },
   {
     id: 1159,
     de: "die Bedingung",
-    en: "the condition",
+    en: "condition",
     type: "noun",
     gender: "f",
     plural: "die Bedingungen",
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn Sie unsere Bedingungen akzeptieren, können wir einen Vertrag machen.", en: "If you accept our conditions, we can draw up a contract." }
   },
   {
@@ -6223,30 +7268,36 @@ var B1_WORDS = [
     conjugation: { "er": "begleitet", "präteritum": "begleitete", "perfekt": "hat begleitet" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich begleite dich ein Stück.", en: "I'll walk part of the way with you." }
   },
   {
     id: 1161,
     de: "beinahe",
-    en: "almost, nearly",
+    en: "almost / nearly",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe heute beinahe den Bus verpasst.", en: "I almost missed the bus today." }
   },
   {
     id: 1162,
     de: "benötigen",
-    en: "to need, require",
+    en: "to need / to require",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "benötigt", "präteritum": "benötigte", "perfekt": "hat benötigt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sagen Sie Bescheid, wenn Sie noch etwas benötigen.", en: "Let us know if you need anything else." }
   },
   {
@@ -6259,42 +7310,50 @@ var B1_WORDS = [
     conjugation: { "er": "berichtet", "präteritum": "berichtete", "perfekt": "hat berichtet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Alle Zeitungen haben über den Unfall berichtet.", en: "All the newspapers reported on the accident." }
   },
   {
     id: 1164,
     de: "besetzen",
-    en: "to occupy, take",
+    en: "to occupy / to take",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "besetzt", "präteritum": "besetzte", "perfekt": "hat besetzt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieser Platz ist besetzt.", en: "This seat is taken." }
   },
   {
     id: 1165,
     de: "der Besuch",
-    en: "the visit",
+    en: "visit",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Besuche",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich mache einen Besuch im Krankenhaus.", en: "I'm paying a visit to the hospital." }
   },
   {
     id: 1166,
     de: "der Bewohner",
-    en: "the resident, inhabitant",
+    en: "resident (male)",
     type: "noun",
     gender: "m",
     plural: "die Bewohner",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich kenne die anderen Hausbewohner nicht.", en: "I don't know the other residents of the building." }
   },
   {
@@ -6307,30 +7366,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du Zucker? Der Tee ist sehr bitter.", en: "Do you have sugar? The tea is very bitter." }
   },
   {
     id: 1168,
     de: "blühen",
-    en: "to bloom, blossom",
+    en: "to bloom / to blossom",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "blüht", "präteritum": "blühte", "perfekt": "hat geblüht" },
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Bäume blühen schon. Es ist Frühling.", en: "The trees are already blooming. It's spring." }
   },
   {
     id: 1169,
     de: "die Broschüre",
-    en: "the brochure",
+    en: "brochure / booklet",
     type: "noun",
     gender: "f",
     plural: "die Broschüren",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "In der Broschüre finden Sie die neuesten Informationen.", en: "You'll find the latest information in the brochure." }
   },
   {
@@ -6343,54 +7408,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "colors",
+    level: "B1",
+    freq: 1,
     example: { de: "Das bunte Kleid gefällt mir gut.", en: "I really like the colorful dress." }
   },
   {
     id: 1171,
     de: "die Couch",
-    en: "the couch",
+    en: "couch",
     type: "noun",
     gender: "f",
     plural: "die Couchs",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben uns eine Couch und neue Sessel gekauft.", en: "We bought ourselves a couch and new armchairs." }
   },
   {
     id: 1172,
     de: "dagegen",
-    en: "against it, into it",
+    en: "against it / into it",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Vorsicht, da ist ein Baum! Fahr nicht dagegen!", en: "Watch out, there's a tree! Don't drive into it!" }
   },
   {
     id: 1173,
     de: "die Datei",
-    en: "the file (computer)",
+    en: "file (computer)",
     type: "noun",
     gender: "f",
     plural: "die Dateien",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Wo hast du die Datei gespeichert?", en: "Where did you save the file?" }
   },
   {
     id: 1174,
     de: "deswegen",
-    en: "therefore, that's why",
+    en: "therefore / that's why",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe falsch geparkt. Deswegen habe ich einen Strafzettel bekommen.", en: "I parked illegally. That's why I got a parking ticket." }
   },
   {
@@ -6403,6 +7478,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe eine Digitaluhr gekauft. Die geht genauer als meine alte Uhr.", en: "I bought a digital clock. It keeps time more accurately than my old one." }
   },
   {
@@ -6415,6 +7492,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Isst du kein Fleisch? – Doch, manchmal schon.", en: "Don't you eat meat? – Yes, sometimes I do." }
   },
   {
@@ -6427,18 +7506,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Dort drüben ist die Haltestelle.", en: "The bus stop is over there." }
   },
   {
     id: 1178,
     de: "ebenso",
-    en: "likewise, just as",
+    en: "likewise / just as",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Schöne Feiertage. – Danke, ebenso.", en: "Happy holidays. – Thanks, likewise." }
   },
   {
@@ -6451,6 +7534,8 @@ var B1_WORDS = [
     conjugation: { "er": "eignet sich", "präteritum": "eignete sich", "perfekt": "hat sich geeignet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieses Hotel eignet sich besonders für Familien mit Kindern.", en: "This hotel is especially suitable for families with children." }
   },
   {
@@ -6463,30 +7548,36 @@ var B1_WORDS = [
     conjugation: { "er": "fügt ein", "präteritum": "fügte ein", "perfekt": "hat eingefügt" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Markieren Sie zuerst die Zeilen, dann „kopieren“ drücken und dann einfügen.", en: "First select the lines, then press \"copy\" and then paste." }
   },
   {
     id: 1181,
     de: "die Einnahme",
-    en: "the income, revenue",
+    en: "income / revenue",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Einnahmen",
     conjugation: null,
     lesson: 0,
     category: "business_economy",
-    example: { de: "Einnahmen waren in diesem Monat höher als im letzten.", en: "Revenue was higher this month than last month." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Unser Geschäft läuft gut. Unsere Einnahmen waren in diesem Monat höher als im letzten.", en: "Our business is going well. Our income this month was higher than last month." }
   },
   {
     id: 1182,
     de: "der Einwohner",
-    en: "the inhabitant",
+    en: "inhabitant (male)",
     type: "noun",
     gender: "m",
     plural: "die Einwohner",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Berlin hat über drei Millionen Einwohner.", en: "Berlin has over three million inhabitants." }
   },
   {
@@ -6499,6 +7590,8 @@ var B1_WORDS = [
     conjugation: { "er": "empfiehlt", "präteritum": "empfahl", "perfekt": "hat empfohlen" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Was können Sie mir denn empfehlen?", en: "What can you recommend to me?" }
   },
   {
@@ -6511,31 +7604,37 @@ var B1_WORDS = [
     conjugation: { "er": "entfernt", "präteritum": "entfernte", "perfekt": "hat entfernt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Müll muss dringend entfernt werden.", en: "The trash urgently needs to be removed." }
   },
   {
     id: 1185,
     de: "erfahren",
-    en: "to find out, learn",
+    en: "to find out / to learn",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erfährt", "präteritum": "erfuhr", "perfekt": "hat erfahren" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Wann erfahren wir das Ergebnis der Prüfung?", en: "When will we find out the exam results?" }
   },
   {
     id: 1186,
     de: "die Erholung",
-    en: "rest, relaxation",
+    en: "rest / relaxation",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Erholungen",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "brauche ich etwas Erholung.", en: "I need some rest." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich habe zu viel gearbeitet. Jetzt brauche ich etwas Erholung.", en: "I've worked too much. Now I need some rest." }
   },
   {
     id: 1187,
@@ -6547,30 +7646,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Der starke Verkehr ist ein ernstes Problem.", en: "The heavy traffic is a serious problem." }
   },
   {
     id: 1188,
     de: "erziehen",
-    en: "to raise, bring up (children)",
+    en: "to raise / to bring up (children)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erzieht", "präteritum": "erzog", "perfekt": "hat erzogen" },
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Kinder zu erziehen ist nicht leicht.", en: "Raising children is not easy." }
   },
   {
     id: 1189,
     de: "das Fach",
-    en: "the compartment; subject",
+    en: "compartment / subject",
     type: "noun",
     gender: "n",
     plural: "die Fächer",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Handtücher sind im obersten Fach links.", en: "The towels are in the top compartment on the left." }
   },
   {
@@ -6583,30 +7688,36 @@ var B1_WORDS = [
     conjugation: { "er": "fängt", "präteritum": "fing", "perfekt": "hat gefangen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Kind hat den Ball gefangen.", en: "The child caught the ball." }
   },
   {
     id: 1191,
     de: "die Fernbedienung",
-    en: "the remote control",
+    en: "remote control",
     type: "noun",
     gender: "f",
     plural: "die Fernbedienungen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du die Fernbedienung gesehen?", en: "Have you seen the remote control?" }
   },
   {
     id: 1192,
     de: "der Film",
-    en: "the film, movie",
+    en: "film / movie",
     type: "noun",
     gender: "m",
     plural: "die Filme",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Den Film musst du dir unbedingt ansehen.", en: "You really must watch this film." }
   },
   {
@@ -6619,7 +7730,9 @@ var B1_WORDS = [
     conjugation: { "er": "fließt", "präteritum": "floss", "perfekt": "ist geflossen" },
     lesson: 0,
     category: "weather_nature",
-    example: { de: "Dieser Fluss fließt in die Nordsee. fließend1. Mein Kollege spricht fließend Deutsch.", en: "This river flows into the North Sea. — fluently: my colleague speaks fluent German." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Dieser Fluss fließt in die Nordsee.", en: "This river flows into the North Sea." }
   },
   {
     id: 1194,
@@ -6631,78 +7744,92 @@ var B1_WORDS = [
     conjugation: { "er": "fordert", "präteritum": "forderte", "perfekt": "hat gefordert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Arbeitnehmer fordern mehr Geld.", en: "The employees are demanding more money." }
   },
   {
     id: 1195,
     de: "das Forum",
-    en: "the forum",
+    en: "forum",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Foren",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich melde mich heute bei diesem Forum an.", en: "I'm signing up for this forum today." }
   },
   {
     id: 1196,
     de: "der Friseur",
-    en: "the hairdresser",
+    en: "hairdresser",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Friseure",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Du siehst toll aus! Wer ist dein Friseur?", en: "You look great! Who's your hairdresser?" }
   },
   {
     id: 1197,
     de: "der Fußball",
-    en: "football, soccer ball",
+    en: "football / soccer ball",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Fußbälle",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Jonas wünscht sich zu Weihnachten einen neuen Fußball.", en: "Jonas wants a new football for Christmas." }
   },
   {
     id: 1198,
     de: "das Gebiet",
-    en: "the area, region",
+    en: "area / territory / field",
     type: "noun",
     gender: "n",
     plural: "die Gebiete",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "In diesem Gebiet gibt es kaum Industrie.", en: "There is hardly any industry in this area." }
   },
   {
     id: 1199,
     de: "das Gefühl",
-    en: "the feeling",
+    en: "feeling",
     type: "noun",
     gender: "n",
     plural: "die Gefühle",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich glaube, ich schaffe die Prüfung. Ich habe ein gutes Gefühl.", en: "I think I'll pass the exam. I have a good feeling about it." }
   },
   {
     id: 1200,
     de: "die Gelegenheit",
-    en: "the opportunity",
+    en: "opportunity",
     type: "noun",
     gender: "f",
     plural: "die Gelegenheiten",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Fest ist eine gute Gelegenheit, unsere Freunde zu sehen.", en: "The party is a good opportunity to see our friends." }
   },
   {
@@ -6715,6 +7842,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Bild hängt nicht gerade.", en: "The picture isn't hanging straight." }
   },
   {
@@ -6727,30 +7856,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin seit drei Jahren geschieden.", en: "I have been divorced for three years." }
   },
   {
     id: 1203,
     de: "die Gewalt",
-    en: "violence, force",
+    en: "violence / force",
     type: "noun",
     gender: "f",
     plural: "die Gewalten",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich mag keine Filme, in denen Gewalt vorkommt.", en: "I don't like movies that involve violence." }
   },
   {
     id: 1204,
     de: "das Gewürz",
-    en: "the spice",
+    en: "spice",
     type: "noun",
     gender: "n",
     plural: "die Gewürze",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Von den scharfen Gewürzen bekommt man Durst.", en: "Spicy seasonings make you thirsty." }
   },
   {
@@ -6763,55 +7898,65 @@ var B1_WORDS = [
     conjugation: { "er": "gratuliert", "präteritum": "gratulierte", "perfekt": "hat gratuliert" },
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich gratuliere euch zur Geburt eurer Tochter.", en: "I congratulate you on the birth of your daughter." }
   },
   {
     id: 1206,
     de: "das Grundstück",
-    en: "the plot of land, property",
+    en: "plot of land / property",
     type: "noun",
     gender: "n",
     plural: "die Grundstücke",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir wollen ein Haus bauen und suchen ein günstiges Grundstück.", en: "We want to build a house and are looking for an affordable plot of land." }
   },
   {
     id: 1207,
     de: "die Hälfte",
-    en: "the half",
+    en: "half (noun)",
     type: "noun",
     gender: "f",
     plural: "die Hälften",
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte teilt euch die Schokolade. Jeder bekommt die Hälfte.", en: "Please share the chocolate. Everyone gets half." }
   },
   {
     id: 1208,
     de: "häufig",
-    en: "frequent, often",
+    en: "frequent / often",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie häufig Kopfschmerzen? Dann sollten Sie nicht so lange am Computer sitzen.", en: "Do you often have headaches? Then you shouldn't sit at the computer so long." }
   },
   {
     id: 1209,
     de: "die Heldin",
-    en: "the heroine",
+    en: "heroine",
     type: "noun",
     gender: "f",
     plural: "die Heldinnen",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Er spielt gern den Helden.", en: "He likes to play the hero." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Sie spielt gern die Heldin.", en: "She likes to play the heroine." }
   },
   {
     id: 1210,
@@ -6823,18 +7968,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe wenig Zeit. Ich kann höchstens eine Viertelstunde bleiben.", en: "I have little time. I can stay for at most a quarter of an hour." }
   },
   {
     id: 1211,
     de: "der Hut",
-    en: "the hat",
+    en: "hat",
     type: "noun",
     gender: "m",
     plural: "die Hüte",
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie sollten im Sommer nicht ohne Hut in die Sonne gehen.", en: "You shouldn't go out in the sun in summer without a hat." }
   },
   {
@@ -6847,54 +7996,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Lehrerin versucht, jedes Kind individuell zu fördern.", en: "The teacher tries to support each child individually." }
   },
   {
     id: 1213,
     de: "insgesamt",
-    en: "in total, altogether",
+    en: "in total / altogether",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Insgesamt haben sich 20 Teilnehmer für die Prüfung angemeldet.", en: "A total of 20 participants registered for the exam." }
   },
   {
     id: 1214,
     de: "das Interview",
-    en: "the interview",
+    en: "interview",
     type: "noun",
     gender: "n",
     plural: "die Interviews",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe im Fernsehen ein interessantes Interview mit zwei Schauspielern gesehen.", en: "I saw an interesting interview with two actors on TV." }
   },
   {
     id: 1215,
     de: "die Journalistin",
-    en: "the journalist",
+    en: "journalist (female)",
     type: "noun",
     gender: "f",
     plural: "die Journalistinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Tochter möchte Journalistin werden.", en: "My daughter wants to become a journalist." }
   },
   {
     id: 1216,
     de: "die Kamera",
-    en: "the camera",
+    en: "camera",
     type: "noun",
     gender: "f",
     plural: "die Kameras",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe eine ganz neue Kamera.", en: "I have a brand new camera." }
   },
   {
@@ -6903,34 +8062,40 @@ var B1_WORDS = [
     en: "carnival",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Karnevals / die Karnevale",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Dort hängt mein Kostüm für den Karnevals(um)zug.", en: "My costume for the carnival parade is hanging there." }
   },
   {
     id: 1218,
     de: "der Kellner",
-    en: "the waiter",
+    en: "waiter",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Kellner",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Ich bin Kellnerin von Beruf.", en: "I am a waitress by profession." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich bin Kellner von Beruf.", en: "I am a waiter by profession." }
   },
   {
     id: 1219,
     de: "klappen",
-    en: "to work out, go well",
+    en: "to work out / to go well",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "klappt", "präteritum": "klappte", "perfekt": "hat geklappt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie war die Reise? – Gut. Es hat alles prima geklappt.", en: "How was the trip? – Good. Everything went great." }
   },
   {
@@ -6943,30 +8108,36 @@ var B1_WORDS = [
     conjugation: { "er": "klettert", "präteritum": "kletterte", "perfekt": "ist geklettert" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kinder sind auf den Baum geklettert.", en: "The children climbed the tree." }
   },
   {
     id: 1221,
     de: "der Knochen",
-    en: "the bone",
+    en: "bone",
     type: "noun",
     gender: "m",
     plural: "die Knochen",
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin hingefallen. Jetzt tun mir alle Knochen weh.", en: "I fell down. Now all my bones hurt." }
   },
   {
     id: 1222,
     de: "die Konfitüre",
-    en: "the jam",
+    en: "jam",
     type: "noun",
     gender: "f",
     plural: "die Konfitüren",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Bring bitte noch ein Glas Konfitüre mit.", en: "Please bring another jar of jam." }
   },
   {
@@ -6979,186 +8150,218 @@ var B1_WORDS = [
     conjugation: { "er": "konzentriert sich", "präteritum": "konzentrierte sich", "perfekt": "hat sich konzentriert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte stör mich jetzt nicht. Ich muss mich auf meine Arbeit konzentrieren.", en: "Please don't disturb me now. I need to concentrate on my work." }
   },
   {
     id: 1224,
     de: "das Kraftfahrzeug",
-    en: "the motor vehicle",
+    en: "motor vehicle",
     type: "noun",
     gender: "n",
     plural: "die Kraftfahrzeuge",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf dieser Straße sind Kraftfahrzeuge nicht erlaubt.", en: "Motor vehicles are not allowed on this street." }
   },
   {
     id: 1225,
     de: "der Krimi",
-    en: "the crime thriller, detective story",
+    en: "crime thriller / detective story",
     type: "noun",
     gender: "m",
     plural: "die Krimis",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Heute Abend kommt ein spannender Krimi im Fernsehen.", en: "There's an exciting crime show on TV tonight." }
   },
   {
     id: 1226,
     de: "die Kurve",
-    en: "the curve, bend",
+    en: "curve / bend",
     type: "noun",
     gender: "f",
     plural: "die Kurven",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Fahr bitte nicht so schnell in die Kurven.", en: "Please don't drive so fast into the curves." }
   },
   {
     id: 1227,
     de: "das Lager",
-    en: "the warehouse, storage",
+    en: "warehouse / storage",
     type: "noun",
     gender: "n",
     plural: "die Lager",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich weiß nicht, ob wir diesen Schuh in Ihrer Größe haben. Ich sehe mal im Lager nach.", en: "I don't know if we have this shoe in your size. I'll check in the storeroom." }
   },
   {
     id: 1228,
     de: "der Lehrling",
-    en: "the apprentice",
+    en: "apprentice",
     type: "noun",
     gender: "m",
     plural: "die Lehrlinge",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Als Lehrling verdient man nicht sehr viel Geld.", en: "As an apprentice, you don't earn very much money." }
   },
   {
     id: 1229,
     de: "das Licht",
-    en: "the light",
+    en: "light",
     type: "noun",
     gender: "n",
     plural: "die Lichter",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Kannst du bitte Licht machen? Ich kann so nichts sehen.", en: "Can you turn the light on, please? I can't see anything otherwise." }
   },
   {
     id: 1230,
     de: "das Loch",
-    en: "the hole",
+    en: "hole",
     type: "noun",
     gender: "n",
     plural: "die Löcher",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe ein Loch im Zahn. Ich muss zum Zahnarzt.", en: "I have a hole in my tooth. I have to go to the dentist." }
   },
   {
     id: 1231,
     de: "das Magazin",
-    en: "the magazine",
+    en: "magazine (illustrated) / storeroom",
     type: "noun",
     gender: "n",
     plural: "die Magazine",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Jugendliche lesen dieses Magazin gern.", en: "Young people like to read this magazine." }
   },
   {
     id: 1232,
     de: "der Mangel",
-    en: "the lack, shortage",
+    en: "lack / shortage",
     type: "noun",
     gender: "m",
     plural: "die Mängel",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "In dieser Stadt gibt es einen großen Mangel an Wohnungen.", en: "There is a great shortage of housing in this city." }
   },
   {
     id: 1233,
     de: "die Mauer",
-    en: "the wall",
+    en: "wall (outdoor / stone)",
     type: "noun",
     gender: "f",
     plural: "die Mauern",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kinder sind über die Mauer geklettert.", en: "The children climbed over the wall." }
   },
   {
     id: 1234,
     de: "der Meister",
-    en: "the master, champion",
+    en: "master / champion",
     type: "noun",
     gender: "m",
     plural: "die Meister",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich weiß nicht, wie man das macht. – Dann frag doch den Meister.", en: "I don't know how to do that. – Then ask the master." }
   },
   {
     id: 1235,
     de: "die Methode",
-    en: "the method",
+    en: "method",
     type: "noun",
     gender: "f",
     plural: "die Methoden",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Weißt du eine gute Methode, um schnell gut Deutsch zu lernen?", en: "Do you know a good method for learning German quickly?" }
   },
   {
     id: 1236,
     de: "der Mitarbeiter",
-    en: "the employee, colleague",
+    en: "employee (male) / colleague",
     type: "noun",
     gender: "m",
     plural: "die Mitarbeiter",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Firma hat sieben Mitarbeiter.", en: "Our company has seven employees." }
   },
   {
     id: 1237,
     de: "das Modell",
-    en: "the model",
+    en: "model",
     type: "noun",
     gender: "n",
     plural: "die Modelle",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie findest du dieses Auto? – Dieses Modell gefällt mir nicht.", en: "What do you think of this car? – I don't like this model." }
   },
   {
     id: 1238,
     de: "das Motorrad",
-    en: "the motorcycle",
+    en: "motorcycle",
     type: "noun",
     gender: "n",
     plural: "die Motorräder",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Oskar fährt jeden Tag mit dem Motorrad zur Arbeit.", en: "Oskar rides his motorcycle to work every day." }
   },
   {
@@ -7171,127 +8374,149 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Schüler braucht Nachhilfe in Mathematik.", en: "The student needs tutoring in math." }
   },
   {
     id: 1240,
     de: "nämlich",
-    en: "namely, you see (giving a reason)",
+    en: "namely / you see (giving a reason)",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss leider gehen. Ich habe nämlich noch einen Termin beim Zahnarzt.", en: "Unfortunately I have to go. I have a dentist's appointment, you see." }
   },
   {
     id: 1241,
     de: "das Netz",
-    en: "the net",
+    en: "net",
     type: "noun",
     gender: "n",
     plural: "die Netze",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte bring ein Netz Orangen.", en: "Please bring a net (bag) of oranges." }
   },
   {
     id: 1242,
     de: "die Nichtraucherin",
-    en: "the non-smoker",
+    en: "non-smoker (female)",
     type: "noun",
     gender: "f",
     plural: "die Nichtraucherinnen",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "In unserer Familie sind alle Nichtraucher.", en: "Everyone in our family is a non-smoker." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Meine Schwester ist Nichtraucherin.", en: "My sister is a non-smoker." }
   },
   {
     id: 1243,
     de: "nötig",
-    en: "necessary",
+    en: "necessary / needed",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn es nötig ist, nehmen Sie noch eine Tablette.", en: "If necessary, take another tablet." }
   },
   {
     id: 1244,
     de: "offenbar",
-    en: "apparently, evidently",
+    en: "apparently / evidently",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Restaurant ist heute offenbar geschlossen.", en: "The restaurant is apparently closed today." }
   },
   {
     id: 1245,
     de: "ordentlich",
-    en: "tidy, orderly",
+    en: "tidy / orderly",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Bruder ist ein sehr ordentlicher Mensch.", en: "My brother is a very tidy person." }
   },
   {
     id: 1246,
     de: "das Paar",
-    en: "the pair, couple",
+    en: "pair / couple",
     type: "noun",
     gender: "n",
     plural: "die Paare",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ina und Pedro sind ein Paar.", en: "Ina and Pedro are a couple." }
   },
   {
     id: 1247,
     de: "die Passagierin",
-    en: "the passenger",
+    en: "passenger (female)",
     type: "noun",
     gender: "f",
     plural: "die Passagierinnen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
-    example: { de: "Die Passagiere Schulz und Kaufmann sollen bitte zur Information kommen.", en: "Passengers Schulz and Kaufmann, please come to the information desk." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Passagierin Schulz soll bitte zur Information kommen.", en: "Passenger Schulz, please come to the information desk." }
   },
   {
     id: 1248,
     de: "per",
-    en: "by, via",
+    en: "by / via",
     type: "preposition",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie kann ich mich für den Kurs anmelden? – Per Fax oder E-Mail.", en: "How can I register for the course? – By fax or email." }
   },
   {
     id: 1249,
     de: "die Pille",
-    en: "the pill",
+    en: "pill",
     type: "noun",
     gender: "f",
     plural: "die Pillen",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "Am Sonntag machen wir ein Picknick. Der Arzt hat mir neue Pillen verschrieben.", en: "On Sunday we're having a picnic. The doctor prescribed me new pills." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Der Arzt hat mir neue Pillen verschrieben.", en: "The doctor prescribed me new pills." }
   },
   {
     id: 1250,
@@ -7303,18 +8528,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben eine positive Nachricht für Sie. Sie bekommen die Stelle.", en: "We have positive news for you. You got the job." }
   },
   {
     id: 1251,
     de: "probieren",
-    en: "to try",
+    en: "to try (out) / to taste",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "probiert", "präteritum": "probierte", "perfekt": "hat probiert" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie dieses Waschmittel schon einmal probiert?", en: "Have you ever tried this detergent?" }
   },
   {
@@ -7327,42 +8556,50 @@ var B1_WORDS = [
     conjugation: { "er": "protestiert", "präteritum": "protestierte", "perfekt": "hat protestiert" },
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir protestieren gegen den Bau der Autobahn.", en: "We are protesting against the construction of the highway." }
   },
   {
     id: 1253,
     de: "quer",
-    en: "diagonally, across",
+    en: "diagonally / across",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich muss zu meiner Arbeit quer durch die ganze Stadt fahren.", en: "I have to drive right across town to get to work." }
   },
   {
     id: 1254,
     de: "der Raum",
-    en: "the room, space",
+    en: "room / space",
     type: "noun",
     gender: "m",
     plural: "die Räume",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Getränke gibt es im Raum nebenan.", en: "Drinks are available in the room next door." }
   },
   {
     id: 1255,
     de: "das Referat",
-    en: "the presentation, report (school)",
+    en: "presentation / report (school)",
     type: "noun",
     gender: "n",
     plural: "die Referate",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Vielen Dank für dieses interessante Referat.", en: "Thank you very much for this interesting presentation." }
   },
   {
@@ -7375,30 +8612,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Banane kannst du nicht essen. Sie ist noch nicht reif.", en: "You can't eat that banana. It's not ripe yet." }
   },
   {
     id: 1257,
     de: "die Reklame",
-    en: "the advertisement",
+    en: "advertising / commercial (colloquial)",
     type: "noun",
     gender: "f",
     plural: "die Reklamen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte keine Reklame im Briefkasten.", en: "I don't want any advertising in my mailbox." }
   },
   {
     id: 1258,
     de: "der Richter",
-    en: "the judge",
+    en: "judge (male)",
     type: "noun",
     gender: "m",
     plural: "die Richter",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Richter hat noch kein Urteil gesprochen.", en: "The judge has not yet delivered a verdict." }
   },
   {
@@ -7411,66 +8654,78 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Du kannst das nicht essen. Das Fleisch ist noch roh.", en: "You can't eat that. The meat is still raw." }
   },
   {
     id: 1260,
     de: "die Rundfahrt",
-    en: "the (sightseeing) tour",
+    en: "(sightseeing) tour",
     type: "noun",
     gender: "f",
     plural: "die Rundfahrten",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Am zweiten Tag haben wir eine Rundfahrt durch den Hafen gemacht.", en: "On the second day we took a tour around the harbor." }
   },
   {
     id: 1261,
     de: "der Sänger",
-    en: "the singer",
+    en: "singer (male)",
     type: "noun",
     gender: "m",
     plural: "die Sänger",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie findest du diesen Sänger? − Ich finde seine Stimme toll.", en: "What do you think of this singer? – I think his voice is great." }
   },
   {
     id: 1262,
     de: "schalten",
-    en: "to switch, shift",
+    en: "to switch / to shift",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "schaltet", "präteritum": "schaltete", "perfekt": "hat geschaltet" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Schalten Sie bitte das Licht aus, wenn Sie gehen.", en: "Please turn off the light when you leave." }
   },
   {
     id: 1263,
     de: "der Schein",
-    en: "the banknote, certificate",
+    en: "banknote / certificate",
     type: "noun",
     gender: "m",
     plural: "die Scheine",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Kannst du einen Schein in Kleingeld wechseln?", en: "Can you break a bill into small change?" }
   },
   {
     id: 1264,
     de: "die Schlange",
-    en: "the line, queue; snake",
+    en: "line / queue / snake",
     type: "noun",
     gender: "f",
     plural: "die Schlangen",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf der Post gibt es immer eine lange (Warte-)Schlange.", en: "There's always a long line at the post office." }
   },
   {
@@ -7483,6 +8738,8 @@ var B1_WORDS = [
     conjugation: { "er": "schminkt", "präteritum": "schminkte", "perfekt": "hat geschminkt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Du bist heute sehr schön geschminkt.", en: "Your makeup looks very nice today." }
   },
   {
@@ -7495,102 +8752,120 @@ var B1_WORDS = [
     conjugation: { "er": "schützt", "präteritum": "schützte", "perfekt": "hat geschützt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese Impfung schützt vor Grippe.", en: "This vaccination protects against the flu." }
   },
   {
     id: 1267,
     de: "die Sekretärin",
-    en: "the secretary",
+    en: "secretary (female)",
     type: "noun",
     gender: "f",
     plural: "die Sekretärinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Der neue Sekretär hat sich gestern vorgestellt.", en: "The new secretary introduced himself yesterday." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Die neue Sekretärin hat sich gestern vorgestellt.", en: "The new secretary introduced herself yesterday." }
   },
   {
     id: 1268,
     de: "die Serie",
-    en: "the series (TV)",
+    en: "series (TV)",
     type: "noun",
     gender: "f",
     plural: "die Serien",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Tochter liebt es, im Fernsehen Serien zu schauen.", en: "My daughter loves watching series on TV." }
   },
   {
     id: 1269,
     de: "die Situation",
-    en: "the situation",
+    en: "situation",
     type: "noun",
     gender: "f",
     plural: "die Situationen",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin in einer schwierigen Situation.", en: "I am in a difficult situation." }
   },
   {
     id: 1270,
     de: "sorgen",
-    en: "to take care of, look after",
+    en: "to take care of / to look after",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "sorgt", "präteritum": "sorgte", "perfekt": "hat gesorgt" },
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer sorgt denn für die Kinder?", en: "Who takes care of the children, then?" }
   },
   {
     id: 1271,
     de: "der Spaziergang",
-    en: "the walk, stroll",
+    en: "walk / stroll",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Spaziergänge",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Spaziergang durch das Viertel.", en: "A walk through the neighborhood." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Abends mache ich oft einen Spaziergang durch das Viertel.", en: "In the evening I often take a walk through the neighborhood." }
   },
   {
     id: 1272,
     de: "spitz",
-    en: "pointed, sharp",
+    en: "pointed / sharp",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Bleistift ist nicht spitz.", en: "The pencil isn't sharp." }
   },
   {
     id: 1273,
     de: "ständig",
-    en: "constant, constantly",
+    en: "constant / constantly",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe schon ein paar Mal bei meiner Freundin angerufen. Es ist ständig besetzt.", en: "I've already called my girlfriend a few times. It's constantly busy." }
   },
   {
     id: 1274,
     de: "der Stau",
-    en: "the traffic jam",
+    en: "traffic jam",
     type: "noun",
     gender: "m",
     plural: "die Staus",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf der A3 gibt es wegen eines Unfalls 5 km Stau.", en: "There's a 5 km traffic jam on the A3 because of an accident." }
   },
   {
@@ -7603,78 +8878,92 @@ var B1_WORDS = [
     conjugation: { "er": "stirbt", "präteritum": "starb", "perfekt": "ist gestorben" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Kollege kommt heute nicht. Sein Vater ist gestern gestorben.", en: "My colleague isn't coming in today. His father died yesterday." }
   },
   {
     id: 1276,
     de: "die Stimmung",
-    en: "the mood, atmosphere",
+    en: "mood / atmosphere",
     type: "noun",
     gender: "f",
     plural: "die Stimmungen",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Es war eine tolle Party. Die Stimmung war sehr gut.", en: "It was a great party. The mood was very good." }
   },
   {
     id: 1277,
     de: "der Strand",
-    en: "the beach",
+    en: "beach",
     type: "noun",
     gender: "m",
     plural: "die Strände",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Urlaub bin ich am liebsten am Strand.", en: "On vacation, I like being at the beach best." }
   },
   {
     id: 1278,
     de: "stürzen",
-    en: "to fall, plunge",
+    en: "to fall / to plunge",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stürzt", "präteritum": "stürzte", "perfekt": "ist gestürzt" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin auf der Straße gestürzt und habe mir den Fuß gebrochen.", en: "I fell in the street and broke my foot." }
   },
   {
     id: 1279,
     de: "die Tabelle",
-    en: "the table, chart",
+    en: "table / chart",
     type: "noun",
     gender: "f",
     plural: "die Tabellen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Tragen Sie die richtige Information in die Tabelle ein.", en: "Enter the correct information into the table." }
   },
   {
     id: 1280,
     de: "das Taschentuch",
-    en: "the handkerchief, tissue",
+    en: "handkerchief / tissue",
     type: "noun",
     gender: "n",
     plural: "die Taschentücher",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du ein Taschentuch für mich?", en: "Do you have a tissue for me?" }
   },
   {
     id: 1281,
     de: "die Technik",
-    en: "technology, technique",
+    en: "technology / technique",
     type: "noun",
     gender: "f",
     plural: "die Techniken",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich verstehe nicht viel von Technik.", en: "I don't understand much about technology." }
   },
   {
@@ -7687,42 +8976,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe die theoretische Prüfung bestanden. Nach der praktischen habe ich den Führerschein.", en: "I passed the theoretical exam. After the practical one, I'll have my driver's license." }
   },
   {
     id: 1283,
     de: "der Titel",
-    en: "the title",
+    en: "title",
     type: "noun",
     gender: "m",
     plural: "die Titel",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie heißt der Film? – Ich weiß den Titel nicht mehr.", en: "What's the movie called? – I can't remember the title anymore." }
   },
   {
     id: 1284,
     de: "trainieren",
-    en: "to train, practice",
+    en: "to train / to practice",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "trainiert", "präteritum": "trainierte", "perfekt": "hat trainiert" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir trainieren einmal pro Woche im Sportverein.", en: "We train once a week at the sports club." }
   },
   {
     id: 1285,
     de: "trotz",
-    en: "despite, in spite of",
+    en: "despite / in spite of",
     type: "preposition",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Trotz Grippe bin ich zur Arbeit gegangen.", en: "Despite having the flu, I went to work." }
   },
   {
@@ -7735,42 +9032,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Suppe schmeckt mir überhaupt nicht.", en: "I don't like the soup at all." }
   },
   {
     id: 1287,
     de: "die Überschrift",
-    en: "the headline, heading",
+    en: "headline / heading",
     type: "noun",
     gender: "f",
     plural: "die Überschriften",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Artikel erschien unter der folgenden Überschrift: „…“", en: "The article appeared under the following headline: \"...\"" }
   },
   {
     id: 1288,
     de: "die Umfrage",
-    en: "the survey, poll",
+    en: "survey / poll",
     type: "noun",
     gender: "f",
     plural: "die Umfragen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir machen eine Umfrage zum Thema Umweltschutz.", en: "We're conducting a survey on the topic of environmental protection." }
   },
   {
     id: 1289,
     de: "unbedingt",
-    en: "absolutely, definitely",
+    en: "absolutely / definitely",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss unbedingt mit dir sprechen.", en: "I absolutely have to talk to you." }
   },
   {
@@ -7783,6 +9088,8 @@ var B1_WORDS = [
     conjugation: { "er": "unterlässt", "präteritum": "unterließ", "perfekt": "hat unterlassen" },
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Rauchen auf den Gängen ist zu unterlassen.", en: "Smoking in the corridors is prohibited." }
   },
   {
@@ -7795,67 +9102,79 @@ var B1_WORDS = [
     conjugation: { "er": "unterstreicht", "präteritum": "unterstrich", "perfekt": "hat unterstrichen" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir sollen alle wichtigen Wörter unterstreichen.", en: "We're supposed to underline all the important words." }
   },
   {
     id: 1292,
     de: "die Vase",
-    en: "the vase",
+    en: "vase",
     type: "noun",
     gender: "f",
     plural: "die Vasen",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du eine Vase für die Blumen?", en: "Do you have a vase for the flowers?" }
   },
   {
     id: 1293,
     de: "der Verbrecher",
-    en: "the criminal",
+    en: "criminal (male)",
     type: "noun",
     gender: "m",
     plural: "die Verbrecher",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Polizei hat den Verbrecher verhaftet.", en: "The police arrested the criminal." }
   },
   {
     id: 1294,
     de: "der Vergleich",
-    en: "the comparison",
+    en: "comparison",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Vergleiche",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Im Vergleich zum Wetter letzte Woche ist es heute warm.", en: "Compared to last week's weather, it's warm today." }
   },
   {
     id: 1295,
     de: "verlangen",
-    en: "to demand, require",
+    en: "to demand / to require",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verlangt", "präteritum": "verlangte", "perfekt": "hat verlangt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Jeden Tag Überstunden? Das können Sie nicht verlangen.", en: "Overtime every day? You can't demand that." }
   },
   {
     id: 1296,
     de: "vermuten",
-    en: "to suspect, assume",
+    en: "to suspect / to assume",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "vermutet", "präteritum": "vermutete", "perfekt": "hat vermutet" },
     lesson: 0,
     category: "other_verbs",
-    example: { de: "Ich vermute, sie wird heute nicht kommen. vermutlich Vermutlich sagt er die Wahrheit.", en: "I assume she won't come today. Probably: he's probably telling the truth." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich vermute, sie wird heute nicht kommen.", en: "I assume she won't come today." }
   },
   {
     id: 1297,
@@ -7867,30 +9186,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere beiden Kinder sind sehr verschieden.", en: "Our two children are very different." }
   },
   {
     id: 1298,
     de: "die Vertreterin",
-    en: "the representative",
+    en: "representative (female)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Vertreterinnen",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Die Elternvertreter treffen sich morgen Abend in der Schule.", en: "The parent representatives are meeting tomorrow evening at the school." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Elternvertreterin unserer Klasse heißt Frau Nowak.", en: "Our class's parent representative is Mrs. Nowak." }
   },
   {
     id: 1299,
     de: "das Viertel",
-    en: "the quarter, district",
+    en: "quarter / district",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Viertel",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir wohnen in einem schönen Viertel.", en: "We live in a nice neighborhood." }
   },
   {
@@ -7903,18 +9228,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "pronouns",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben lange nichts voneinander gehört.", en: "We haven't heard from each other in a long time." }
   },
   {
     id: 1301,
     de: "vorkommen",
-    en: "to occur, happen",
+    en: "to occur / to happen",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kommt vor", "präteritum": "kam vor", "perfekt": "ist vorgekommen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Kein Problem. Das kann vorkommen.", en: "No problem. That can happen." }
   },
   {
@@ -7927,6 +9256,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich kann nicht vorbei. Bitte fahr noch ein Stück vorwärts.", en: "I can't get past. Please pull forward a bit." }
   },
   {
@@ -7939,30 +9270,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wahrscheinlich mache ich im Herbst noch einen Deutschkurs.", en: "I'll probably take another German course in the fall." }
   },
   {
     id: 1304,
     de: "wegen",
-    en: "because of, due to",
+    en: "because of / due to",
     type: "preposition",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Wegen Nebels konnte unser Flugzeug nicht landen.", en: "Due to fog, our plane couldn't land." }
   },
   {
     id: 1305,
     de: "das Werk",
-    en: "the factory, work",
+    en: "factory / work",
     type: "noun",
     gender: "n",
     plural: "die Werke",
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben gestern das Werk besichtigt.", en: "We visited the factory yesterday." }
   },
   {
@@ -7975,43 +9312,51 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Das ist ein wilder Fluss.", en: "That is a wild river." }
   },
   {
     id: 1307,
     de: "die Wirtin",
-    en: "the landlady, innkeeper",
+    en: "innkeeper (female) / landlady",
     type: "noun",
     gender: "f",
     plural: "die Wirtinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich kenne die Wirtin von diesem Lokal. Sie ist sehr nett.", en: "I know the landlady of this restaurant. She's very nice." }
   },
   {
     id: 1308,
     de: "die Wunde",
-    en: "the wound",
+    en: "wound",
     type: "noun",
     gender: "f",
     plural: "die Wunden",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Wunde müssen wir sofort verbinden.", en: "We need to bandage the wound right away." }
   },
   {
     id: 1309,
     de: "das Zeichen",
-    en: "the sign, signal",
+    en: "sign / signal",
     type: "noun",
     gender: "n",
     plural: "die Zeichen",
     conjugation: null,
     lesson: 0,
     category: "communication",
-    example: { de: "Bitte fangen Sie erst an, wenn ich Ihnen ein Zeichen gebe. WORTLISTE 99", en: "Please only start when I give you a signal." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Bitte fangen Sie erst an, wenn ich Ihnen ein Zeichen gebe.", en: "Please only start when I give you a signal." }
   },
   {
     id: 1310,
@@ -8023,54 +9368,64 @@ var B1_WORDS = [
     conjugation: { "er": "zerstört", "präteritum": "zerstörte", "perfekt": "hat zerstört" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Sturm hat viele Häuser zerstört.", en: "The storm destroyed many houses." }
   },
   {
     id: 1311,
     de: "die Zigarette",
-    en: "the cigarette",
+    en: "cigarette",
     type: "noun",
     gender: "f",
     plural: "die Zigaretten",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie viele Zigaretten rauchst du am Tag?", en: "How many cigarettes do you smoke a day?" }
   },
   {
     id: 1312,
     de: "zufrieden",
-    en: "satisfied, content",
+    en: "satisfied / content",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Kinder haben heute Zeugnisse bekommen. Ich bin zufrieden.", en: "My children got their report cards today. I am satisfied." }
   },
   {
     id: 1313,
     de: "der Zuschlag",
-    en: "the surcharge",
+    en: "surcharge",
     type: "noun",
     gender: "m",
     plural: "die Zuschläge",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
-    example: { de: "Für diesen Zug müssen Sie einen Zuschlag zahlen. WORTLISTE 101", en: "You have to pay a surcharge for this train." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Für diesen Zug müssen Sie einen Zuschlag zahlen.", en: "You have to pay a surcharge for this train." }
   },
   {
     id: 1314,
     de: "die Zwiebel",
-    en: "the onion",
+    en: "onion",
     type: "noun",
     gender: "f",
     plural: "die Zwiebeln",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Eine Zwiebel in kleine Stücke schneiden und zusammen mit dem Fleisch braten.", en: "Cut an onion into small pieces and fry it together with the meat." }
   },
   {
@@ -8083,18 +9438,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei Feueralarm dürfen Sie die Aufzüge nicht benutzen.", en: "In case of a fire alarm, you must not use the elevators." }
   },
   {
     id: 1316,
     de: "sich amüsieren",
-    en: "to have fun, to enjoy oneself",
+    en: "to have fun / to enjoy oneself",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "amüsiert sich", "präteritum": "amüsierte sich", "perfekt": "hat sich amüsiert" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei dem Fest haben wir uns sehr gut amüsiert.", en: "We had a lot of fun at the party." }
   },
   {
@@ -8103,46 +9462,54 @@ var B1_WORDS = [
     en: "fear",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Ängste",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Du brauchst keine Angst zu haben. Der Hund tut dir nichts.", en: "You don't need to be afraid. The dog won't hurt you." }
   },
   {
     id: 1318,
     de: "die Ansage",
-    en: "announcement",
+    en: "announcement (e.g. on the phone)",
     type: "noun",
     gender: "f",
     plural: "die Ansagen",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Achten Sie auf die Ansage am Bahnsteig.", en: "Pay attention to the announcement on the platform." }
   },
   {
     id: 1319,
     de: "das Apartment",
-    en: "apartment",
+    en: "small apartment / studio",
     type: "noun",
     gender: "n",
     plural: "die Apartments",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben ein Ferienapartment gemietet.", en: "We rented a holiday apartment." }
   },
   {
     id: 1320,
     de: "aufgeben",
-    en: "to give up; to mail (a letter/package)",
+    en: "to give up / to mail (a letter/package)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "gibt auf", "präteritum": "gab auf", "perfekt": "hat aufgegeben" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe auf der Post ein Paket aufgegeben.", en: "I mailed a package at the post office." }
   },
   {
@@ -8155,30 +9522,36 @@ var B1_WORDS = [
     conjugation: { "er": "druckt aus", "präteritum": "druckte aus", "perfekt": "hat ausgedruckt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Kann ich das auf deinem Drucker ausdrucken?", en: "Can I print this out on your printer?" }
   },
   {
     id: 1322,
     de: "die Aushilfe",
-    en: "temporary help, temp worker",
+    en: "temporary help / temp worker",
     type: "noun",
     gender: "f",
     plural: "die Aushilfen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir suchen eine freundliche Aushilfe für unser Geschäft.", en: "We are looking for a friendly temp for our shop." }
   },
   {
     id: 1323,
     de: "die Aussicht",
-    en: "view; prospect",
+    en: "view / prospect",
     type: "noun",
     gender: "f",
     plural: "die Aussichten",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Von diesem Turm hat man eine tolle Aussicht.", en: "From this tower you have a wonderful view." }
   },
   {
@@ -8187,11 +9560,13 @@ var B1_WORDS = [
     en: "bathtub",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Badewannen",
     conjugation: null,
     lesson: 0,
     category: "housing",
-    example: { de: "sie sich in die Badewanne.", en: "... herself into the bathtub." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Nach einem langen Arbeitstag setzte sie sich in die Badewanne.", en: "After a long day at work she got into the bathtub." }
   },
   {
     id: 1325,
@@ -8203,19 +9578,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Zahlen Sie bar?", en: "Are you paying in cash?" }
   },
   {
     id: 1326,
     de: "der Beamte",
-    en: "civil servant, official",
+    en: "civil servant (male) / official",
     type: "noun",
     gender: "m",
     plural: "die Beamten",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Meine Frau ist Beamtin bei der Polizei.", en: "My wife is a civil servant with the police." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Mein Vater ist Beamter bei der Polizei.", en: "My father is a civil servant with the police." }
   },
   {
     id: 1327,
@@ -8227,6 +9606,8 @@ var B1_WORDS = [
     conjugation: { "er": "beeilt sich", "präteritum": "beeilte sich", "perfekt": "hat sich beeilt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen uns beeilen. Sonst verpassen wir den Zug.", en: "We have to hurry. Otherwise we'll miss the train." }
   },
   {
@@ -8239,6 +9620,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Teilnehmerzahl ist auf 12 begrenzt.", en: "The number of participants is limited to 12." }
   },
   {
@@ -8251,67 +9634,79 @@ var B1_WORDS = [
     conjugation: { "er": "beißt", "präteritum": "biss", "perfekt": "hat gebissen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Pass auf, dass dich der Hund nicht beißt!", en: "Watch out that the dog doesn't bite you!" }
   },
   {
     id: 1330,
     de: "benutzen",
-    en: "to use",
+    en: "to use (a thing or tool)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "benutzt", "präteritum": "benutzte", "perfekt": "hat benutzt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Benutzen Sie bitte die öffentlichen Verkehrsmittel.", en: "Please use public transportation." }
   },
   {
     id: 1331,
     de: "beruhigen",
-    en: "to calm down, to reassure",
+    en: "to calm down / to reassure",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beruhigt", "präteritum": "beruhigte", "perfekt": "hat beruhigt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Beruhigen Sie sich bitte. Es ist alles in Ordnung.", en: "Please calm down. Everything is fine." }
   },
   {
     id: 1332,
     de: "besorgen",
-    en: "to get, to obtain",
+    en: "to get / to obtain",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "besorgt", "präteritum": "besorgte", "perfekt": "hat besorgt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Soll ich die Eintrittskarten besorgen?", en: "Should I get the tickets?" }
   },
   {
     id: 1333,
     de: "sich beteiligen",
-    en: "to take part, to participate",
+    en: "to take part / to contribute",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beteiligt sich", "präteritum": "beteiligte sich", "perfekt": "hat sich beteiligt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir wollen unserer Lehrerin ein Geschenk kaufen. Wer möchte sich beteiligen?", en: "We want to buy our teacher a present. Who would like to chip in?" }
   },
   {
     id: 1334,
     de: "die Bewohnerin",
-    en: "resident, inhabitant (female)",
+    en: "resident (female)",
     type: "noun",
     gender: "f",
     plural: "die Bewohnerinnen",
     conjugation: null,
     lesson: 0,
     category: "housing",
-    example: { de: "Ich kenne die anderen Hausbewohner nicht.", en: "I don't know the other residents of the house." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine Bewohnerin aus dem dritten Stock hat sich über den Lärm beschwert.", en: "A resident from the third floor complained about the noise." }
   },
   {
     id: 1335,
@@ -8323,6 +9718,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Du siehst ganz blass aus. Bist du krank?", en: "You look quite pale. Are you sick?" }
   },
   {
@@ -8335,6 +9732,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben meiner Mutter Blumen zum Geburtstag geschenkt.", en: "We gave my mother flowers for her birthday." }
   },
   {
@@ -8347,6 +9746,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Fahren Sie über die nächste Brücke und dann rechts.", en: "Drive over the next bridge and then turn right." }
   },
   {
@@ -8359,6 +9760,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Von der Burg hat man eine schöne Aussicht.", en: "From the castle you have a beautiful view." }
   },
   {
@@ -8367,22 +9770,26 @@ var B1_WORDS = [
     en: "cream",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Cremes / die Cremen",
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich hätte gern eine Creme für die Hände.", en: "I would like a cream for my hands." }
   },
   {
     id: 1340,
     de: "daher",
-    en: "therefore, for that reason",
+    en: "therefore / for that reason",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin erkältet, daher kann ich heute nicht kommen.", en: "I have a cold, so I can't come today." }
   },
   {
@@ -8391,10 +9798,12 @@ var B1_WORDS = [
     en: "date",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Daten",
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Welches Datum haben wir heute?", en: "What is today's date?" }
   },
   {
@@ -8407,6 +9816,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieses Detail ist unwichtig.", en: "This detail is unimportant." }
   },
   {
@@ -8419,6 +9830,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Gib mir bitte mal das Ding da drüben.", en: "Please hand me that thing over there." }
   },
   {
@@ -8431,30 +9844,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du alle Dokumente für die Anmeldung dabei?", en: "Do you have all the documents for the registration with you?" }
   },
   {
     id: 1345,
     de: "dumm",
-    en: "stupid, silly",
+    en: "stupid / silly",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Entschuldigung, das war dumm von mir.", en: "Sorry, that was stupid of me." }
   },
   {
     id: 1346,
     de: "echt",
-    en: "real, genuine",
+    en: "real / genuine",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich träume von einem echten Perserteppich.", en: "I dream of a genuine Persian carpet." }
   },
   {
@@ -8467,43 +9886,51 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Goethestraße ist jetzt eine Einbahnstraße.", en: "Goethestraße is now a one-way street." }
   },
   {
     id: 1348,
     de: "einführen",
-    en: "to introduce; to import",
+    en: "to introduce / to import",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "führt ein", "präteritum": "führte ein", "perfekt": "hat eingeführt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Dürfen wir diese Ware ins Land einführen?", en: "May we import this product into the country?" }
   },
   {
     id: 1349,
     de: "die Einrichtung",
-    en: "furnishing(s); facility",
+    en: "furnishing(s) / facility",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Einrichtungen",
     conjugation: null,
     lesson: 0,
     category: "housing",
-    example: { de: "Einrichtung gefällt mir sehr gut.", en: "I really like the furnishings." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Deine Wohnung ist sehr gemütlich, die Einrichtung gefällt mir sehr gut.", en: "Your apartment is very cozy, I really like the furnishings." }
   },
   {
     id: 1350,
     de: "die Einwohnerin",
-    en: "inhabitant, resident (female)",
+    en: "inhabitant (female)",
     type: "noun",
     gender: "f",
     plural: "die Einwohnerinnen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
-    example: { de: "Berlin hat über drei Millionen Einwohner.", en: "Berlin has over three million inhabitants." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Frau Berger ist die älteste Einwohnerin unseres Dorfes.", en: "Mrs. Berger is the oldest inhabitant of our village." }
   },
   {
     id: 1351,
@@ -8515,6 +9942,8 @@ var B1_WORDS = [
     conjugation: { "er": "endet", "präteritum": "endete", "perfekt": "hat geendet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Straße endet hier.", en: "The street ends here." }
   },
   {
@@ -8527,6 +9956,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Gehen Sie diese Straße entlang. Dann kommen Sie direkt zum Bahnhof.", en: "Walk along this street. Then you'll come directly to the train station." }
   },
   {
@@ -8539,6 +9970,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Erfindung des Buchdrucks war sehr wichtig für die Menschen.", en: "The invention of printing was very important for humankind." }
   },
   {
@@ -8551,66 +9984,78 @@ var B1_WORDS = [
     conjugation: { "er": "erinnert", "präteritum": "erinnerte", "perfekt": "hat erinnert" },
     lesson: 0,
     category: "daily_verbs",
-    example: { de: "Bitte, erinnern Sie mich noch einmal an den Termin", en: "Please remind me of the appointment again." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Bitte, erinnern Sie mich noch einmal an den Termin.", en: "Please remind me of the appointment again." }
   },
   {
     id: 1355,
     de: "eröffnen",
-    en: "to open",
+    en: "to open (a new shop) / to inaugurate",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "eröffnet", "präteritum": "eröffnete", "perfekt": "hat eröffnet" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Nachbar hat letzten Monat ein Geschäft eröffnet.", en: "My neighbor opened a shop last month." }
   },
   {
     id: 1356,
     de: "eventuell",
-    en: "possibly, perhaps",
+    en: "possibly / perhaps",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme eventuell etwas später.", en: "I might come a bit later." }
   },
   {
     id: 1357,
     de: "die Fähigkeit",
-    en: "ability, skill",
+    en: "ability / skill",
     type: "noun",
     gender: "f",
     plural: "die Fähigkeiten",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "In seiner Position braucht man die Fähigkeit, andere zu überzeugen.", en: "In his position you need the ability to convince others." }
   },
   {
     id: 1358,
     de: "fassen",
-    en: "to catch, to grasp",
+    en: "to catch / to grasp",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "fasst", "präteritum": "fasste", "perfekt": "hat gefasst" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie haben den Dieb gefasst.", en: "They caught the thief." }
   },
   {
     id: 1359,
     de: "fest",
-    en: "firm, solid",
+    en: "firm / solid",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Kollege glaubt fest daran, dass er die neue Stelle bekommt.", en: "My colleague firmly believes that he will get the new position." }
   },
   {
@@ -8623,6 +10068,8 @@ var B1_WORDS = [
     conjugation: { "er": "finanziert", "präteritum": "finanzierte", "perfekt": "hat finanziert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich weiß nicht, wie ich das Auto finanzieren soll.", en: "I don't know how I'm going to finance the car." }
   },
   {
@@ -8635,42 +10082,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Diesen Hut habe ich am Flohmarkt gekauft. Sie spielt sehr schön Flöte.", en: "I bought this hat at the flea market. She plays the flute very beautifully." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Diesen Hut habe ich am Flohmarkt gekauft.", en: "I bought this hat at the flea market." }
   },
   {
     id: 1362,
     de: "fördern",
-    en: "to promote, to support",
+    en: "to promote / to support",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "fördert", "präteritum": "förderte", "perfekt": "hat gefördert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Stadt fördert viele Sportprojekte.", en: "The city supports many sports projects." }
   },
   {
     id: 1363,
     de: "frech",
-    en: "cheeky, impudent",
+    en: "cheeky / impudent",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Du darfst in der Schule nicht so frech sein.", en: "You mustn't be so cheeky at school." }
   },
   {
     id: 1364,
     de: "die Frist",
-    en: "deadline, time limit",
+    en: "deadline / time limit",
     type: "noun",
     gender: "f",
     plural: "die Fristen",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Frist für die Anmeldung zum Deutschkurs ist abgelaufen.", en: "The deadline for registering for the German course has expired." }
   },
   {
@@ -8683,6 +10138,8 @@ var B1_WORDS = [
     conjugation: { "er": "füttert", "präteritum": "fütterte", "perfekt": "hat gefüttert" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Es ist im Zoo nicht erlaubt, die Tiere zu füttern.", en: "It is not allowed to feed the animals at the zoo." }
   },
   {
@@ -8695,54 +10152,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Gebühr liegt bei 60 Euro.", en: "The fee is 60 euros." }
   },
   {
     id: 1367,
     de: "die Gegend",
-    en: "area, region",
+    en: "area / region (around here)",
     type: "noun",
     gender: "f",
     plural: "die Gegenden",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Schwarzwald ist eine sehr schöne Gegend.", en: "The Black Forest is a very beautiful region." }
   },
   {
     id: 1368,
     de: "gemeinsam",
-    en: "together, joint",
+    en: "together / joint",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Du musst die Wohnung renovieren? Ich helfe dir. Wir können das gemeinsam machen.", en: "You need to renovate your apartment? I'll help you. We can do it together." }
   },
   {
     id: 1369,
     de: "das Gerät",
-    en: "device, appliance",
+    en: "device / appliance",
     type: "noun",
     gender: "n",
     plural: "die Geräte",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kaufe meine Elektrogeräte immer gebraucht. Das ist viel billiger.", en: "I always buy my electrical appliances secondhand. It's much cheaper." }
   },
   {
     id: 1370,
     de: "das Geschlecht",
-    en: "gender, sex",
+    en: "gender / sex",
     type: "noun",
     gender: "n",
     plural: "die Geschlechter",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte kreuzen Sie an: „Geschlecht: weiblich/männlich“.", en: "Please check the box: 'Gender: female/male'." }
   },
   {
@@ -8755,6 +10222,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Gewerkschaft vertritt die Interessen der Arbeitnehmer.", en: "The union represents the interests of the employees." }
   },
   {
@@ -8767,18 +10236,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "Vorsicht, das Gift dieser Pflanze ist für Menschen gefährlich! giftig Vorsicht, das ist giftig!", en: "Watch out, the poison of this plant is dangerous to humans! poisonous: Watch out, that's poisonous!" }
+    level: "B1",
+    freq: 2,
+    example: { de: "Vorsicht, das Gift dieser Pflanze ist für Menschen gefährlich!", en: "Careful, this plant's poison is dangerous to humans!" }
   },
   {
     id: 1373,
     de: "die Gratulation",
-    en: "congratulations",
+    en: "congratulations (formal noun)",
     type: "noun",
     gender: "f",
     plural: "die Gratulationen",
     conjugation: null,
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 2,
     example: { de: "Herzliche Gratulation! Sie haben gewonnen!", en: "Congratulations! You won!" }
   },
   {
@@ -8791,6 +10264,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Für Gruppen gibt es eine Ermäßigung.", en: "There is a discount for groups." }
   },
   {
@@ -8803,6 +10278,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Stadt baut eine neue Sporthalle.", en: "The city is building a new sports hall." }
   },
   {
@@ -8815,6 +10292,8 @@ var B1_WORDS = [
     conjugation: { "er": "hebt", "präteritum": "hob", "perfekt": "hat gehoben" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Kannst du mir helfen? Das Paket kann ich allein nicht heben.", en: "Can you help me? I can't lift the package by myself." }
   },
   {
@@ -8827,6 +10306,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Spiel ist eine Herausforderung.", en: "The game is a challenge." }
   },
   {
@@ -8839,18 +10320,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Claudia und Peter wollen ihre Hochzeit groß feiern.", en: "Claudia and Peter want to celebrate their wedding in a big way." }
   },
   {
     id: 1379,
     de: "die Hütte",
-    en: "hut, cabin",
+    en: "hut / cabin",
     type: "noun",
     gender: "f",
     plural: "die Hütten",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir übernachten in der Hütte auf dem Berg.", en: "We're staying overnight in the cabin on the mountain." }
   },
   {
@@ -8863,6 +10348,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "In dieser Gegend gibt es viel Industrie.", en: "There is a lot of industry in this area." }
   },
   {
@@ -8875,42 +10362,50 @@ var B1_WORDS = [
     conjugation: { "er": "installiert", "präteritum": "installierte", "perfekt": "hat installiert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Können Sie mir helfen, meinen Computer zu installieren?", en: "Can you help me install my computer?" }
   },
   {
     id: 1382,
     de: "inzwischen",
-    en: "meanwhile, in the meantime",
+    en: "meanwhile / in the meantime",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Herr Müller kommt gleich zurück. Sie können inzwischen in seinem Büro warten.", en: "Mr. Müller will be back shortly. You can wait in his office in the meantime." }
   },
   {
     id: 1383,
     de: "der Jugendliche",
-    en: "young person, teenager",
+    en: "teenager (male) / young person",
     type: "noun",
     gender: "m",
     plural: "die Jugendlichen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Jugendlichen gehen gerne in die Disko.", en: "The teenagers like to go to the disco." }
   },
   {
     id: 1384,
     de: "kämpfen",
-    en: "to fight, to struggle",
+    en: "to fight / to struggle",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kämpft", "präteritum": "kämpfte", "perfekt": "hat gekämpft" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Frauen kämpfen für mehr Rechte.", en: "The women are fighting for more rights." }
   },
   {
@@ -8923,18 +10418,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Hasen fressen gern Karotten.", en: "Rabbits like to eat carrots." }
   },
   {
     id: 1386,
     de: "das Kennzeichen",
-    en: "license plate; distinguishing mark",
+    en: "license plate / distinguishing mark",
     type: "noun",
     gender: "n",
     plural: "die Kennzeichen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Auto hat ein Schweizer Kennzeichen.", en: "The car has a Swiss license plate." }
   },
   {
@@ -8947,6 +10446,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie müssen noch mehr Deutsch lernen. – Ja, das ist mir klar.", en: "You need to learn more German. – Yes, I'm aware of that." }
   },
   {
@@ -8959,6 +10460,8 @@ var B1_WORDS = [
     conjugation: { "er": "klickt", "präteritum": "klickte", "perfekt": "hat geklickt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn du die Datei öffnen willst, musst du mit der Maus zweimal klicken.", en: "If you want to open the file, you have to double-click with the mouse." }
   },
   {
@@ -8967,11 +10470,13 @@ var B1_WORDS = [
     en: "dumpling",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Knödel",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
-    example: { de: "Möchten Sie zum Fleisch Erdäpfel oder Knödel? – Knödel bitte.", en: "Would you like potatoes or dumplings with the meat? – Dumplings, please." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Möchten Sie zum Fleisch Kartoffeln oder Knödel? – Knödel bitte.", en: "Would you like potatoes or dumplings with the meat? – Dumplings, please." }
   },
   {
     id: 1390,
@@ -8983,6 +10488,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Das ist ein alter Konflikt.", en: "That's an old conflict." }
   },
   {
@@ -8995,18 +10502,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Für das Konzert am Sonntag gibt es noch Karten.", en: "There are still tickets available for the concert on Sunday." }
   },
   {
     id: 1392,
     de: "das Kraftwerk",
-    en: "power plant, power station",
+    en: "power plant / power station",
     type: "noun",
     gender: "n",
     plural: "die Kraftwerke",
     conjugation: null,
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Menschen protestieren gegen das Kraftwerk.", en: "People are protesting against the power plant." }
   },
   {
@@ -9019,18 +10530,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Wirtschaft steckt in einer schweren Krise.", en: "The economy is in a severe crisis." }
   },
   {
     id: 1394,
     de: "kürzlich",
-    en: "recently",
+    en: "recently / lately",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir haben doch kürzlich darüber gesprochen, dass wir am Wochenende wegfahren wollen.", en: "We talked about this recently — that we want to go away for the weekend." }
   },
   {
@@ -9043,6 +10558,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Landschaft ist sehr hügelig.", en: "The landscape is very hilly." }
   },
   {
@@ -9055,30 +10572,36 @@ var B1_WORDS = [
     conjugation: { "er": "leidet", "präteritum": "litt", "perfekt": "hat gelitten" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Er leidet an einer schweren Krankheit.", en: "He suffers from a severe illness." }
   },
   {
     id: 1397,
     de: "lieb",
-    en: "dear, sweet, good",
+    en: "dear / sweet / good",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kinder waren heute sehr lieb.", en: "The children were very good today." }
   },
   {
     id: 1398,
     de: "locker",
-    en: "loose, relaxed",
+    en: "loose / relaxed",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Lassen Sie bitte die Arme ganz locker und atmen Sie tief ein.", en: "Please keep your arms nice and loose and breathe in deeply." }
   },
   {
@@ -9091,6 +10614,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 1,
     example: { de: "Mit tut der Magen weh. Ich habe Magenschmerzen.", en: "My stomach hurts. I have a stomachache." }
   },
   {
@@ -9103,30 +10628,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Mannschaft hat 0:1 verloren.", en: "Our team lost 0:1." }
   },
   {
     id: 1401,
     de: "maximal",
-    en: "at most, maximum",
+    en: "at most / maximum",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie lange braucht ein Brief? – Maximal zwei Tage.", en: "How long does a letter take? – Two days at most." }
   },
   {
     id: 1402,
     de: "die Menge",
-    en: "quantity, amount",
+    en: "quantity / amount",
     type: "noun",
     gender: "f",
     plural: "die Mengen",
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Diesen Preis gibt es nur, wenn Sie große Mengen kaufen.", en: "You only get this price if you buy large quantities." }
   },
   {
@@ -9139,19 +10670,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Berlin und Wien sind Metropolen.", en: "Berlin and Vienna are metropolises." }
   },
   {
     id: 1404,
     de: "die Mitarbeiterin",
-    en: "employee, colleague (female)",
+    en: "employee (female) / colleague",
     type: "noun",
     gender: "f",
     plural: "die Mitarbeiterinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Unsere Firma hat sieben Mitarbeiter.", en: "Our company has seven employees." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine neue Mitarbeiterin fängt am Montag bei uns an.", en: "A new employee starts with us on Monday." }
   },
   {
     id: 1405,
@@ -9163,6 +10698,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Wohnung ist modern eingerichtet.", en: "The apartment is furnished in a modern style." }
   },
   {
@@ -9175,6 +10712,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Automat nimmt nur Münzen.", en: "The vending machine only takes coins." }
   },
   {
@@ -9187,6 +10726,8 @@ var B1_WORDS = [
     conjugation: { "er": "schlägt nach", "präteritum": "schlug nach", "perfekt": "hat nachgeschlagen" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kenne das Wort nicht. Das musst du im Wörterbuch nachschlagen.", en: "I don't know the word. You have to look it up in the dictionary." }
   },
   {
@@ -9199,6 +10740,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Wegen Nebels konnten wir gestern nicht in Frankfurt landen.", en: "Because of fog, we couldn't land in Frankfurt yesterday." }
   },
   {
@@ -9211,6 +10754,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Soziale Netzwerke sind wichtig.", en: "Social networks are important." }
   },
   {
@@ -9223,6 +10768,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Räume hier sind mir zu niedrig.", en: "The rooms here are too low for me." }
   },
   {
@@ -9235,6 +10782,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe Ihnen eine Notiz geschrieben.", en: "I wrote you a note." }
   },
   {
@@ -9247,19 +10796,24 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie bekommen von uns eine offizielle Einladung.", en: "You will receive an official invitation from us." }
   },
   {
     id: 1413,
     de: "die Ordination",
-    en: "doctor's office, medical practice",
+    en: "doctor's office / medical practice (Austrian)",
     type: "noun",
     gender: "f",
     plural: "die Ordinationen",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "Die Ordination bleibt bis zum", en: "The practice remains ... until the." }
+    level: "B1",
+    freq: 2,
+    region: "A",
+    example: { de: "Die Ordination bleibt bis zum 7. Jänner geschlossen.", en: "The practice is closed until 7 January." }
   },
   {
     id: 1414,
@@ -9271,6 +10825,8 @@ var B1_WORDS = [
     conjugation: { "er": "packt", "präteritum": "packte", "perfekt": "hat gepackt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss noch meinen Koffer packen.", en: "I still need to pack my suitcase." }
   },
   {
@@ -9283,6 +10839,8 @@ var B1_WORDS = [
     conjugation: { "er": "passiert", "präteritum": "passierte", "perfekt": "ist passiert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Entschuldigung! – Kein Problem. Es ist nichts passiert.", en: "Sorry! – No problem. Nothing happened." }
   },
   {
@@ -9295,6 +10853,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Reiseorganisation war perfekt.", en: "The trip was organized perfectly." }
   },
   {
@@ -9307,18 +10867,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Haben Sie frische Pilze?", en: "Do you have fresh mushrooms?" }
   },
   {
     id: 1418,
     de: "das Poulet",
-    en: "chicken",
+    en: "chicken (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Poulets",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Zum Mittagessen gibt es Poulet mit Reis.", en: "For lunch there is chicken with rice." }
   },
   {
@@ -9331,18 +10896,22 @@ var B1_WORDS = [
     conjugation: { "er": "produziert", "präteritum": "produzierte", "perfekt": "hat produziert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Unsere Firma produziert Feuerzeuge.", en: "Our company produces lighters." }
   },
   {
     id: 1420,
     de: "der Prozess",
-    en: "trial, lawsuit, process",
+    en: "trial / lawsuit / process",
     type: "noun",
     gender: "m",
     plural: "die Prozesse",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Prozess wird direkt aus dem Gerichtssaal im Fernsehen übertragen.", en: "The trial is being broadcast live on television from the courtroom." }
   },
   {
@@ -9355,6 +10924,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Brauchen Sie eine Quittung?", en: "Do you need a receipt?" }
   },
   {
@@ -9363,11 +10934,13 @@ var B1_WORDS = [
     en: "reality",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Realitäten",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Realität. realistisch Ich glaube nicht, dass du für das Auto noch so viel Geld bekommst. Das ist nicht realistisch.", en: "Reality. realistic: I don't think you'll get that much money for the car anymore. That's not realistic." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Das gefällt dir nicht? Aber das ist die Realität.", en: "You don't like that? But that's reality." }
   },
   {
     id: 1423,
@@ -9379,6 +10952,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Regierung plant für nächstes Jahr eine Reform. Die Steuern sollen steigen.", en: "The government is planning a reform for next year. Taxes are supposed to rise." }
   },
   {
@@ -9391,6 +10966,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Ihr Wagen braucht neue Reifen.", en: "Your car needs new tires." }
   },
   {
@@ -9403,6 +10980,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Es gibt einen neuen Rekord im Schwimmen.", en: "There is a new record in swimming." }
   },
   {
@@ -9415,7 +10994,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Der Richter hat noch kein Urteil gesprochen.", en: "The judge has not yet passed a verdict." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Richterin hat noch kein Urteil gesprochen.", en: "The judge has not yet passed a verdict." }
   },
   {
     id: 1427,
@@ -9427,18 +11008,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Schauspielerin hat ihre Rolle sehr gut gespielt.", en: "The actress played her role very well." }
   },
   {
     id: 1428,
     de: "der Saal",
-    en: "hall, room",
+    en: "hall / room",
     type: "noun",
     gender: "m",
     plural: "die Säle",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Für unsere Familienfeier haben wir einen kleinen Saal gemietet.", en: "We rented a small hall for our family celebration." }
   },
   {
@@ -9451,18 +11036,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Wie findest du diesen Sänger? − Ich finde seine Stimme toll.", en: "What do you think of this singer? – I think his voice is great." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Wie findest du diese Sängerin? – Ich finde ihre Stimme toll.", en: "What do you think of this singer? – I think her voice is great." }
   },
   {
     id: 1430,
     de: "scharf",
-    en: "spicy, sharp",
+    en: "spicy / sharp",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Bei uns zu Hause essen wir immer sehr scharf.", en: "At home we always eat very spicy food." }
   },
   {
@@ -9475,6 +11064,8 @@ var B1_WORDS = [
     conjugation: { "er": "schenkt", "präteritum": "schenkte", "perfekt": "hat geschenkt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir wollen dir zum Geburtstag etwas schenken.", en: "We want to give you something for your birthday." }
   },
   {
@@ -9487,18 +11078,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "In diesem Kleid siehst du sehr schlank aus.", en: "You look very slim in this dress." }
   },
   {
     id: 1433,
     de: "das Schnitzel",
-    en: "schnitzel, cutlet",
+    en: "schnitzel / cutlet",
     type: "noun",
     gender: "n",
     plural: "die Schnitzel",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte ein Schnitzel mit Kartoffeln und Salat.", en: "A schnitzel with potatoes and salad, please." }
   },
   {
@@ -9511,55 +11106,66 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin noch nicht gesund. Ich fühle mich noch sehr schwach.", en: "I'm not well yet. I still feel very weak." }
   },
   {
     id: 1435,
     de: "selbst",
-    en: "myself/yourself/oneself",
+    en: "myself / yourself / oneself",
     type: "pronoun",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "pronouns",
-    example: { de: "Den Kuchen habe ich selbst gebacken. selber Sie will das selber machen.", en: "I baked the cake myself. — She wants to do that herself." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Den Kuchen habe ich selbst gebacken.", en: "I baked the cake myself." }
   },
   {
     id: 1436,
     de: "der Serviceangestellte",
-    en: "service attendant, service employee",
+    en: "waiter / service employee (Swiss)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Serviceangestellten",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Ich bin Serviceangestellte von Beruf.", en: "I am a service attendant by profession." }
+    level: "B1",
+    freq: 2,
+    region: "CH",
+    example: { de: "Er ist Serviceangestellter von Beruf.", en: "He is a waiter by profession." }
   },
   {
     id: 1437,
     de: "so",
-    en: "so, like this",
+    en: "so / like this",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie macht man das? – So!", en: "How do you do that? – Like this!" }
   },
   {
     id: 1438,
     de: "die Sorge",
-    en: "worry, concern",
+    en: "worry / concern",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Sorgen",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
-    example: { de: "keine Sorgen zu machen.", en: "... not to worry." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Um Ihre Zukunft brauchen Sie sich keine Sorgen zu machen.", en: "You don't need to worry about your future." }
   },
   {
     id: 1439,
@@ -9571,42 +11177,50 @@ var B1_WORDS = [
     conjugation: { "er": "speichert", "präteritum": "speicherte", "perfekt": "hat gespeichert" },
     lesson: 0,
     category: "work_study_verbs",
-    example: { de: "Sie müssen die Datei speichern. WORTLISTE 81", en: "You have to save the file. WORD LIST 81" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Sie müssen die Datei speichern.", en: "You have to save the file." }
   },
   {
     id: 1440,
     de: "der Sportler",
-    en: "athlete, sportsman",
+    en: "athlete / sportsman",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Sportler",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "sportlich1. Ich bin nicht sehr sportlich.", en: "athletic1. I'm not very athletic." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Mein Bruder ist ein guter Sportler. Er trainiert jeden Tag.", en: "My brother is a good athlete. He trains every day." }
   },
   {
     id: 1441,
     de: "der Standpunkt",
-    en: "point of view, standpoint",
+    en: "point of view / standpoint",
     type: "noun",
     gender: "m",
     plural: "die Standpunkte",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Von seinem Standpunkt aus hat er recht.", en: "From his point of view, he is right." }
   },
   {
     id: 1442,
     de: "die Steckdose",
-    en: "electrical outlet, socket",
+    en: "electrical outlet / socket",
     type: "noun",
     gender: "f",
     plural: "die Steckdosen",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Es gibt drei Steckdosen in diesem Zimmer.", en: "There are three outlets in this room." }
   },
   {
@@ -9619,6 +11233,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Heute sieht man viele Sterne am Himmel.", en: "Today you can see many stars in the sky." }
   },
   {
@@ -9631,18 +11247,22 @@ var B1_WORDS = [
     conjugation: { "er": "stinkt", "präteritum": "stank", "perfekt": "hat gestunken" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Was stinkt denn hier so? – Das ist der Fisch. Er ist nicht mehr frisch.", en: "What's that smell? – That's the fish. It's not fresh anymore." }
   },
   {
     id: 1445,
     de: "die Strecke",
-    en: "route, distance, stretch",
+    en: "route / distance / stretch",
     type: "noun",
     gender: "f",
     plural: "die Strecken",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Sind Sie die ganze Strecke zu Fuß gegangen?", en: "Did you walk the whole way?" }
   },
   {
@@ -9655,6 +11275,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Sucht nach Medikamenten nimmt zu.", en: "Addiction to medication is increasing." }
   },
   {
@@ -9667,6 +11289,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Lehrer schreibt das neue Wort an die Tafel.", en: "The teacher writes the new word on the board." }
   },
   {
@@ -9679,18 +11303,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Tastatur an meinem Computer ist ganz neu.", en: "The keyboard on my computer is brand new." }
   },
   {
     id: 1449,
     de: "teilen",
-    en: "to share, to divide",
+    en: "to share / to divide",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "teilt", "präteritum": "teilte", "perfekt": "hat geteilt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Mann und ich teilen uns die Arbeit.", en: "My husband and I share the work." }
   },
   {
@@ -9703,18 +11331,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Therapie hat geholfen. Es geht mir schon viel besser.", en: "The therapy helped. I feel much better now." }
   },
   {
     id: 1451,
     de: "die Toilette",
-    en: "toilet, restroom",
+    en: "toilet / restroom",
     type: "noun",
     gender: "f",
     plural: "die Toiletten",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wo ist die Toilette, bitte?", en: "Where is the restroom, please?" }
   },
   {
@@ -9723,34 +11355,40 @@ var B1_WORDS = [
     en: "training",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Trainings",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich gehe jede Woche zum Training.", en: "I go to training every week." }
   },
   {
     id: 1453,
     de: "das Tuch",
-    en: "cloth, scarf",
+    en: "cloth / scarf",
     type: "noun",
     gender: "n",
     plural: "die Tücher",
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Wo hast du dieses schöne Tuch gekauft?", en: "Where did you buy this beautiful scarf?" }
   },
   {
     id: 1454,
     de: "überholen",
-    en: "to overtake, to pass",
+    en: "to overtake / to pass",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "überholt", "präteritum": "überholte", "perfekt": "hat überholt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier dürfen Lkws nicht überholen.", en: "Trucks are not allowed to overtake here." }
   },
   {
@@ -9763,18 +11401,22 @@ var B1_WORDS = [
     conjugation: { "er": "übersetzt", "präteritum": "übersetzte", "perfekt": "hat übersetzt" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Können Sie mir bitte diesen Brief übersetzen?", en: "Can you please translate this letter for me?" }
   },
   {
     id: 1456,
     de: "die Umgebung",
-    en: "surroundings, surrounding area",
+    en: "surroundings / surrounding area",
     type: "noun",
     gender: "f",
     plural: "die Umgebungen",
     conjugation: null,
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 1,
     example: { de: "In der Umgebung von Berlin kann man schöne Ausflüge machen.", en: "You can take beautiful trips in the area around Berlin." }
   },
   {
@@ -9787,18 +11429,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich hatte letzte Woche einen Unfall.", en: "I had an accident last week." }
   },
   {
     id: 1458,
     de: "unternehmen",
-    en: "to undertake, to do (something)",
+    en: "to undertake / to do (something)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "unternimmt", "präteritum": "unternahm", "perfekt": "hat unternommen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wollen wir heute Abend noch etwas unternehmen?", en: "Shall we do something else tonight?" }
   },
   {
@@ -9811,6 +11457,8 @@ var B1_WORDS = [
     conjugation: { "er": "unterstützt", "präteritum": "unterstützte", "perfekt": "hat unterstützt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie unterstützen mich, wo sie nur können.", en: "They support me wherever they can." }
   },
   {
@@ -9823,6 +11471,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich mag kein Fleisch. Ich esse am liebsten vegetarisch.", en: "I don't like meat. I prefer to eat vegetarian." }
   },
   {
@@ -9835,42 +11485,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Die Polizei hat den Verbrecher verhaftet.", en: "The police arrested the criminal." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Polizei hat die Verbrecherin verhaftet.", en: "The police arrested the criminal." }
   },
   {
     id: 1462,
     de: "sich vergnügen",
-    en: "to enjoy oneself, to have fun",
+    en: "to enjoy oneself / to have fun",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "vergnügt sich", "präteritum": "vergnügte sich", "perfekt": "hat sich vergnügt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf der Party habe ich mich sehr vergnügt.", en: "I had a lot of fun at the party." }
   },
   {
     id: 1463,
     de: "verlängern",
-    en: "to extend, to renew",
+    en: "to extend / to renew",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verlängert", "präteritum": "verlängerte", "perfekt": "hat verlängert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss meinen Pass verlängern lassen.", en: "I need to get my passport renewed." }
   },
   {
     id: 1464,
     de: "verpflegen",
-    en: "to provide with food, to cater for",
+    en: "to provide with food / to cater for",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verpflegt", "präteritum": "verpflegte", "perfekt": "hat verpflegt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir werden hier sehr gut mit Essen verpflegt.", en: "We are very well catered for here." }
   },
   {
@@ -9883,18 +11541,22 @@ var B1_WORDS = [
     conjugation: { "er": "versichert", "präteritum": "versicherte", "perfekt": "hat versichert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wollen Sie Ihr Gepäck versichern?", en: "Do you want to insure your luggage?" }
   },
   {
     id: 1466,
     de: "verurteilen",
-    en: "to convict, to sentence",
+    en: "to convict / to sentence",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verurteilt", "präteritum": "verurteilte", "perfekt": "hat verurteilt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Gericht hat den Täter zu einer Geldstrafe verurteilt.", en: "The court sentenced the perpetrator to a fine." }
   },
   {
@@ -9907,30 +11569,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf dieser Website kann man an einer virtuellen Stadtrundfahrt teilnehmen.", en: "On this website you can take part in a virtual city tour." }
   },
   {
     id: 1468,
     de: "voraus",
-    en: "ahead, in advance",
+    en: "ahead / in advance",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Gehen Sie schon voraus.", en: "Go on ahead." }
   },
   {
     id: 1469,
     de: "vorläufig",
-    en: "temporary, for the time being",
+    en: "temporary / for the time being",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe noch keine Wohnung. Ich wohne vorläufig bei einem Freund.", en: "I don't have an apartment yet. For now I'm living with a friend." }
   },
   {
@@ -9943,6 +11611,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ziehen Sie bitte einen waagerechten Strich.", en: "Please draw a horizontal line." }
   },
   {
@@ -9955,6 +11625,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Hinter unserem Haus fängt der Wald an.", en: "The forest begins behind our house." }
   },
   {
@@ -9967,6 +11639,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Kreuzen Sie bitte an: „weiblich“ oder „männlich“.", en: "Please check: 'female' or 'male'." }
   },
   {
@@ -9979,6 +11653,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Auto ist vielleicht noch 1000 Euro wert.", en: "The car might still be worth 1000 euros." }
   },
   {
@@ -9991,6 +11667,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Vor unserem Haus ist eine Wiese mit Bäumen.", en: "In front of our house there is a meadow with trees." }
   },
   {
@@ -10003,18 +11681,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Vertreter von Kunst und Wissenschaft treffen sich heute in Berlin.", en: "Representatives of art and science are meeting in Berlin today." }
   },
   {
     id: 1476,
     de: "das Wunder",
-    en: "miracle, wonder",
+    en: "miracle / wonder",
     type: "noun",
     gender: "n",
     plural: "die Wunder",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin mit dem Fahrrad gestürzt. Es war ein Wunder, dass nichts Schlimmes passiert ist.", en: "I fell off my bike. It was a miracle that nothing serious happened." }
   },
   {
@@ -10027,6 +11709,8 @@ var B1_WORDS = [
     conjugation: { "er": "zeichnet", "präteritum": "zeichnete", "perfekt": "hat gezeichnet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Tochter kann sehr gut zeichnen.", en: "My daughter can draw very well." }
   },
   {
@@ -10039,6 +11723,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wenn ich die Prüfung schaffe, bekomme ich ein Zertifikat.", en: "If I pass the exam, I'll get a certificate." }
   },
   {
@@ -10051,6 +11737,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Heute gehen wir mit den Kindern in den Zirkus.", en: "Today we're going to the circus with the children." }
   },
   {
@@ -10063,30 +11751,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Zugang zu diesem Haus ist schwierig.", en: "Access to this house is difficult." }
   },
   {
     id: 1481,
     de: "der Zustand",
-    en: "condition, state",
+    en: "condition / state",
     type: "noun",
     gender: "m",
     plural: "die Zustände",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Als wir in die Wohnung eingezogen sind, war sie in sehr schlechtem Zustand.", en: "When we moved into the apartment, it was in very bad condition." }
   },
   {
     id: 1482,
     de: "allerdings",
-    en: "however",
+    en: "however / admittedly",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir können uns morgen treffen, allerdings habe ich erst ab Mittag Zeit.", en: "We can meet tomorrow; however, I only have time from noon on." }
   },
   {
@@ -10099,7 +11793,9 @@ var B1_WORDS = [
     conjugation: { "er": "bietet an", "präteritum": "bot an", "perfekt": "hat angeboten" },
     lesson: 0,
     category: "daily_verbs",
-    example: { de: "Darf ich Ihnen etwas zu trinken anbieten? WORTLISTE 17", en: "May I offer you something to drink?" }
+    level: "B1",
+    freq: 1,
+    example: { de: "Darf ich Ihnen etwas zu trinken anbieten?", en: "May I offer you something to drink?" }
   },
   {
     id: 1484,
@@ -10111,6 +11807,8 @@ var B1_WORDS = [
     conjugation: { "er": "klickt an", "präteritum": "klickte an", "perfekt": "hat angeklickt" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Du musst das Bild anklicken. Dann wird es größer.", en: "You have to click on the picture. Then it gets bigger." }
   },
   {
@@ -10123,6 +11821,8 @@ var B1_WORDS = [
     conjugation: { "er": "schließt an", "präteritum": "schloss an", "perfekt": "hat angeschlossen" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Wo kann ich den Computer anschließen?", en: "Where can I connect the computer?" }
   },
   {
@@ -10135,6 +11835,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Können Sie den Apparat bitte etwas leiser stellen?", en: "Could you please turn the device down a bit (make it quieter)?" }
   },
   {
@@ -10147,6 +11849,8 @@ var B1_WORDS = [
     conjugation: { "er": "löst auf", "präteritum": "löste auf", "perfekt": "hat aufgelöst" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Tablette bitte in Wasser auflösen.", en: "Please dissolve the tablet in water." }
   },
   {
@@ -10159,30 +11863,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir wohnen nicht weit auseinander.", en: "We don't live far apart." }
   },
   {
     id: 1489,
     de: "die Auskunft",
-    en: "information",
+    en: "information (on request) / information desk",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Auskünfte",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich hätte gern eine Auskunft.", en: "I would like some information." }
   },
   {
     id: 1490,
     de: "auswählen",
-    en: "to choose / select",
+    en: "to choose / to select",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "wählt aus", "präteritum": "wählte aus", "perfekt": "hat ausgewählt" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Für die Aufgabe können Sie aus drei Themen auswählen.", en: "For the task, you can choose from three topics." }
   },
   {
@@ -10195,6 +11905,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme mit der Bahn.", en: "I'm coming by train." }
   },
   {
@@ -10207,42 +11919,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "John trägt jetzt einen Bart.", en: "John has a beard now." }
   },
   {
     id: 1493,
     de: "die Beamtin",
-    en: "female civil servant / official",
+    en: "civil servant (female) / official",
     type: "noun",
     gender: "f",
     plural: "die Beamtinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Frau ist Beamtin bei der Polizei.", en: "My wife is a civil servant with the police." }
   },
   {
     id: 1494,
     de: "beenden",
-    en: "to finish / end",
+    en: "to finish / to end",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beendet", "präteritum": "beendete", "perfekt": "hat beendet" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Du musst deine Ausbildung auf jeden Fall beenden.", en: "You definitely have to finish your training." }
   },
   {
     id: 1495,
     de: "begründen",
-    en: "to justify / give reasons for",
+    en: "to justify / to give reasons for",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "begründet", "präteritum": "begründete", "perfekt": "hat begründet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte begründen Sie Ihre Meinung.", en: "Please justify your opinion." }
   },
   {
@@ -10255,18 +11975,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Krankenkasse hat die Beiträge erhöht.", en: "The health insurance company has increased the premiums." }
   },
   {
     id: 1497,
     de: "beobachten",
-    en: "to observe / watch",
+    en: "to observe / to watch",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beobachtet", "präteritum": "beobachtete", "perfekt": "hat beobachtet" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer hat den Unfall beobachtet?", en: "Who witnessed the accident?" }
   },
   {
@@ -10279,18 +12003,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Michael Schumacher ist ein berühmter Rennfahrer.", en: "Michael Schumacher is a famous race car driver." }
   },
   {
     id: 1499,
     de: "besprechen",
-    en: "to discuss",
+    en: "to discuss / to talk over",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "bespricht", "präteritum": "besprach", "perfekt": "hat besprochen" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen noch genau besprechen, wann wir losfahren und was wir mitnehmen.", en: "We still need to work out exactly when we'll leave and what we'll bring." }
   },
   {
@@ -10303,30 +12031,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte überweisen Sie den Betrag auf unser Konto.", en: "Please transfer the amount to our account." }
   },
   {
     id: 1501,
     de: "die Beziehung",
-    en: "relationship",
+    en: "relationship / connection",
     type: "noun",
     gender: "f",
     plural: "die Beziehungen",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben gute Beziehungen zu unseren Nachbarn.", en: "We have a good relationship with our neighbors." }
   },
   {
     id: 1502,
     de: "bleiben",
-    en: "to stay / remain",
+    en: "to stay / to remain",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "bleibt", "präteritum": "blieb", "perfekt": "ist geblieben" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bleibe heute zu Hause.", en: "I'm staying home today." }
   },
   {
@@ -10339,43 +12073,52 @@ var B1_WORDS = [
     conjugation: { "er": "blutet", "präteritum": "blutete", "perfekt": "hat geblutet" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe mich verletzt. Meine Hand blutet.", en: "I hurt myself. My hand is bleeding." }
   },
   {
     id: 1504,
     de: "der Bub",
-    en: "boy",
+    en: "boy (Austrian / Swiss)",
     type: "noun",
     gender: "m",
     plural: "die Buben",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "In der Schulklasse sind 15 Buben und 10 Mädchen.", en: "There are 15 boys and 10 girls in the class." }
   },
   {
     id: 1505,
     de: "der Bürger",
-    en: "citizen",
+    en: "citizen (male)",
     type: "noun",
     gender: "m",
     plural: "die Bürger",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "EU-Bürgerinnen und Bürger können überall in Europa arbeiten.", en: "EU citizens can work anywhere in Europe." }
   },
   {
     id: 1506,
     de: "der Cousin",
-    en: "cousin",
+    en: "cousin (male)",
     type: "noun",
     gender: "m",
     plural: "die Cousins",
     conjugation: null,
     lesson: 0,
     category: "people_family",
-    example: { de: "Meine Cousine wohnt jetzt in Brasilien.", en: "My cousin now lives in Brazil." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Mein Cousin wohnt jetzt in Brasilien.", en: "My cousin lives in Brazil now." }
   },
   {
     id: 1507,
@@ -10387,18 +12130,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
-    example: { de: "Der Zug kommt in 30 Minuten. Bis dahin können wir einen Kaffee trinken. WORTLISTE 29", en: "The train arrives in 30 minutes. Until then, we can have a coffee." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Der Zug kommt in 30 Minuten. Bis dahin können wir einen Kaffee trinken.", en: "The train arrives in 30 minutes. Until then, we can have a coffee." }
   },
   {
     id: 1508,
     de: "dauern",
-    en: "to last / take (time)",
+    en: "to last / to take (time)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "dauert", "präteritum": "dauerte", "perfekt": "hat gedauert" },
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie lange dauert die Pause? – Eine halbe Stunde.", en: "How long does the break last? - Half an hour." }
   },
   {
@@ -10411,6 +12158,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Schreiben Sie bitte deutlich!", en: "Please write clearly!" }
   },
   {
@@ -10423,6 +12172,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wo kann ich mein Diplom abholen?", en: "Where can I pick up my diploma?" }
   },
   {
@@ -10435,6 +12186,8 @@ var B1_WORDS = [
     conjugation: { "er": "donnert", "präteritum": "donnerte", "perfekt": "hat gedonnert" },
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Hörst du es donnern? Das Gewitter kommt näher.", en: "Do you hear it thundering? The storm is getting closer." }
   },
   {
@@ -10447,6 +12200,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Alle meine Sachen sind durcheinander. Ich finde nichts mehr.", en: "All my things are a mess. I can't find anything anymore." }
   },
   {
@@ -10459,6 +12214,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Das bekommen Sie im Kiosk an der Ecke.", en: "You can get that at the kiosk on the corner." }
   },
   {
@@ -10471,6 +12228,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Ergebnis ist eindeutig. Du hast gewonnen.", en: "The result is clear. You won." }
   },
   {
@@ -10483,6 +12242,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Schüler dieser Schule tragen einheitliche Kleidung.", en: "The students at this school wear a uniform outfit." }
   },
   {
@@ -10495,6 +12256,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ohne meine Familie fühle ich mich ein bisschen einsam.", en: "Without my family I feel a bit lonely." }
   },
   {
@@ -10507,6 +12270,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Mineralwasser gibt es nur als Sechserpack, nicht einzeln.", en: "This mineral water is only sold as a six-pack, not individually." }
   },
   {
@@ -10519,18 +12284,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Endlich haben wir eine schöne Wohnung gefunden.", en: "We've finally found a nice apartment." }
   },
   {
     id: 1519,
     de: "entlassen",
-    en: "to dismiss / discharge",
+    en: "to dismiss / to discharge",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "entlässt", "präteritum": "entließ", "perfekt": "hat entlassen" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Operation ist gut gelaufen. Wir können Sie nächste Woche aus dem Krankenhaus entlassen.", en: "The operation went well. We can discharge you from the hospital next week." }
   },
   {
@@ -10543,18 +12312,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Film war ein großer Erfolg.", en: "The film was a great success." }
   },
   {
     id: 1521,
     de: "erlauben",
-    en: "to allow / permit",
+    en: "to allow / to permit",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erlaubt", "präteritum": "erlaubte", "perfekt": "hat erlaubt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich erlaube meinen Kindern nicht, so lange fernzusehen.", en: "I don't allow my children to watch TV for so long." }
   },
   {
@@ -10567,6 +12340,8 @@ var B1_WORDS = [
     conjugation: { "er": "erreicht", "präteritum": "erreichte", "perfekt": "hat erreicht" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn wir uns beeilen, erreichen wir noch den 8-Uhr-Zug.", en: "If we hurry, we can still catch the 8 o'clock train." }
   },
   {
@@ -10579,6 +12354,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich warte schon ewig auf mein neues Auto!", en: "I've been waiting forever for my new car!" }
   },
   {
@@ -10587,11 +12364,13 @@ var B1_WORDS = [
     en: "roadway / carriageway",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Fahrbahnen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
-    example: { de: "Kühe auf der Fahrbahn.", en: "Cows on the road." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Fahren Sie bitte vorsichtig. Es sind Kühe auf der Fahrbahn.", en: "Please drive carefully. There are cows on the road." }
   },
   {
     id: 1525,
@@ -10603,6 +12382,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Sohn war am Anfang in der Schule sehr faul. Heute lernt er sehr fleißig.", en: "At first my son was very lazy at school. Today he studies very diligently." }
   },
   {
@@ -10615,6 +12396,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Wenn ich 18 werde, feiern wir ein großes Fest.", en: "When I turn 18, we'll have a big celebration." }
   },
   {
@@ -10627,6 +12410,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 2,
     example: { de: "Für die Arbeit brauche ich flache Schuhe.", en: "For work I need flat shoes." }
   },
   {
@@ -10639,7 +12424,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Diesen Hut habe ich am Flohmarkt gekauft. Sie spielt sehr schön Flöte.", en: "I bought this hat at the flea market. She plays the flute very beautifully." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Sie spielt sehr schön Flöte.", en: "She plays the flute very beautifully." }
   },
   {
     id: 1529,
@@ -10647,11 +12434,13 @@ var B1_WORDS = [
     en: "funding / support",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Förderungen",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
-    example: { de: "Förderung von der Stadt.", en: "Funding from the city." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Für das Projekt bekommen wir eine Förderung von der Stadt.", en: "We're getting funding from the city for the project." }
   },
   {
     id: 1530,
@@ -10663,6 +12452,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Manchmal bleibe ich freiwillig länger im Büro.", en: "Sometimes I voluntarily stay longer at the office." }
   },
   {
@@ -10675,6 +12466,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin froh, dass alles so gut geklappt hat.", en: "I'm glad that everything worked out so well." }
   },
   {
@@ -10687,6 +12480,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Galerie ist sehr interessant.", en: "This gallery is very interesting." }
   },
   {
@@ -10699,6 +12494,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir gratulieren zur Geburt eures Kindes!", en: "Congratulations on the birth of your child!" }
   },
   {
@@ -10711,6 +12508,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese beiden Meinungen stehen in starkem Gegensatz zueinander.", en: "These two opinions are in strong contrast to each other." }
   },
   {
@@ -10723,6 +12522,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Rauchen ist in den Gemeinschafts-räumen nicht erlaubt.", en: "Smoking is not allowed in the common rooms." }
   },
   {
@@ -10735,6 +12536,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Lass uns den Kuchen gerecht verteilen.", en: "Let's divide the cake fairly." }
   },
   {
@@ -10747,6 +12550,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Auto fuhr mit zu hoher Geschwindigkeit.", en: "The car was driving at too high a speed." }
   },
   {
@@ -10759,6 +12564,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie teuer ist das Päckchen? – Das hängt vom Gewicht ab.", en: "How much does the package cost? - That depends on the weight." }
   },
   {
@@ -10771,6 +12578,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich spiele seit drei Jahren Gitarre.", en: "I've been playing guitar for three years." }
   },
   {
@@ -10783,18 +12592,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese Reparatur kostet Sie gar nichts, wir machen das gratis für Sie.", en: "This repair won't cost you anything at all, we'll do it for you free of charge." }
   },
   {
     id: 1541,
     de: "grüßen",
-    en: "to greet",
+    en: "to greet / to say hello",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "grüßt", "präteritum": "grüßte", "perfekt": "hat gegrüßt" },
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer war die Frau, die du eben gegrüßt hast?", en: "Who was the woman you just greeted?" }
   },
   {
@@ -10807,6 +12620,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Es gibt leider keine Karten mehr. – Schade. Da kann man nichts machen. Das ist halt so.", en: "Unfortunately there are no tickets left. - Too bad. There's nothing you can do. That's just how it is." }
   },
   {
@@ -10819,6 +12634,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich will jetzt heim.", en: "I want to go home now." }
   },
   {
@@ -10827,11 +12644,13 @@ var B1_WORDS = [
     en: "manufacturer",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Hersteller",
     conjugation: null,
     lesson: 0,
     category: "business_economy",
-    example: { de: "an den Hersteller zurück und lassen es reparieren.", en: "...send it back to the manufacturer and have it repaired." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Ihr Handy ist kaputt? Wir schicken es an den Hersteller zurück und lassen es reparieren.", en: "Your cell phone is broken? We'll send it back to the manufacturer and have it repaired." }
   },
   {
     id: 1545,
@@ -10843,6 +12662,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kinder spielen am liebsten im Hof.", en: "The children like best to play in the courtyard." }
   },
   {
@@ -10855,6 +12676,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Eine Wohnung mit Garten wäre für uns ideal.", en: "An apartment with a garden would be ideal for us." }
   },
   {
@@ -10867,6 +12690,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie haben eine Infektion. Sie müssen Tabletten nehmen.", en: "You have an infection. You need to take tablets." }
   },
   {
@@ -10879,31 +12704,38 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich besuche einen Sprachkurs in einem kleinen Sprachinstitut.", en: "I attend a language course at a small language institute." }
   },
   {
     id: 1549,
     de: "die Jause",
-    en: "snack",
+    en: "snack (Austrian)",
     type: "noun",
     gender: "f",
     plural: "die Jausen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Es ist Zeit für eine kleine Jause.", en: "It's time for a little snack." }
   },
   {
     id: 1550,
     de: "die Jugendliche",
-    en: "young person / teenager",
+    en: "teenager (female) / young person",
     type: "noun",
     gender: "f",
-    plural: "die Jugendlichenen",
+    plural: "die Jugendlichen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
-    example: { de: "Die Jugendlichen gehen gerne in die Disko.", en: "Young people like to go to the disco." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine Jugendliche hat mir den Weg zum Bahnhof gezeigt.", en: "A teenage girl showed me the way to the station." }
   },
   {
     id: 1551,
@@ -10911,11 +12743,13 @@ var B1_WORDS = [
     en: "fight / struggle",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Kämpfe",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Kampf um die Sitzplätze.", en: "Fight/struggle for seats." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Im Schulbus gibt es immer einen Kampf um die Sitzplätze.", en: "On the school bus there's always a fight for the seats." }
   },
   {
     id: 1552,
@@ -10927,6 +12761,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Bruder hat große Pläne. Er will Karriere machen.", en: "My brother has big plans. He wants to build a career." }
   },
   {
@@ -10939,18 +12775,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Für den Geburtstagstisch brauchen wir viele Blumen und Kerzen.", en: "For the birthday table we need lots of flowers and candles." }
   },
   {
     id: 1554,
     de: "klären",
-    en: "to clarify / resolve",
+    en: "to clarify / to resolve",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "klärt", "präteritum": "klärte", "perfekt": "hat geklärt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich hoffe, wir können dieses Problem bald klären.", en: "I hope we can resolve this problem soon." }
   },
   {
@@ -10959,11 +12799,13 @@ var B1_WORDS = [
     en: "click",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Klicks",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
-    example: { de: "Doppelklick mit der linken Maustaste.", en: "Double-click with the left mouse button." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Um das Wort zu markieren, genügt ein Doppelklick mit der linken Maustaste.", en: "To highlight the word, a double-click with the left mouse button is enough." }
   },
   {
     id: 1556,
@@ -10975,6 +12817,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "An meiner Jacke fehlt ein Knopf.", en: "My jacket is missing a button." }
   },
   {
@@ -10987,6 +12831,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Der spanische König ist in Deutschland zu Besuch.", en: "The Spanish king is visiting Germany." }
   },
   {
@@ -10996,9 +12842,11 @@ var B1_WORDS = [
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: null,
+    conjugation: { "er": "kopiert", "präteritum": "kopierte", "perfekt": "hat kopiert" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Kann ich mir diesen Artikel kopieren?", en: "Can I copy this article?" }
   },
   {
@@ -11011,6 +12859,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kinder sind beim Basteln sehr kreativ.", en: "The children are very creative when doing crafts." }
   },
   {
@@ -11023,6 +12873,8 @@ var B1_WORDS = [
     conjugation: { "er": "kritisiert", "präteritum": "kritisierte", "perfekt": "hat kritisiert" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Kritisiere mich nicht so oft.", en: "Don't criticize me so often." }
   },
   {
@@ -11035,6 +12887,8 @@ var B1_WORDS = [
     conjugation: { "er": "küsst", "präteritum": "küsste", "perfekt": "hat geküsst" },
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Er nahm sie in die Arme und küsste sie.", en: "He took her in his arms and kissed her." }
   },
   {
@@ -11047,6 +12901,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wann reparierst du die Heizung. – Die habe ich schon längst repariert.", en: "When are you going to fix the heating? - I fixed it a long time ago already." }
   },
   {
@@ -11059,6 +12915,8 @@ var B1_WORDS = [
     conjugation: { "er": "leistet", "präteritum": "leistete", "perfekt": "hat geleistet" },
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "So ein teures Auto kann ich mir leider nicht leisten.", en: "Unfortunately, I can't afford such an expensive car." }
   },
   {
@@ -11071,6 +12929,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Zu deinem Geburtstag singen wir dir ein Lied.", en: "On your birthday we'll sing you a song." }
   },
   {
@@ -11083,6 +12943,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie bekommen Ihren Lohn immer am Ende des Monats.", en: "You always get your wages at the end of the month." }
   },
   {
@@ -11095,6 +12957,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte 1 kg mageres Fleisch.", en: "1 kg of lean meat, please." }
   },
   {
@@ -11107,18 +12971,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Pass ist in dieser Mappe.", en: "My passport is in this case." }
   },
   {
     id: 1568,
     de: "der Mechaniker",
-    en: "mechanic",
+    en: "mechanic (male)",
     type: "noun",
     gender: "m",
     plural: "die Mechaniker",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Das kann nur ein Mechaniker reparieren.", en: "Only a mechanic can repair that." }
   },
   {
@@ -11127,10 +12995,12 @@ var B1_WORDS = [
     en: "university cafeteria",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Mensas / die Mensen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich esse fast jeden Tag in der Mensa.", en: "I eat in the cafeteria almost every day." }
   },
   {
@@ -11143,6 +13013,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieser Metzger hat sehr gute Wurst.", en: "This butcher has very good sausage." }
   },
   {
@@ -11155,6 +13027,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sprechen Sie bitte miteinander.", en: "Please talk to each other." }
   },
   {
@@ -11163,11 +13037,13 @@ var B1_WORDS = [
     en: "possibility / option",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Möglichkeiten",
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "mehrere Möglichkeiten. Ihnen der Termin passt.", en: "There are several options as to when the appointment suits you." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Sie wollen ans Meer? Da gibt es mehrere Möglichkeiten.", en: "You want to go to the seaside? There are several options." }
   },
   {
     id: 1573,
@@ -11179,19 +13055,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Im Fitness-Studio trainieren wir unsere Muskeln.", en: "At the gym we train our muscles." }
   },
   {
     id: 1574,
     de: "die Nachspeise",
-    en: "dessert",
+    en: "dessert / sweet course",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Nachspeisen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
-    example: { de: "Nach dem Essen gab es noch eine leckere Nachspeise", en: "After the meal there was a delicious dessert." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Nach dem Essen gab es noch eine leckere Nachspeise.", en: "After the meal there was a delicious dessert." }
   },
   {
     id: 1575,
@@ -11203,6 +13083,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Freund studiert Geschichte. Und nebenbei arbeitet er in einer Kneipe.", en: "My friend studies history. And on the side, he works in a pub." }
   },
   {
@@ -11215,6 +13097,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "In dieser Sache gibt es keine Neuigkeiten.", en: "There is no news on this matter." }
   },
   {
@@ -11227,18 +13111,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich kann die Quittung nirgends finden.", en: "I can't find the receipt anywhere." }
   },
   {
     id: 1578,
     de: "notwendig",
-    en: "necessary",
+    en: "necessary / essential",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Muss ich nochmal wiederkommen? – Nein, das ist nicht notwendig.", en: "Do I have to come back again? - No, that's not necessary." }
   },
   {
@@ -11251,18 +13139,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Oma ist achtzig Jahre alt geworden.", en: "My grandma turned eighty years old." }
   },
   {
     id: 1580,
     de: "ordnen",
-    en: "to organize / put in order",
+    en: "to organize / to put in order",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "ordnet", "präteritum": "ordnete", "perfekt": "hat geordnet" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Letztes Wochenende habe ich meine Papiere geordnet.", en: "Last weekend I organized my papers." }
   },
   {
@@ -11275,6 +13167,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du das Paket zur Post gebracht?", en: "Did you take the package to the post office?" }
   },
   {
@@ -11287,7 +13181,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
-    example: { de: "Man sollte im Kurs nicht passiv sein, sondern mitdiskutieren. WORTLISTE 69", en: "You shouldn't be passive in the course, but should join the discussion." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Man sollte im Kurs nicht passiv sein, sondern mitdiskutieren.", en: "You shouldn't be passive in the course, but should join the discussion." }
   },
   {
     id: 1583,
@@ -11299,6 +13195,8 @@ var B1_WORDS = [
     conjugation: { "er": "pflanzt", "präteritum": "pflanzte", "perfekt": "hat gepflanzt" },
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 2,
     example: { de: "Lass uns einen Baum pflanzen!", en: "Let's plant a tree!" }
   },
   {
@@ -11307,10 +13205,12 @@ var B1_WORDS = [
     en: "pizza",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Pizzas / die Pizzen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Lass uns eine Pizza bestellen!", en: "Let's order a pizza!" }
   },
   {
@@ -11323,30 +13223,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich mache diesen Sommer drei Monate ein Praktikum bei einer Firma.", en: "This summer I'm doing a three-month internship at a company." }
   },
   {
     id: 1586,
     de: "der Professor",
-    en: "professor",
+    en: "professor (male)",
     type: "noun",
     gender: "m",
     plural: "die Professoren",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Unsere Nachbarin ist Professorin an der Universität.", en: "Our neighbor is a professor at the university." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Unser Nachbar ist Professor an der Universität.", en: "Our neighbor is a professor at the university." }
   },
   {
     id: 1587,
     de: "prüfen",
-    en: "to check / verify",
+    en: "to check / to examine",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "prüft", "präteritum": "prüfte", "perfekt": "hat geprüft" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte prüfen Sie sofort, ob die Rechnung stimmt.", en: "Please check immediately whether the invoice is correct." }
   },
   {
@@ -11359,18 +13265,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie bekommen zehn Prozent Rabatt.", en: "You get a ten percent discount." }
   },
   {
     id: 1589,
     de: "die Recherche",
-    en: "research",
+    en: "research (looking things up) / investigation",
     type: "noun",
     gender: "f",
     plural: "die Recherchen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Für diesen Bericht waren viele Recherchen nötig.", en: "A lot of research was necessary for this report." }
   },
   {
@@ -11383,6 +13293,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Buch steht im Regal oben rechts.", en: "The book is on the shelf, top right." }
   },
   {
@@ -11395,6 +13307,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe Karten für das Konzert. Wir sitzen in der dritten Reihe.", en: "I have tickets for the concert. We're sitting in the third row." }
   },
   {
@@ -11407,6 +13321,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Wohnung ist relativ groß, aber sehr teuer.", en: "The apartment is relatively big, but very expensive." }
   },
   {
@@ -11419,6 +13335,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zug in Richtung Köln hat Verspätung.", en: "The train heading to Cologne is delayed." }
   },
   {
@@ -11431,6 +13349,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich lese gern Romane.", en: "I like to read novels." }
   },
   {
@@ -11443,6 +13363,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben unsere Sachen im Hotel gelassen.", en: "We left our things at the hotel." }
   },
   {
@@ -11455,6 +13377,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Möchten Sie noch etwas? – Nein danke, ich bin satt.", en: "Would you like some more? - No thanks, I'm full." }
   },
   {
@@ -11467,6 +13391,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Gestern hatten wir 25 Grad im Schatten.", en: "Yesterday we had 25 degrees in the shade." }
   },
   {
@@ -11479,6 +13405,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Schere hier schneidet schlecht. Hast du noch eine andere?", en: "These scissors don't cut well. Do you have another pair?" }
   },
   {
@@ -11491,6 +13419,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich musste lange warten. Aber schließlich habe ich den Job doch noch bekommen.", en: "I had to wait a long time. But in the end I got the job after all." }
   },
   {
@@ -11503,6 +13433,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich kann leider deine Schrift nicht lesen.", en: "Unfortunately I can't read your handwriting." }
   },
   {
@@ -11515,6 +13447,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Prüfung war sehr schwierig.", en: "The exam was very difficult." }
   },
   {
@@ -11527,6 +13461,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Jetzt bin ich angestellt. Früher war ich selbstständig.", en: "Now I'm employed. Before, I was self-employed." }
   },
   {
@@ -11539,6 +13475,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich hätte gern einen bequemen Sessel.", en: "I would like a comfortable armchair." }
   },
   {
@@ -11551,6 +13489,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Sobald ich den Termin weiß, gebe ich Ihnen Bescheid.", en: "As soon as I know the appointment, I'll let you know." }
   },
   {
@@ -11563,6 +13503,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe ein paar Souvenirs aus dem Urlaub mitgebracht.", en: "I brought back a few souvenirs from my vacation." }
   },
   {
@@ -11575,6 +13517,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich suche einen ganz speziellen Ring für meine Freundin.", en: "I'm looking for a very special ring for my girlfriend." }
   },
   {
@@ -11587,6 +13531,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe heute vom Arzt eine Spritze gegen die Schmerzen bekommen.", en: "Today I got an injection from the doctor for the pain." }
   },
   {
@@ -11599,6 +13545,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Sängerin ist ein großer Star in Deutschland.", en: "This singer is a big star in Germany." }
   },
   {
@@ -11611,6 +13559,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Stecker passt nicht in diese Steckdose.", en: "The plug doesn't fit into this socket." }
   },
   {
@@ -11623,6 +13573,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen immer mehr Steuern zahlen.", en: "We have to pay more and more taxes." }
   },
   {
@@ -11635,6 +13587,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Was für ein Stoff ist das? – Wolle.", en: "What kind of fabric is this? - Wool." }
   },
   {
@@ -11647,6 +13601,8 @@ var B1_WORDS = [
     conjugation: { "er": "streikt", "präteritum": "streikte", "perfekt": "hat gestreikt" },
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Arbeiter streiken für höhere Löhne.", en: "The workers are striking for higher wages." }
   },
   {
@@ -11659,6 +13615,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Summe scheint mir zu hoch!", en: "The sum seems too high to me!" }
   },
   {
@@ -11671,6 +13629,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie ist Ihr Tagesablauf?", en: "What is your daily routine?" }
   },
   {
@@ -11683,30 +13643,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "An der Fernbedienung ist eine Taste kaputt.", en: "A button on the remote control is broken." }
   },
   {
     id: 1616,
     de: "teilnehmen",
-    en: "to take part / participate",
+    en: "to take part / to participate",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "nimmt teil", "präteritum": "nahm teil", "perfekt": "hat teilgenommen" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Leider konnte ich an dem Kurs nicht regelmäßig teilnehmen.", en: "Unfortunately I couldn't attend the course regularly." }
   },
   {
     id: 1617,
     de: "das Ticket",
-    en: "ticket",
+    en: "ticket (flight / event)",
     type: "noun",
     gender: "n",
     plural: "die Tickets",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen die Tickets für unseren Flug ausdrucken.", en: "We have to print out the tickets for our flight." }
   },
   {
@@ -11719,6 +13685,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Nachbarn hören oft laut Musik. Wir müssen sehr tolerant sein.", en: "The neighbors often play loud music. We have to be very tolerant." }
   },
   {
@@ -11727,11 +13695,13 @@ var B1_WORDS = [
     en: "tear (crying)",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Tränen",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
-    example: { de: "Sie trocknet dem Kind die Tränen. Wie willst du die Möbel denn transportieren?", en: "She dries the child's tears. How do you want to transport the furniture, then?" }
+    level: "B1",
+    freq: 2,
+    example: { de: "Sie trocknet dem Kind die Tränen.", en: "She dries the child's tears." }
   },
   {
     id: 1620,
@@ -11743,18 +13713,22 @@ var B1_WORDS = [
     conjugation: { "er": "tut", "präteritum": "tat", "perfekt": "hat getan" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe heute viel zu tun.", en: "I have a lot to do today." }
   },
   {
     id: 1621,
     de: "überlegen",
-    en: "to think over / consider",
+    en: "to think over / to consider",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "überlegt", "präteritum": "überlegte", "perfekt": "hat überlegt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich kann mich nicht entscheiden. Ich muss mir das noch überlegen.", en: "I can't decide. I still need to think it over." }
   },
   {
@@ -11767,18 +13741,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss heute Überstunden machen.", en: "I have to work overtime today." }
   },
   {
     id: 1623,
     de: "umgehen",
-    en: "to handle / deal with",
+    en: "to handle / to deal with",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "geht um", "präteritum": "ging um", "perfekt": "ist umgegangen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Er kann sehr gut mit Kindern umgehen.", en: "He is very good at dealing with children." }
   },
   {
@@ -11791,6 +13769,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich finde diese Speise ungewöhnlich, aber sie schmeckt gut.", en: "I find this dish unusual, but it tastes good." }
   },
   {
@@ -11803,6 +13783,8 @@ var B1_WORDS = [
     conjugation: { "er": "unterrichtet", "präteritum": "unterrichtete", "perfekt": "hat unterrichtet" },
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Frau unterrichtet Spanisch.", en: "My wife teaches Spanish." }
   },
   {
@@ -11815,18 +13797,23 @@ var B1_WORDS = [
     conjugation: { "er": "untersucht", "präteritum": "untersuchte", "perfekt": "hat untersucht" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie sollten sich vom Arzt untersuchen lassen.", en: "You should have yourself examined by a doctor." }
   },
   {
     id: 1627,
     de: "das Velo",
-    en: "bicycle",
+    en: "bicycle (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Velos",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Sie fährt jeden Morgen mit dem Velo zur Arbeit.", en: "She rides her bike to work every morning." }
   },
   {
@@ -11839,6 +13826,8 @@ var B1_WORDS = [
     conjugation: { "er": "verdient", "präteritum": "verdiente", "perfekt": "hat verdient" },
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "In diesem Beruf verdient man gut.", en: "You earn well in this profession." }
   },
   {
@@ -11851,6 +13840,8 @@ var B1_WORDS = [
     conjugation: { "er": "verhaftet", "präteritum": "verhaftete", "perfekt": "hat verhaftet" },
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Polizei hat 23 Menschen verhaftet.", en: "The police arrested 23 people." }
   },
   {
@@ -11863,6 +13854,8 @@ var B1_WORDS = [
     conjugation: { "er": "verlässt", "präteritum": "verließ", "perfekt": "hat verlassen" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe die Party um 3 Uhr verlassen.", en: "I left the party at 3 o'clock." }
   },
   {
@@ -11875,6 +13868,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie sind verpflichtet, den Unfall zu melden.", en: "You are obligated to report the accident." }
   },
   {
@@ -11887,6 +13882,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Unser Zug hatte 10 Minuten Verspätung.", en: "Our train was 10 minutes late." }
   },
   {
@@ -11899,6 +13896,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Sprechen Sie bitte mit der Verwaltung. Die können Ihnen helfen.", en: "Please speak with the administration. They can help you." }
   },
   {
@@ -11911,6 +13910,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe mal wieder einen Virus auf meinem Computer.", en: "I have a virus on my computer again." }
   },
   {
@@ -11923,6 +13924,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Gesunde Ernährung ist die Voraussetzung für ein langes Leben.", en: "Healthy nutrition is the prerequisite for a long life." }
   },
   {
@@ -11935,6 +13938,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir wohnen in einem Vorort von Köln.", en: "We live in a suburb of Cologne." }
   },
   {
@@ -11947,18 +13952,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Bist du schon lange wach?", en: "Have you been awake long?" }
   },
   {
     id: 1638,
     de: "die Wand",
-    en: "wall",
+    en: "wall (of a room)",
     type: "noun",
     gender: "f",
     plural: "die Wände",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich stelle das Regal rechts an die Wand.", en: "I'm putting the shelf against the wall on the right." }
   },
   {
@@ -11971,6 +13980,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte zum Frühstück ein weiches Ei.", en: "For breakfast I'd like a soft-boiled egg." }
   },
   {
@@ -11983,18 +13994,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Haus hat einen Wert von ca. 1 Mio. Euro.", en: "The house has a value of about 1 million euros." }
   },
   {
     id: 1641,
     de: "wieso",
-    en: "why",
+    en: "why / how come",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie lange sind Sie hier? – Wieso fragen Sie?", en: "How long have you been here? - Why do you ask?" }
   },
   {
@@ -12007,6 +14022,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben Witze erzählt und viel gelacht.", en: "We told jokes and laughed a lot." }
   },
   {
@@ -12019,6 +14036,8 @@ var B1_WORDS = [
     conjugation: { "er": "wundert sich", "präteritum": "wunderte sich", "perfekt": "hat sich gewundert" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Es hat mich gewundert, dass das Essen hier so günstig ist.", en: "I was surprised that the food here is so cheap." }
   },
   {
@@ -12031,6 +14050,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Wort steht in der fünften Zeile von oben.", en: "The word is in the fifth line from the top." }
   },
   {
@@ -12043,6 +14064,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du einen Zettel für mich? Ich muss etwas aufschreiben.", en: "Do you have a piece of paper for me? I need to write something down." }
   },
   {
@@ -12055,6 +14078,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich hätte gern einen Tee mit Zitrone.", en: "I would like a tea with lemon." }
   },
   {
@@ -12067,6 +14092,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bitte dich, zukünftig früher zu kommen.", en: "I ask you to come earlier in the future." }
   },
   {
@@ -12079,6 +14106,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben ein Problem mit der Heizung. Wer ist dafür zuständig?", en: "We have a problem with the heating. Who is responsible for that?" }
   },
   {
@@ -12091,6 +14120,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben nur über allgemeine Probleme gesprochen.", en: "We only talked about general problems." }
   },
   {
@@ -12103,6 +14134,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Tarek möchte zwar studieren, aber andererseits möchte er auch gleich Geld verdienen.", en: "Tarek does want to study, but on the other hand he also wants to start earning money right away." }
   },
   {
@@ -12115,6 +14148,8 @@ var B1_WORDS = [
     conjugation: { "er": "kündigt an", "präteritum": "kündigte an", "perfekt": "hat angekündigt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir sollten unseren Besuch ankündigen.", en: "We should announce our visit." }
   },
   {
@@ -12127,19 +14162,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "In Mannheim haben Sie Anschluss nach Saarbrücken.", en: "In Mannheim you have a connection to Saarbrücken." }
   },
   {
     id: 1653,
     de: "der Architekt",
-    en: "architect",
+    en: "architect (male)",
     type: "noun",
     gender: "m",
     plural: "die Architekten",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Dieses Haus hat eine berühmte Architektin gebaut.", en: "A famous architect built this house." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Dieses Haus hat ein berühmter Architekt gebaut.", en: "A famous architect built this house." }
   },
   {
     id: 1654,
@@ -12151,6 +14190,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Schülerin hörte aufmerksam zu.", en: "The student listened attentively." }
   },
   {
@@ -12163,6 +14204,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Hier ist eine Ausfahrt, da dürfen Sie nicht parken.", en: "This is a driveway, you're not allowed to park here." }
   },
   {
@@ -12175,6 +14218,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Normalerweise muss ich am Wochenende arbeiten. Aber heute ist eine Ausnahme.", en: "Normally I have to work on weekends. But today is an exception." }
   },
   {
@@ -12187,6 +14232,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Darf ich mal Ihren Ausweis sehen?", en: "May I see your ID, please?" }
   },
   {
@@ -12195,10 +14242,12 @@ var B1_WORDS = [
     en: "platform",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Bahnsteige",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Auf Hauptbahnhöfen gibt es meist viele Bahnsteige.", en: "Main stations usually have many platforms." }
   },
   {
@@ -12211,6 +14260,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie spielt sehr gern Basketball.", en: "She really likes playing basketball." }
   },
   {
@@ -12223,6 +14274,8 @@ var B1_WORDS = [
     conjugation: { "er": "beantragt", "präteritum": "beantragte", "perfekt": "hat beantragt" },
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du schon einen neuen Pass beantragt?", en: "Have you already applied for a new passport?" }
   },
   {
@@ -12235,18 +14288,22 @@ var B1_WORDS = [
     conjugation: { "er": "befindet sich", "präteritum": "befand sich", "perfekt": "hat sich befunden" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Bord-Bistro befindet sich in der Mitte des Zuges.", en: "The bistro car is located in the middle of the train." }
   },
   {
     id: 1662,
     de: "begrüßen",
-    en: "to greet",
+    en: "to greet / to welcome",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "begrüßt", "präteritum": "begrüßte", "perfekt": "hat begrüßt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Gastgeber begrüßt seine Gäste.", en: "The host greets his guests." }
   },
   {
@@ -12259,6 +14316,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein Onkel von mir ist ein bekannter Politiker.", en: "An uncle of mine is a well-known politician." }
   },
   {
@@ -12271,6 +14330,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Kinder ziehen am liebsten bequeme Sachen an.", en: "My children prefer to wear comfortable clothes." }
   },
   {
@@ -12283,6 +14344,8 @@ var B1_WORDS = [
     conjugation: { "er": "beschädigt", "präteritum": "beschädigte", "perfekt": "hat beschädigt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Bitte machen Sie eine Liste davon, was die Einbrecher beschädigt haben.", en: "Please make a list of what the burglars damaged." }
   },
   {
@@ -12295,18 +14358,22 @@ var B1_WORDS = [
     conjugation: { "er": "bestätigt", "präteritum": "bestätigte", "perfekt": "hat bestätigt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Firma hat mir den Termin schriftlich bestätigt.", en: "The company confirmed the appointment to me in writing." }
   },
   {
     id: 1667,
     de: "betreuen",
-    en: "to look after / take care of",
+    en: "to look after / to take care of",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "betreut", "präteritum": "betreute", "perfekt": "hat betreut" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer betreut bei Ihnen die Kinder?", en: "Who looks after the children at your place?" }
   },
   {
@@ -12319,6 +14386,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ein Bild von meinen Kindern hängt über meinem Schreibtisch.", en: "A picture of my children hangs above my desk." }
   },
   {
@@ -12331,6 +14400,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Von hier hat man einen tollen Blick über die Stadt.", en: "From here you have a great view over the city." }
   },
   {
@@ -12343,6 +14414,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Bücher lagen alle auf dem Boden.", en: "The books were all lying on the floor." }
   },
   {
@@ -12355,30 +14428,36 @@ var B1_WORDS = [
     conjugation: { "er": "bucht", "präteritum": "buchte", "perfekt": "hat gebucht" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe für morgen einen Flug nach Rom gebucht.", en: "I've booked a flight to Rome for tomorrow." }
   },
   {
     id: 1672,
     de: "die Bürgerin",
-    en: "citizen",
+    en: "citizen (female)",
     type: "noun",
     gender: "f",
     plural: "die Bürgerinnen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
-    example: { de: "EU-Bürgerinnen und Bürger können überall in Europa arbeiten.", en: "EU citizens can work anywhere in Europe." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Als EU-Bürgerin kann sie überall in Europa arbeiten.", en: "As an EU citizen, she can work anywhere in Europe." }
   },
   {
     id: 1673,
     de: "die Cousine",
-    en: "cousin",
+    en: "cousin (female)",
     type: "noun",
     gender: "f",
     plural: "die Cousinen",
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Meine Cousine wohnt jetzt in Brasilien.", en: "My cousin now lives in Brazil." }
   },
   {
@@ -12391,6 +14470,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Mit 15 wollte ich gerne Klavier spielen lernen. Aber damals hatte ich kein Geld dafür.", en: "At 15 I wanted to learn to play the piano. But back then I had no money for it." }
   },
   {
@@ -12403,6 +14484,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Das dauernde Klingeln des Telefons stört mich.", en: "The constant ringing of the phone bothers me." }
   },
   {
@@ -12415,6 +14498,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "countries_languages",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich verstehe dich besser, wenn du nicht Dialekt sprichst.", en: "I understand you better when you don't speak dialect." }
   },
   {
@@ -12427,6 +14512,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir liefern Ihnen die Waren direkt ins Haus.", en: "We deliver the goods directly to your home." }
   },
   {
@@ -12439,18 +14526,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Buch habe ich doppelt.", en: "I have that book twice." }
   },
   {
     id: 1679,
     de: "die Durchsage",
-    en: "announcement",
+    en: "announcement (over a loudspeaker)",
     type: "noun",
     gender: "f",
     plural: "die Durchsagen",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Achtung, Achtung, eine wichtige Durchsage!", en: "Attention, attention, an important announcement!" }
   },
   {
@@ -12463,6 +14554,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Es ist mir ganz egal, was die Leute denken.", en: "It's completely irrelevant to me what people think." }
   },
   {
@@ -12475,18 +14568,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich finde die Leute auf der Straße ziemlich unfreundlich. Wie ist dein Eindruck?", en: "I find the people on the street rather unfriendly. What's your impression?" }
   },
   {
     id: 1682,
     de: "sich einigen",
-    en: "to agree / reach an agreement",
+    en: "to agree / to reach an agreement",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "einigt sich", "präteritum": "einigte sich", "perfekt": "hat sich geeinigt" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Jeder hat einen anderen Vorschlag. Wir können uns leider nicht einigen.", en: "Everyone has a different suggestion. Unfortunately we can't agree." }
   },
   {
@@ -12499,6 +14596,8 @@ var B1_WORDS = [
     conjugation: { "er": "schaltet ein", "präteritum": "schaltete ein", "perfekt": "hat eingeschaltet" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Können Sie bitte die Heizung einschalten?", en: "Could you please switch on the heating?" }
   },
   {
@@ -12511,6 +14610,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kinder wünschen sich eine elektrische Eisenbahn.", en: "The children want an electric train set." }
   },
   {
@@ -12523,6 +14624,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen Energie sparen.", en: "We need to save energy." }
   },
   {
@@ -12535,6 +14638,8 @@ var B1_WORDS = [
     conjugation: { "er": "entsorgt", "präteritum": "entsorgte", "perfekt": "hat entsorgt" },
     lesson: 0,
     category: "environment",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie kann ich meine alte Kaffeemaschine entsorgen?", en: "How can I dispose of my old coffee maker?" }
   },
   {
@@ -12547,6 +14652,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier ist die Liste der erforderlichen Zutaten für den Kuchen.", en: "Here is the list of ingredients required for the cake." }
   },
   {
@@ -12559,6 +14666,8 @@ var B1_WORDS = [
     conjugation: { "er": "erlebt", "präteritum": "erlebte", "perfekt": "hat erlebt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "In unserem Urlaub haben wir viel Schönes erlebt.", en: "We experienced a lot of wonderful things on our vacation." }
   },
   {
@@ -12571,6 +14680,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Nach dem Sport bin ich immer sehr erschöpft.", en: "After sports I'm always very exhausted." }
   },
   {
@@ -12583,6 +14694,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich verstehe ein bisschen was von Computern. Aber ich bin kein Experte.", en: "I know a bit about computers. But I'm no expert." }
   },
   {
@@ -12595,6 +14708,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich finde, unsere Mannschaft hat sehr fair gespielt.", en: "I think our team played very fairly." }
   },
   {
@@ -12607,6 +14722,8 @@ var B1_WORDS = [
     conjugation: { "er": "faulenzt", "präteritum": "faulenzte", "perfekt": "hat gefaulenzt" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Am Wochenende können wir faulenzen.", en: "On the weekend we can laze around." }
   },
   {
@@ -12619,6 +14736,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Mein Computer hat eine große Festplatte.", en: "My computer has a large hard drive." }
   },
   {
@@ -12631,6 +14750,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Unsere Wohnung hat eine Wohnfläche von 100 m².", en: "Our apartment has a living area of 100 m²." }
   },
   {
@@ -12643,6 +14764,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe den Flug für Sie gebucht.", en: "I've booked the flight for you." }
   },
   {
@@ -12655,6 +14778,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese Schuhe haben eine schöne Form.", en: "These shoes have a nice shape." }
   },
   {
@@ -12667,6 +14792,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich reise gern in fremde Länder.", en: "I like traveling to foreign countries." }
   },
   {
@@ -12679,6 +14806,8 @@ var B1_WORDS = [
     conjugation: { "er": "frühstückt", "präteritum": "frühstückte", "perfekt": "hat gefrühstückt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie schon gefrühstückt?", en: "Have you already had breakfast?" }
   },
   {
@@ -12691,7 +14820,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
-    example: { de: "Wir warten draußen im Gang. ( →D, CH: Korridor; D: Flur)", en: "We're waiting outside in the corridor." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Wir warten draußen im Gang.", en: "We're waiting outside in the corridor." }
   },
   {
     id: 1700,
@@ -12703,6 +14834,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Kennst du ein schönes Gedicht?", en: "Do you know a nice poem?" }
   },
   {
@@ -12715,6 +14848,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Gegenteil von „klein“ ist „groß“.", en: "The opposite of 'small' is 'big'." }
   },
   {
@@ -12727,6 +14862,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben eine sehr gemütliche Wohnung.", en: "We have a very cozy apartment." }
   },
   {
@@ -12739,6 +14876,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe heute Vormittag einen Termin beim Gericht.", en: "I have an appointment at the court this morning." }
   },
   {
@@ -12751,6 +14890,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 1,
     example: { de: "Er will die Gesellschaft verändern.", en: "He wants to change society." }
   },
   {
@@ -12763,6 +14904,8 @@ var B1_WORDS = [
     conjugation: { "er": "gewinnt", "präteritum": "gewann", "perfekt": "hat gewonnen" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte so gern einmal im Lotto gewinnen.", en: "I'd love to win the lottery sometime." }
   },
   {
@@ -12775,30 +14918,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Fahr vorsichtig! Es ist glatt.", en: "Drive carefully! It's slippery." }
   },
   {
     id: 1707,
     de: "greifen",
-    en: "to grab / reach",
+    en: "to grab / to reach",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "greift", "präteritum": "griff", "perfekt": "hat gegriffen" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Greifen Sie doch zu!", en: "Go ahead, help yourself!" }
   },
   {
     id: 1708,
     de: "gucken",
-    en: "to look",
+    en: "to look (colloquial)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "guckt", "präteritum": "guckte", "perfekt": "hat geguckt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Guck doch mal! Es schneit.", en: "Look! It's snowing." }
   },
   {
@@ -12811,6 +14960,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Diese Tomaten sind mindestens 2 Wochen haltbar.", en: "These tomatoes keep for at least 2 weeks." }
   },
   {
@@ -12823,6 +14974,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Oma wohnt in einem Seniorenheim.", en: "My grandma lives in a retirement home." }
   },
   {
@@ -12835,6 +14988,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme oft hierher. In diesem Café gibt es guten Kuchen.", en: "I often come here. This café has good cake." }
   },
   {
@@ -12847,6 +15002,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Unser Nachbar ist sehr höflich. Er sagt immer als Erster Guten Tag.", en: "Our neighbor is very polite. He always says good morning first." }
   },
   {
@@ -12859,6 +15016,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Du willst ein Picknick machen? Ich finde die Idee toll.", en: "You want to have a picnic? I think that's a great idea." }
   },
   {
@@ -12871,6 +15030,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Geben Sie den Inhalt der Packung in einen Liter kochendes Wasser.", en: "Put the contents of the packet into a liter of boiling water." }
   },
   {
@@ -12883,6 +15044,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich spiele Klavier. Spielen Sie auch ein Musikinstrument?", en: "I play the piano. Do you play a musical instrument too?" }
   },
   {
@@ -12895,6 +15058,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Pullover kosten je nach Qualität zwischen 40 und 60 Euro.", en: "Depending on quality, the sweaters cost between 40 and 60 euros." }
   },
   {
@@ -12907,6 +15072,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Wo habt ihr übernachtet? – In einer Jugendherberge.", en: "Where did you stay the night? – In a youth hostel." }
   },
   {
@@ -12919,6 +15086,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie viele Kandidaten kommen zur Prüfung?", en: "How many candidates are coming to the exam?" }
   },
   {
@@ -12931,6 +15100,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Eltern besitzen noch viele Musikkassetten.", en: "My parents still own many music cassettes." }
   },
   {
@@ -12943,6 +15114,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe zum Geburtstag eine goldene Kette bekommen.", en: "I got a gold necklace for my birthday." }
   },
   {
@@ -12955,6 +15128,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich finde unseren Lehrer klasse.", en: "I think our teacher is great." }
   },
   {
@@ -12967,6 +15142,8 @@ var B1_WORDS = [
     conjugation: { "er": "klingt", "präteritum": "klang", "perfekt": "hat geklungen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wollen wir einkaufen gehen und danach zusammen kochen? – Ja, das klingt gut.", en: "Shall we go shopping and then cook together? – Yes, that sounds good." }
   },
   {
@@ -12979,6 +15156,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Essen schmeckt komisch. Probier mal.", en: "The food tastes strange. Try it." }
   },
   {
@@ -12991,6 +15170,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Ein Visum bekommst du auch im Konsulat.", en: "You can also get a visa at the consulate." }
   },
   {
@@ -13003,6 +15184,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Arzt sagt, ich muss etwas für meinen Körper tun, z. B. schwimmen oder Fahrrad fahren.", en: "The doctor says I need to do something for my body, like swimming or cycling." }
   },
   {
@@ -13015,6 +15198,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe den Wagen auf Kredit gekauft.", en: "I bought the car on credit." }
   },
   {
@@ -13027,6 +15212,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Kugelschreiber ist weg.", en: "My ballpoint pen is gone." }
   },
   {
@@ -13039,6 +15226,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 2,
     example: { de: "Gib der Mama einen Kuss!", en: "Give mom a kiss!" }
   },
   {
@@ -13051,30 +15240,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Auf der Autobahn waren so viele Laster. Deshalb hat es so lange gedauert.", en: "There were so many trucks on the highway. That's why it took so long." }
   },
   {
     id: 1730,
     de: "leiten",
-    en: "to lead / run",
+    en: "to lead / to run",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "leitet", "präteritum": "leitete", "perfekt": "hat geleitet" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wer leitet den Kurs?", en: "Who's running the course?" }
   },
   {
     id: 1731,
     de: "liegen",
-    en: "to lie / be located",
+    en: "to lie / to be located",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "liegt", "präteritum": "lag", "perfekt": "hat/ist gelegen" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Brief liegt schon auf Ihrem Schreibtisch.", en: "The letter is already lying on your desk." }
   },
   {
@@ -13087,6 +15282,8 @@ var B1_WORDS = [
     conjugation: { "er": "lohnt sich", "präteritum": "lohnte sich", "perfekt": "hat sich gelohnt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Für drei Tage zu meinen Eltern fahren lohnt sich nicht. Es ist zu weit.", en: "Driving to my parents' for three days isn't worth it. It's too far." }
   },
   {
@@ -13099,6 +15296,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Tropfen bitte immer nach den Mahlzeiten einnehmen.", en: "Please always take the drops after meals." }
   },
   {
@@ -13111,19 +15310,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Großmutter hat uns viele Märchen erzählt.", en: "My grandmother told us many fairy tales." }
   },
   {
     id: 1735,
     de: "die Mechanikerin",
-    en: "mechanic",
+    en: "mechanic (female)",
     type: "noun",
     gender: "f",
     plural: "die Mechanikerinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Das kann nur ein Mechaniker reparieren.", en: "Only a mechanic can repair that." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Die Mechanikerin hat unser Auto schnell repariert.", en: "The mechanic repaired our car quickly." }
   },
   {
     id: 1736,
@@ -13135,18 +15338,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Nimm doch das Menü, das sieht gut aus.", en: "Why don't you have the set meal? It looks good." }
   },
   {
     id: 1737,
     de: "der Migrant",
-    en: "migrant",
+    en: "migrant (male)",
     type: "noun",
     gender: "m",
     plural: "die Migranten",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Viele Migranten kommen aus Osteuropa.", en: "Many migrants come from Eastern Europe." }
   },
   {
@@ -13159,18 +15366,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Für Mitglieder ist der Eintritt zum Konzert gratis.", en: "Admission to the concert is free for members." }
   },
   {
     id: 1739,
     de: "die Möhre",
-    en: "carrot",
+    en: "carrot (in Germany)",
     type: "noun",
     gender: "f",
     plural: "die Möhren",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Hasen fressen gern Möhren.", en: "Rabbits like eating carrots." }
   },
   {
@@ -13183,6 +15394,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Es war sehr mutig von dir, deine Meinung laut zu sagen.", en: "It was very brave of you to say your opinion out loud." }
   },
   {
@@ -13195,6 +15408,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Einen Nachteil hat die Wohnung. Sie liegt nicht zentral.", en: "The apartment has one disadvantage. It's not centrally located." }
   },
   {
@@ -13207,6 +15422,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Schwester hat zwei Kinder. Meine Neffen sind drei und fünf Jahre alt.", en: "My sister has two children. My nephews are three and five years old." }
   },
   {
@@ -13219,30 +15436,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Nachbarn sind ziemlich neugierig.", en: "The neighbors are quite curious/nosy." }
   },
   {
     id: 1744,
     de: "nirgendwo",
-    en: "nowhere",
+    en: "nowhere / not anywhere",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Schlüssel kann ich nirgendwo finden.", en: "I can't find the keys anywhere." }
   },
   {
     id: 1745,
     de: "nun",
-    en: "now",
+    en: "now / well (then)",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Schade, dass du arbeiten musst. – Das ist nun mal so.", en: "It's a shame you have to work. – That's just how it is." }
   },
   {
@@ -13255,6 +15478,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Opa heißt Hans.", en: "My grandpa is named Hans." }
   },
   {
@@ -13263,11 +15488,13 @@ var B1_WORDS = [
     en: "folder / binder",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Ordner",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "habe ich mir einen Ordner gekauft.", en: "...I bought myself a folder." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Für meine Übungen im Deutschkurs habe ich mir einen Ordner gekauft.", en: "I bought myself a folder for my German course exercises." }
   },
   {
     id: 1748,
@@ -13279,19 +15506,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Kurz vor München hatten wir eine Panne mit dem Auto.", en: "Shortly before Munich, we had a car breakdown." }
   },
   {
     id: 1749,
     de: "der Patient",
-    en: "patient",
+    en: "patient (male)",
     type: "noun",
     gender: "m",
     plural: "die Patienten",
     conjugation: null,
     lesson: 0,
     category: "health",
-    example: { de: "Ich bin Patientin bei Dr. Hausner. Ich möchte bitte einen Termin.", en: "I'm a patient of Dr. Hausner's. I'd like an appointment, please." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich bin Patient bei Dr. Hausner. Ich möchte bitte einen Termin.", en: "I'm a patient of Dr. Hausner's. I'd like an appointment, please." }
   },
   {
     id: 1750,
@@ -13303,6 +15534,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du ein Pflaster? Ich habe mich geschnitten.", en: "Do you have a bandage? I cut myself." }
   },
   {
@@ -13315,6 +15548,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Im Unterricht haben wir ein Plakat gemacht.", en: "We made a poster in class." }
   },
   {
@@ -13327,18 +15562,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich finde diese Küchenmaschine sehr praktisch.", en: "I find this kitchen appliance very practical." }
   },
   {
     id: 1753,
     de: "die Professorin",
-    en: "professor",
+    en: "professor (female)",
     type: "noun",
     gender: "f",
     plural: "die Professorinnen",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Unsere Nachbarin ist Professorin an der Universität.", en: "Our neighbor is a professor at the university." }
   },
   {
@@ -13351,6 +15590,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Konzert beginnt um Punkt 20 Uhr.", en: "The concert starts at exactly 8 p.m." }
   },
   {
@@ -13363,6 +15604,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Hast du noch ein Rad? Ich bin durch Glas gefahren und jetzt ist mein Rad kaputt.", en: "Do you still have a wheel? I rode through glass and now my wheel is broken." }
   },
   {
@@ -13375,6 +15618,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Nach deutschem Recht kann er dafür nicht bestraft werden.", en: "Under German law, he cannot be punished for that." }
   },
   {
@@ -13387,6 +15632,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Straßenverkehr sind viele Regeln zu beachten.", en: "Many rules must be observed in road traffic." }
   },
   {
@@ -13399,6 +15646,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Achten Sie auf die Reihenfolge der Inhaltspunkte.", en: "Pay attention to the sequence of the content points." }
   },
   {
@@ -13411,6 +15660,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "society_politics",
+    level: "B1",
+    freq: 2,
     example: { de: "Religion ist für manche Menschen sehr wichtig.", en: "Religion is very important to some people." }
   },
   {
@@ -13423,6 +15674,8 @@ var B1_WORDS = [
     conjugation: { "er": "riecht", "präteritum": "roch", "perfekt": "hat gerochen" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Parfüm riecht sehr gut.", en: "This perfume smells very good." }
   },
   {
@@ -13435,6 +15688,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Rote Rosen sind ein schönes Geschenk.", en: "Red roses are a lovely gift." }
   },
   {
@@ -13447,6 +15702,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich hätte gern einen Sack Kartoffeln.", en: "I'd like a sack of potatoes, please." }
   },
   {
@@ -13459,6 +15716,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Äpfel sind mir zu sauer.", en: "The apples are too sour for me." }
   },
   {
@@ -13471,6 +15730,8 @@ var B1_WORDS = [
     conjugation: { "er": "schätzt", "präteritum": "schätzte", "perfekt": "hat geschätzt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie alt ist der Chef? – Ich weiß nicht, ich schätze, um die Fünfzig.", en: "How old is the boss? – I don't know, I'd guess around fifty." }
   },
   {
@@ -13483,6 +15744,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Spiegel hängt ganz schief.", en: "The mirror is hanging quite crooked." }
   },
   {
@@ -13495,6 +15758,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Wunde sieht schlimm aus.", en: "The wound looks bad." }
   },
   {
@@ -13507,6 +15772,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Sprachschule ist nur ein paar Schritte von hier.", en: "The language school is only a few steps from here." }
   },
   {
@@ -13519,6 +15786,8 @@ var B1_WORDS = [
     conjugation: { "er": "schwitzt", "präteritum": "schwitzte", "perfekt": "hat geschwitzt" },
     lesson: 0,
     category: "body",
+    level: "B1",
+    freq: 2,
     example: { de: "Es war sehr heiß. Wir haben alle sehr geschwitzt.", en: "It was very hot. We all sweated a lot." }
   },
   {
@@ -13531,7 +15800,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
-    example: { de: "Selbstverständlich sagen wir Ihnen sofort Bescheid. WORTLISTE 79", en: "Of course we'll let you know right away." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Selbstverständlich sagen wir Ihnen sofort Bescheid.", en: "Of course we'll let you know right away." }
   },
   {
     id: 1770,
@@ -13543,6 +15814,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Auto ist besonders sicher.", en: "This car is especially safe." }
   },
   {
@@ -13555,6 +15828,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Winter brauche ich warme Socken.", en: "In winter I need warm socks." }
   },
   {
@@ -13567,6 +15842,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Soviel ich weiß, hat dieses Restaurant heute Ruhetag.", en: "As far as I know, this restaurant is closed today." }
   },
   {
@@ -13579,18 +15856,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte gerne sehen, wie mein Kleid sitzt. Hast du einen Spiegel?", en: "I'd like to see how my dress fits. Do you have a mirror?" }
   },
   {
     id: 1774,
     de: "spülen",
-    en: "to rinse / wash up",
+    en: "to rinse / to wash up",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "spült", "präteritum": "spülte", "perfekt": "hat gespült" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du das Geschirr gespült?", en: "Have you washed the dishes?" }
   },
   {
@@ -13603,6 +15884,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Kaffee ist sehr stark.", en: "The coffee is very strong." }
   },
   {
@@ -13615,19 +15898,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Straße zu unserem Haus ist sehr steil.", en: "The road to our house is very steep." }
   },
   {
     id: 1777,
     de: "der Steward",
-    en: "flight attendant / steward",
+    en: "flight attendant (male) / steward",
     type: "noun",
     gender: "m",
     plural: "die Stewards",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Die Stewardess bringt das Mittagessen.", en: "The flight attendant is bringing lunch." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Der Steward bringt das Mittagessen.", en: "The flight attendant brings lunch." }
   },
   {
     id: 1778,
@@ -13639,6 +15926,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin stolz auf dich. Das hast du sehr gut gemacht.", en: "I'm proud of you. You did that very well." }
   },
   {
@@ -13651,6 +15940,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Tochter hat einen sehr strengen Lehrer.", en: "Our daughter has a very strict teacher." }
   },
   {
@@ -13663,6 +15954,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich esse gern süße Sachen.", en: "I like eating sweet things." }
   },
   {
@@ -13675,6 +15968,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Unser Dorf liegt in einem Tal.", en: "Our village lies in a valley." }
   },
   {
@@ -13687,6 +15982,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieser Mensch hat mit vielen guten Taten geholfen.", en: "This person has helped with many good deeds." }
   },
   {
@@ -13699,6 +15996,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe mir einen neuen Teppich gekauft.", en: "I bought myself a new carpet." }
   },
   {
@@ -13711,6 +16010,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Vorsicht, Kinder! Das Wasser ist hier sehr tief.", en: "Watch out, children! The water is very deep here." }
   },
   {
@@ -13723,6 +16024,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Hinter dem Tor geht es zur Fabrik.", en: "Behind the gate you get to the factory." }
   },
   {
@@ -13735,6 +16038,8 @@ var B1_WORDS = [
     conjugation: { "er": "treibt", "präteritum": "trieb", "perfekt": "hat getrieben" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Welchen Sport treibst du?", en: "What sport do you do?" }
   },
   {
@@ -13747,6 +16052,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Kommen Sie auf den Turm, von hier sieht man die ganze Stadt.", en: "Come up the tower, from here you can see the whole city." }
   },
   {
@@ -13759,6 +16066,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Morgen kann ich nicht. Wir sehen uns übermorgen.", en: "I can't tomorrow. We'll see each other the day after tomorrow." }
   },
   {
@@ -13771,6 +16080,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "In Deutschland ist es üblich, früh zu Abend zu essen.", en: "In Germany it's customary to have dinner early." }
   },
   {
@@ -13783,6 +16094,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Nein, umgekehrt: erst der Vorname, dann der Nachname.", en: "No, the other way around: first the first name, then the last name." }
   },
   {
@@ -13795,6 +16108,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Es ist unglaublich. Schon wieder so ein Unglück.", en: "It's unbelievable. Another accident like that." }
   },
   {
@@ -13807,6 +16122,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Es ist untersagt, hier zu rauchen.", en: "Smoking here is prohibited." }
   },
   {
@@ -13819,18 +16136,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Warte auf mich. Ich bin unterwegs und komme gleich.", en: "Wait for me. I'm on my way and will be there soon." }
   },
   {
     id: 1794,
     de: "die Veranstaltung",
-    en: "event",
+    en: "event (organized)",
     type: "noun",
     gender: "f",
     plural: "die Veranstaltungen",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Am Samstag ist unser Lokal geschlossen. Wir haben eine Veranstaltung.", en: "Our restaurant is closed on Saturday. We have an event." }
   },
   {
@@ -13843,6 +16164,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin schon seit 15 Jahren Mitglied in diesem Verein.", en: "I've been a member of this club for 15 years." }
   },
   {
@@ -13855,6 +16178,8 @@ var B1_WORDS = [
     conjugation: { "er": "verhält sich", "präteritum": "verhielt sich", "perfekt": "hat sich verhalten" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Mann hat sich uns gegenüber merkwürdig verhalten.", en: "The man behaved strangely toward us." }
   },
   {
@@ -13867,18 +16192,22 @@ var B1_WORDS = [
     conjugation: { "er": "verläuft sich", "präteritum": "verlief sich", "perfekt": "hat sich verlaufen" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Gestern haben wir uns im Wald verlaufen. Wir haben erst eine Stunde später den richtigen Weg gefunden.", en: "Yesterday we got lost in the forest. We only found the right path an hour later." }
   },
   {
     id: 1798,
     de: "verreisen",
-    en: "to go on a trip / be away traveling",
+    en: "to go on a trip / to be away traveling",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verreist", "präteritum": "verreiste", "perfekt": "ist verreist" },
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Frau Dr. Müller ist zurzeit verreist.", en: "Dr. Müller is currently away on a trip." }
   },
   {
@@ -13891,7 +16220,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Nach acht Stunden Schule haben die Kinder keine Lust mehr, die Hausaufgaben zu machen. Ich finde das verständlich. WORTLISTE 93", en: "After eight hours of school, the children no longer feel like doing their homework. I find that understandable." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Nach acht Stunden Schule haben die Kinder keine Lust mehr, die Hausaufgaben zu machen. Ich finde das verständlich.", en: "After eight hours of school, the children no longer feel like doing their homework. I find that understandable." }
   },
   {
     id: 1800,
@@ -13903,6 +16234,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "people_family",
+    level: "B1",
+    freq: 1,
     example: { de: "Sind Sie mit Frau Meyer verwandt?", en: "Are you related to Mrs. Meyer?" }
   },
   {
@@ -13915,6 +16248,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Darf ich Ihnen meine Visitenkarte geben?", en: "May I give you my business card?" }
   },
   {
@@ -13927,6 +16262,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zug hat voraussichtlich 20 Minuten Verspätung.", en: "The train is expected to be 20 minutes late." }
   },
   {
@@ -13939,18 +16276,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Beachten Sie bitte die Vorschriften für das Benutzen der Bibliothek.", en: "Please observe the regulations for using the library." }
   },
   {
     id: 1804,
     de: "der Wagen",
-    en: "car",
+    en: "car / (train) carriage",
     type: "noun",
     gender: "m",
     plural: "die Wagen",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe meinen Wagen in die Werkstatt gebracht.", en: "I took my car to the repair shop." }
   },
   {
@@ -13963,6 +16304,8 @@ var B1_WORDS = [
     conjugation: { "er": "wandert", "präteritum": "wanderte", "perfekt": "ist gewandert" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir gehen oft wandern.", en: "We often go hiking." }
   },
   {
@@ -13975,18 +16318,22 @@ var B1_WORDS = [
     conjugation: { "er": "weint", "präteritum": "weinte", "perfekt": "hat geweint" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte nicht weinen. Du bekommst eine neue Puppe.", en: "Please don't cry. You'll get a new doll." }
   },
   {
     id: 1807,
     de: "weshalb",
-    en: "why",
+    en: "why / for what reason",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Weshalb rufst du an?", en: "Why are you calling?" }
   },
   {
@@ -13999,6 +16346,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Herzlich willkommen in Köln.", en: "Welcome to Cologne." }
   },
   {
@@ -14011,6 +16360,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Woher kommst du?", en: "Where are you from?" }
   },
   {
@@ -14023,30 +16374,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Warum bist du so wütend?", en: "Why are you so furious?" }
   },
   {
     id: 1811,
     de: "die Zeitschrift",
-    en: "magazine",
+    en: "magazine / journal",
     type: "noun",
     gender: "f",
     plural: "die Zeitschriften",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese Zeitschrift kaufe ich jede Woche.", en: "I buy this magazine every week." }
   },
   {
     id: 1812,
     de: "der Zeuge",
-    en: "witness",
+    en: "witness (male)",
     type: "noun",
     gender: "m",
     plural: "die Zeugen",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Polizei sucht noch Zeugen für den Unfall.", en: "The police are still looking for witnesses to the accident." }
   },
   {
@@ -14059,6 +16416,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Das war die Passkontrolle. Wir müssen jetzt noch durch den Zoll.", en: "That was passport control. Now we still have to go through customs." }
   },
   {
@@ -14071,6 +16430,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kleider packen wir zuletzt ein.", en: "We pack the clothes last." }
   },
   {
@@ -14083,6 +16444,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Kollege kommt bestimmt gleich. Er ist immer sehr zuverlässig.", en: "The colleague is sure to come soon. He's always very reliable." }
   },
   {
@@ -14095,54 +16458,64 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wie viele Buchstaben hat das Alphabet in Ihrer Sprache?", en: "How many letters does the alphabet have in your language?" }
   },
   {
     id: 1817,
     de: "anders",
-    en: "differently, otherwise",
+    en: "differently / otherwise",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Anders geht das leider nicht.", en: "Unfortunately, it can't be done any other way." }
   },
   {
     id: 1818,
     de: "die Anlage",
-    en: "system, facility",
+    en: "system / facility",
     type: "noun",
     gender: "f",
     plural: "die Anlagen",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Musikanlage ist kaputt.", en: "My stereo system is broken." }
   },
   {
     id: 1819,
     de: "der Anspruch",
-    en: "claim, entitlement",
+    en: "claim / entitlement",
     type: "noun",
     gender: "m",
     plural: "die Ansprüche",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie wohnen im Stadtzentrum. Deshalb haben Sie keinen Anspruch auf Fahrgeld.", en: "They live in the city center. That's why they aren't entitled to travel money." }
   },
   {
     id: 1820,
     de: "die Architektin",
-    en: "architect",
+    en: "architect (female)",
     type: "noun",
     gender: "f",
     plural: "die Architektinnen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieses Haus hat eine berühmte Architektin gebaut.", en: "A famous architect built this house." }
   },
   {
@@ -14155,18 +16528,22 @@ var B1_WORDS = [
     conjugation: { "er": "räumt auf", "präteritum": "räumte auf", "perfekt": "hat aufgeräumt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Vor meinem Urlaub muss ich unbedingt noch meinen Schreibtisch aufräumen.", en: "Before my vacation I absolutely have to tidy up my desk." }
   },
   {
     id: 1822,
     de: "der Ausflug",
-    en: "excursion, trip",
+    en: "excursion / trip",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Ausflüge",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Am Wochenende machen wir mit Freunden einen Ausflug nach Heidelberg.", en: "On the weekend we're taking a trip to Heidelberg with friends." }
   },
   {
@@ -14179,6 +16556,8 @@ var B1_WORDS = [
     conjugation: { "er": "richtet aus", "präteritum": "richtete aus", "perfekt": "hat ausgerichtet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Mann ist nicht da. Soll ich ihm etwas ausrichten?", en: "My husband isn't here. Should I pass on a message to him?" }
   },
   {
@@ -14191,6 +16570,8 @@ var B1_WORDS = [
     conjugation: { "er": "zieht aus", "präteritum": "zog aus", "perfekt": "hat/ist ausgezogen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Willst du den Mantel nicht ausziehen?", en: "Don't you want to take off your coat?" }
   },
   {
@@ -14203,6 +16584,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich spiele gern mit meinen Kindern Ball.", en: "I like playing ball with my children." }
   },
   {
@@ -14215,18 +16598,22 @@ var B1_WORDS = [
     conjugation: { "er": "bastelt", "präteritum": "bastelte", "perfekt": "hat gebastelt" },
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kinder basteln ein Vogelhaus.", en: "The children are building a birdhouse." }
   },
   {
     id: 1827,
     de: "beantworten",
-    en: "to answer",
+    en: "to answer (a question / letter)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "beantwortet", "präteritum": "beantwortete", "perfekt": "hat beantwortet" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie haben meine Frage leider nicht beantwortet.", en: "Unfortunately, you didn't answer my question." }
   },
   {
@@ -14239,6 +16626,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Studenten und Studentinnen sind von den Rundfunk-Gebühren befreit.", en: "Students are exempt from the broadcasting fee." }
   },
   {
@@ -14251,42 +16640,50 @@ var B1_WORDS = [
     conjugation: { "er": "behält", "präteritum": "behielt", "perfekt": "hat behalten" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Darf ich die Zeitschrift behalten?", en: "May I keep the magazine?" }
   },
   {
     id: 1830,
     de: "der Beleg",
-    en: "receipt",
+    en: "receipt / proof / voucher",
     type: "noun",
     gender: "m",
     plural: "die Belege",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Brauchen Sie einen Beleg?", en: "Do you need a receipt?" }
   },
   {
     id: 1831,
     de: "der Bereich",
-    en: "area, field",
+    en: "area / field",
     type: "noun",
     gender: "m",
     plural: "die Bereiche",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "In welchem Bereich möchten Sie arbeiten?", en: "In which field would you like to work?" }
   },
   {
     id: 1832,
     de: "der Bescheid",
-    en: "notice, notification",
+    en: "notice / notification",
     type: "noun",
     gender: "m",
     plural: "die Bescheide",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Den endgültigen Bescheid erhalten Sie in etwa vier Wochen.", en: "You will receive the final notice in about four weeks." }
   },
   {
@@ -14295,34 +16692,40 @@ var B1_WORDS = [
     en: "confirmation",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Bestätigungen",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Bestätigung für das Amt.", en: "Confirmation for the authority." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich brauche eine schriftliche Bestätigung für das Amt.", en: "I need a written confirmation for the authorities." }
   },
   {
     id: 1834,
     de: "der Betrieb",
-    en: "company, business",
+    en: "company / business",
     type: "noun",
     gender: "m",
     plural: "die Betriebe",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "In diesem Betrieb arbeiten zehn Leute.", en: "Ten people work at this company." }
   },
   {
     id: 1835,
     de: "der Bildschirm",
-    en: "screen, monitor",
+    en: "screen / monitor",
     type: "noun",
     gender: "m",
     plural: "die Bildschirme",
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich brauche einen größeren Bildschirm für meinen Computer.", en: "I need a bigger screen for my computer." }
   },
   {
@@ -14335,6 +16738,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Er ist von Geburt an blind.", en: "He has been blind since birth." }
   },
   {
@@ -14343,11 +16748,13 @@ var B1_WORDS = [
     en: "sheet (of paper)",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Bogen / die Bögen",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Bitte schreiben Sie Ihren Namen auf den Antwortbogen. Ich esse gern Bohnen. An diesem See kann man Boote mieten. Das Visum habe ich von der Botschaft bekommen.", en: "Please write your name on the answer sheet. I like eating beans. You can rent boats on this lake. I got the visa from the embassy." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Bitte schreiben Sie Ihren Namen auf den Antwortbogen.", en: "Please write your name on the answer sheet." }
   },
   {
     id: 1838,
@@ -14359,6 +16766,8 @@ var B1_WORDS = [
     conjugation: { "er": "buchstabiert", "präteritum": "buchstabierte", "perfekt": "hat buchstabiert" },
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 1,
     example: { de: "Würden Sie Ihren Namen bitte buchstabieren?", en: "Could you please spell your name?" }
   },
   {
@@ -14371,18 +16780,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du eine Bürste? Meine Schuhe sind so schmutzig.", en: "Do you have a brush? My shoes are so dirty." }
   },
   {
     id: 1840,
     de: "das Couvert",
-    en: "envelope",
+    en: "envelope (Swiss)",
     type: "noun",
     gender: "n",
     plural: "die Couverts",
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
+    region: "CH",
     example: { de: "Ich hätte gern 50 Couverts und Briefmarken dazu.", en: "I would like 50 envelopes and stamps to go with them." }
   },
   {
@@ -14395,6 +16809,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Mach schnell, damit wir nicht zu spät kommen.", en: "Hurry up, so that we don't arrive too late." }
   },
   {
@@ -14407,6 +16823,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "Im Wohnzimmer haben wir keine Lampe an der Decke.", en: "In the living room we don't have a lamp on the ceiling." }
   },
   {
@@ -14419,30 +16837,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "communication",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie hören jetzt einen Dialog.", en: "You will now hear a dialogue." }
   },
   {
     id: 1844,
     de: "der Direktor",
-    en: "director",
+    en: "director (male)",
     type: "noun",
     gender: "m",
     plural: "die Direktoren",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich möchte gern mit dem Direktor sprechen.", en: "I would like to speak with the director." }
   },
   {
     id: 1845,
     de: "die Dose",
-    en: "can, tin",
+    en: "can / tin / (storage) box",
     type: "noun",
     gender: "f",
     plural: "die Dosen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe noch eine Dose Bohnen.", en: "I still have a can of beans." }
   },
   {
@@ -14455,6 +16879,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Durchschnitt der Ausgaben liegt bei 150 Euro im Monat.", en: "The average expenditure is 150 euros a month." }
   },
   {
@@ -14467,6 +16893,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie hat zwei Kinder aus erster Ehe.", en: "She has two children from her first marriage." }
   },
   {
@@ -14479,30 +16907,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Einerseits möchte ich die Reise gern machen, andererseits ist sie zu teuer.", en: "On the one hand I'd like to take the trip, on the other hand it's too expensive." }
   },
   {
     id: 1849,
     de: "einkaufen",
-    en: "to shop, to go shopping",
+    en: "to shop / to go shopping",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "kauft ein", "präteritum": "kaufte ein", "perfekt": "hat eingekauft" },
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir gehen einmal pro Woche einkaufen.", en: "We go shopping once a week." }
   },
   {
     id: 1850,
     de: "einschließlich",
-    en: "including",
+    en: "including / inclusive of",
     type: "preposition",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 2,
     example: { de: "Alles zusammen kostet 200 Euro einschließlich Fahrtkosten.", en: "Altogether it costs 200 euros including travel costs." }
   },
   {
@@ -14515,18 +16949,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich finde dein Kleid sehr elegant.", en: "I think your dress is very elegant." }
   },
   {
     id: 1852,
     de: "eng",
-    en: "narrow, tight",
+    en: "narrow / tight",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Jacke ist mir zu eng.", en: "The jacket is too tight for me." }
   },
   {
@@ -14539,6 +16977,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Urlaub war sehr entspannend.", en: "The vacation was very relaxing." }
   },
   {
@@ -14551,30 +16991,36 @@ var B1_WORDS = [
     conjugation: { "er": "erfordert", "präteritum": "erforderte", "perfekt": "hat erfordert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Dieser Job erfordert viel Kraft.", en: "This job requires a lot of strength." }
   },
   {
     id: 1855,
     de: "erledigen",
-    en: "to take care of, to get done",
+    en: "to take care of / to get done",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "erledigt", "präteritum": "erledigte", "perfekt": "hat erledigt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese zwei Pakete müssen zur Post. Könntest du das für mich erledigen?", en: "These two packages need to go to the post office. Could you take care of that for me?" }
   },
   {
     id: 1856,
     de: "erst",
-    en: "only, not until",
+    en: "only / not until",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sofia ist erst 20 Jahre alt.", en: "Sofia is only 20 years old." }
   },
   {
@@ -14587,6 +17033,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "business_economy",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier ist die Firma Schulz, Import und Export.", en: "This is the Schulz company, import and export." }
   },
   {
@@ -14599,42 +17047,51 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Creme hat einen hohen Sonnenschutzfaktor.", en: "The cream has a high sun protection factor." }
   },
   {
     id: 1859,
     de: "der Fauteuil",
-    en: "armchair",
+    en: "armchair (Austrian / Swiss)",
     type: "noun",
     gender: "m",
     plural: "die Fauteuils",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Ich hätte gern einen bequemen Fauteuil.", en: "I would like a comfortable armchair." }
   },
   {
     id: 1860,
     de: "festlegen",
-    en: "to fix, to commit to",
+    en: "to fix / to commit to",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "legt fest", "präteritum": "legte fest", "perfekt": "hat festgelegt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich weiß noch nicht, ob ich das mache. Ich möchte mich noch nicht festlegen.", en: "I don't know yet whether I'll do that. I don't want to commit myself yet." }
   },
   {
     id: 1861,
     de: "der Fleck",
-    en: "stain, spot",
+    en: "stain / spot",
     type: "noun",
     gender: "m",
     plural: "die Flecken",
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Du hast einen Fleck auf der Bluse.", en: "You have a stain on your blouse." }
   },
   {
@@ -14647,6 +17104,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie heißt dieser Fluss?", en: "What is this river called?" }
   },
   {
@@ -14659,6 +17118,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Füllen Sie bitte dieses Formular aus.", en: "Please fill out this form." }
   },
   {
@@ -14671,6 +17132,8 @@ var B1_WORDS = [
     conjugation: { "er": "frisst", "präteritum": "fraß", "perfekt": "hat gefressen" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Hat der Hund schon etwas zu fressen bekommen?", en: "Has the dog been given something to eat yet?" }
   },
   {
@@ -14683,18 +17146,22 @@ var B1_WORDS = [
     conjugation: { "er": "fühlt", "präteritum": "fühlte", "perfekt": "hat gefühlt" },
     lesson: 0,
     category: "emotion_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie fühlen Sie sich? - Danke, ich fühle mich wohl.", en: "How do you feel? - Thanks, I feel fine." }
   },
   {
     id: 1866,
     de: "ganz",
-    en: "whole, entire",
+    en: "whole / entire",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe den ganzen Tag noch nichts gegessen.", en: "I haven't eaten anything all day." }
   },
   {
@@ -14707,6 +17174,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "greetings_phrases",
+    level: "B1",
+    freq: 1,
     example: { de: "Sehr geehrte Damen und Herren, …", en: "Dear Sir or Madam, ..." }
   },
   {
@@ -14719,30 +17188,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich bin mit meinem Gehalt zufrieden.", en: "I am satisfied with my salary." }
   },
   {
     id: 1869,
     de: "genau",
-    en: "exact, precise",
+    en: "exact / precise",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie die genaue Zeit?", en: "Do you have the exact time?" }
   },
   {
     id: 1870,
     de: "gering",
-    en: "small, slight",
+    en: "small / slight",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Unsere Mannschaft hatte nur eine geringe Chance.", en: "Our team only had a slight chance." }
   },
   {
@@ -14755,30 +17230,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Parlament hat ein neues Gesetz beschlossen.", en: "Parliament has passed a new law." }
   },
   {
     id: 1872,
     de: "der Gewinn",
-    en: "profit, prize",
+    en: "profit / prize",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Gewinne",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
-    example: { de: "macht. Der Hauptgewinn ist ein Auto.", en: "...does. The grand prize is a car." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich habe bei einem Ratespiel mitgemacht. Der Hauptgewinn ist ein Auto.", en: "I took part in a quiz. The top prize is a car." }
   },
   {
     id: 1873,
     de: "gleich",
-    en: "right away, same",
+    en: "right away / same",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich komme gleich.", en: "I'm coming right away." }
   },
   {
@@ -14791,6 +17272,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "An der Grenze musst du deinen Ausweis zeigen.", en: "You have to show your ID at the border." }
   },
   {
@@ -14803,6 +17286,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Mein Pass ist nur noch zwei Monate gültig.", en: "My passport is only valid for two more months." }
   },
   {
@@ -14815,6 +17300,8 @@ var B1_WORDS = [
     conjugation: { "er": "hält", "präteritum": "hielt", "perfekt": "hat gehalten" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Kannst du mal kurz meine Handtasche halten?", en: "Can you hold my handbag for a moment?" }
   },
   {
@@ -14827,6 +17314,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Gestern habe ich gehört, dass mein Sohn heimlich raucht.", en: "Yesterday I heard that my son smokes secretly." }
   },
   {
@@ -14839,18 +17328,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Vor der Prüfung habe ich so viel gelernt. Hinterher habe ich vieles wieder vergessen.", en: "Before the exam I studied so much. Afterwards I forgot a lot of it again." }
   },
   {
     id: 1879,
     de: "holen",
-    en: "to get, to fetch",
+    en: "to get / to fetch",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "holt", "präteritum": "holte", "perfekt": "hat geholt" },
     lesson: 0,
     category: "daily_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Soll ich uns was zu trinken holen?", en: "Should I get us something to drink?" }
   },
   {
@@ -14863,18 +17356,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Ohne Steuerkarte zu arbeiten ist illegal. Wenn es herauskommt, musst du Strafe zahlen.", en: "Working without a tax card is illegal. If it comes out, you'll have to pay a fine." }
   },
   {
     id: 1881,
     de: "inklusive",
-    en: "including",
+    en: "including (in a price) / incl.",
     type: "preposition",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "prepositions",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zimmerpreis ist inklusive Frühstück.", en: "The room price includes breakfast." }
   },
   {
@@ -14887,6 +17384,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Maria ist sehr intelligent. Sie kann sehr gut rechnen.", en: "Maria is very intelligent. She's very good at math." }
   },
   {
@@ -14899,6 +17398,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie ruft immer wieder an, jedoch ohne Erfolg.", en: "She keeps calling, however without success." }
   },
   {
@@ -14911,18 +17412,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Wo ist das Kabel für das Aufnahmegerät?", en: "Where is the cable for the recording device?" }
   },
   {
     id: 1885,
     de: "die Kanne",
-    en: "pot, jug",
+    en: "pot / jug",
     type: "noun",
     gender: "f",
     plural: "die Kannen",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Das ist aber eine schöne Teekanne. – Ja, die ist aus China.", en: "That's a beautiful teapot. - Yes, it's from China." }
   },
   {
@@ -14935,6 +17440,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe mir ein Kleid aus dem Katalog bestellt.", en: "I ordered a dress from the catalog." }
   },
   {
@@ -14947,6 +17454,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Zeitungen bekommst du am Kiosk.", en: "You can get newspapers at the kiosk." }
   },
   {
@@ -14959,6 +17468,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 1,
     example: { de: "In der Klasse sind 24 Schülerinnen und Schüler.", en: "There are 24 pupils in the class." }
   },
   {
@@ -14971,42 +17482,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich muss in die Klinik, um meinen kranken Onkel zu besuchen.", en: "I have to go to the clinic to visit my sick uncle." }
   },
   {
     id: 1890,
     de: "komplett",
-    en: "complete, completely",
+    en: "complete / completely",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe den Termin komplett vergessen.", en: "I completely forgot the appointment." }
   },
   {
     id: 1891,
     de: "konsumieren",
-    en: "to consume",
+    en: "to consume (as a consumer)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "konsumiert", "präteritum": "konsumierte", "perfekt": "hat konsumiert" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Europäer haben im letzten Jahr mehr Fleisch konsumiert.", en: "Europeans consumed more meat last year." }
   },
   {
     id: 1892,
     de: "korrekt",
-    en: "correct",
+    en: "correct / proper",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich habe die Rechnung geprüft. Alles ist korrekt.", en: "I checked the bill. Everything is correct." }
   },
   {
@@ -15019,6 +17538,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Kinder sitzen im Kindergarten im Kreis.", en: "The children sit in a circle at kindergarten." }
   },
   {
@@ -15031,7 +17552,9 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Ich interessiere mich für andere Länder und Kulturen. kulturell Es gibt große kulturelle Unterschiede zwischen den Ländern.", en: "I'm interested in other countries and cultures. cultural: There are big cultural differences between countries." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich interessiere mich für andere Länder und Kulturen.", en: "I'm interested in other countries and cultures." }
   },
   {
     id: 1895,
@@ -15043,6 +17566,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Unser Dorf liegt direkt an der Küste.", en: "Our village is located right on the coast." }
   },
   {
@@ -15055,6 +17580,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Für meinen Computer habe ich mir ein neues Laufwerk gekauft.", en: "I bought a new drive for my computer." }
   },
   {
@@ -15067,6 +17594,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Haben Sie eine Leiter für mich? Ich will die Fenster putzen.", en: "Do you have a ladder for me? I want to clean the windows." }
   },
   {
@@ -15079,18 +17608,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Limonade ist sehr süß.", en: "The lemonade is very sweet." }
   },
   {
     id: 1899,
     de: "das Lokal",
-    en: "restaurant, pub",
+    en: "restaurant / pub",
     type: "noun",
     gender: "n",
     plural: "die Lokale",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Gibt es hier in der Nähe ein gemütliches Lokal?", en: "Is there a cozy restaurant nearby?" }
   },
   {
@@ -15103,18 +17636,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
-    example: { de: "Wenn du die Rechnung nicht pünktlich bezahlst, bekommst du eine Mahnung. WORTLISTE 61", en: "If you don't pay the bill on time, you'll get a reminder notice." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Wenn du die Rechnung nicht pünktlich bezahlst, bekommst du eine Mahnung.", en: "If you don't pay the bill on time, you'll get a reminder notice." }
   },
   {
     id: 1901,
     de: "die Marke",
-    en: "brand, stamp",
+    en: "brand / stamp",
     type: "noun",
     gender: "f",
     plural: "die Marken",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich brauche bitte fünf Briefmarken zu 1 Euro.", en: "I would like five 1-euro stamps, please." }
   },
   {
@@ -15127,42 +17664,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir machen immer Urlaub am Meer.", en: "We always spend our vacation by the sea." }
   },
   {
     id: 1903,
     de: "merkwürdig",
-    en: "strange, odd",
+    en: "strange / odd",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Das ist eine merkwürdige Geschichte.", en: "That's a strange story." }
   },
   {
     id: 1904,
     de: "die Migrantin",
-    en: "migrant",
+    en: "migrant (female)",
     type: "noun",
     gender: "f",
     plural: "die Migrantinnen",
     conjugation: null,
     lesson: 0,
     category: "society_politics",
-    example: { de: "Viele Migranten kommen aus Osteuropa.", en: "Many migrants come from Eastern Europe." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Meine Kollegin ist Migrantin. Sie kommt aus Polen.", en: "My colleague is a migrant. She comes from Poland." }
   },
   {
     id: 1905,
     de: "das Mittel",
-    en: "remedy, means",
+    en: "remedy / means",
     type: "noun",
     gender: "n",
     plural: "die Mittel",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Haben Sie ein Mittel gegen Magenschmerzen?", en: "Do you have a remedy for stomach aches?" }
   },
   {
@@ -15175,6 +17720,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "time_calendar",
+    level: "B1",
+    freq: 1,
     example: { de: "Warten Sie bitte einen Moment.", en: "Please wait a moment." }
   },
   {
@@ -15187,6 +17734,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Nachdem wir gegessen hatten, sind wir spazieren gegangen.", en: "After we had eaten, we went for a walk." }
   },
   {
@@ -15199,6 +17748,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "clothing",
+    level: "B1",
+    freq: 2,
     example: { de: "Hast du eine Nadel für mich? Ich muss einen Knopf annähen.", en: "Do you have a needle for me? I need to sew on a button." }
   },
   {
@@ -15211,42 +17762,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Du solltest nicht alles negativ sehen.", en: "You shouldn't see everything negatively." }
   },
   {
     id: 1910,
     de: "neulich",
-    en: "recently",
+    en: "recently / the other day",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich war neulich bei der Bank und habe einen alten Freund getroffen.", en: "I was at the bank recently and met an old friend." }
   },
   {
     id: 1911,
     de: "nochmals",
-    en: "again, once more",
+    en: "again / once more",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Nochmals vielen Dank!", en: "Thanks again!" }
   },
   {
     id: 1912,
     de: "nutzen",
-    en: "to use",
+    en: "to use / to make use of",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "nutzt", "präteritum": "nutzte", "perfekt": "hat genutzt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte das schöne Wetter nutzen und spazieren gehen.", en: "I want to make use of the nice weather and go for a walk." }
   },
   {
@@ -15259,6 +17818,8 @@ var B1_WORDS = [
     conjugation: { "er": "operiert", "präteritum": "operierte", "perfekt": "hat operiert" },
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir müssen das Knie sofort operieren.", en: "We need to operate on the knee immediately." }
   },
   {
@@ -15271,6 +17832,8 @@ var B1_WORDS = [
     conjugation: { "er": "organisiert", "präteritum": "organisierte", "perfekt": "hat organisiert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Für den nächsten Sommerurlaub habe ich schon alles organisiert.", en: "I have already organized everything for the next summer vacation." }
   },
   {
@@ -15283,18 +17846,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Goethestraße ist parallel zur Hauptstraße.", en: "Goethestrasse runs parallel to Hauptstrasse." }
   },
   {
     id: 1916,
     de: "die Patientin",
-    en: "patient",
+    en: "patient (female)",
     type: "noun",
     gender: "f",
     plural: "die Patientinnen",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin Patientin bei Dr. Hausner. Ich möchte bitte einen Termin.", en: "I am a patient of Dr. Hausner's. I would like an appointment, please." }
   },
   {
@@ -15307,6 +17874,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich esse gern Pflaumen und noch lieber Pflaumenkuchen.", en: "I like eating plums, and I like plum cake even more." }
   },
   {
@@ -15319,6 +17888,8 @@ var B1_WORDS = [
     conjugation: { "er": "plant", "präteritum": "plante", "perfekt": "hat geplant" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir haben geplant, diesmal im Urlaub nach Österreich zu fahren.", en: "We planned to go to Austria on vacation this time." }
   },
   {
@@ -15328,22 +17899,26 @@ var B1_WORDS = [
     type: "verb",
     gender: null,
     plural: null,
-    conjugation: null,
+    conjugation: { "er": "präsentiert", "präteritum": "präsentierte", "perfekt": "hat präsentiert" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Präsentieren Sie Ihre Ergebnisse bitte im Kurs.", en: "Please present your results in class." }
   },
   {
     id: 1920,
     de: "der Profi",
-    en: "professional, pro",
+    en: "professional / pro",
     type: "noun",
     gender: "m",
     plural: "die Profis",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
-    example: { de: "Keine Angst. Mein Bruder kann die Heizung bestimmt reparieren. Er ist doch ein Profi. WORTLISTE 71", en: "Don't worry. My brother can definitely fix the heater. He's a professional after all." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Keine Angst. Mein Bruder kann die Heizung bestimmt reparieren. Er ist doch ein Profi.", en: "Don't worry. My brother can definitely fix the heater. He's a professional, after all." }
   },
   {
     id: 1921,
@@ -15355,42 +17930,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Unsere kleine Tochter bekommt zum Geburtstag eine Puppe.", en: "Our little daughter is getting a doll for her birthday." }
   },
   {
     id: 1922,
     de: "der Rand",
-    en: "edge, margin",
+    en: "edge / margin",
     type: "noun",
     gender: "m",
     plural: "die Ränder",
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir wohnen am Rand der Innenstadt. Dort ist es billiger und ruhiger.", en: "We live on the edge of downtown. It's cheaper and quieter there." }
   },
   {
     id: 1923,
     de: "recht",
-    en: "right, suitable",
+    en: "right / suitable",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ist es Ihnen recht, wenn ich morgen vorbeikomme?", en: "Is it alright with you if I come by tomorrow?" }
   },
   {
     id: 1924,
     de: "regeln",
-    en: "to regulate, to direct",
+    en: "to regulate / to direct",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "regelt", "präteritum": "regelte", "perfekt": "hat geregelt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Ampel ist kaputt. Ein Polizist regelt den Verkehr.", en: "The traffic light is broken. A police officer is directing traffic." }
   },
   {
@@ -15403,6 +17986,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Der Pullover ist aus reiner Wolle.", en: "The sweater is made of pure wool." }
   },
   {
@@ -15415,18 +18000,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie ist 67 und bekommt jetzt eine gute Rente.", en: "She is 67 and now receives a good pension." }
   },
   {
     id: 1927,
     de: "riesig",
-    en: "huge, gigantic",
+    en: "huge / gigantic",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Die Stadt ist riesig.", en: "The city is huge." }
   },
   {
@@ -15435,11 +18024,13 @@ var B1_WORDS = [
     en: "backpack",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Rucksäcke",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
-    example: { de: "Ich brauche nicht viel. Ich nehme nur meinen Rucksack mit. Eltern.", en: "I don't need much. I'm only taking my backpack with me." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich brauche nicht viel. Ich nehme nur meinen Rucksack mit.", en: "I don't need much. I'm only taking my backpack with me." }
   },
   {
     id: 1929,
@@ -15451,18 +18042,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Urlaub in den Schulferien ist immer teurer. Das ist die Saison mit den höchsten Preisen.", en: "Vacationing during school holidays is always more expensive. That's the season with the highest prices." }
   },
   {
     id: 1930,
     de: "die Schachtel",
-    en: "box, pack",
+    en: "box / pack",
     type: "noun",
     gender: "f",
     plural: "die Schachteln",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich hätte gern eine Schachtel Zigaretten.", en: "I would like a pack of cigarettes." }
   },
   {
@@ -15475,6 +18070,8 @@ var B1_WORDS = [
     conjugation: { "er": "schaut", "präteritum": "schaute", "perfekt": "hat geschaut" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Schau mal! Da vorne ist noch ein Platz frei.", en: "Look! There's still a free seat up front." }
   },
   {
@@ -15487,6 +18084,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 1,
     example: { de: "Kannst du lesen, was dort auf dem Schild steht?", en: "Can you read what it says on that sign?" }
   },
   {
@@ -15499,18 +18098,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 1,
     example: { de: "An unserer Wohnungstür ist das Schloss kaputt.", en: "The lock on our apartment door is broken." }
   },
   {
     id: 1934,
     de: "die Schularbeit",
-    en: "school assignment, test",
+    en: "class test (Austrian)",
     type: "noun",
     gender: "f",
     plural: "die Schularbeiten",
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
+    region: "A",
     example: { de: "Mein Sohn schreibt bei Schularbeiten immer gute Noten.", en: "My son always gets good grades on his school tests." }
   },
   {
@@ -15519,11 +18123,13 @@ var B1_WORDS = [
     en: "lake",
     type: "noun",
     gender: "m",
-    plural: null,
+    plural: "die Seen",
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
-    example: { de: "Unser Hotel war direkt am See. die See Im Sommer fahren wir immer an die", en: "Our hotel was right on the lake. the sea: In summer we always travel to the ..." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Unser Hotel war direkt am See.", en: "Our hotel was right on the lake." }
   },
   {
     id: 1936,
@@ -15535,30 +18141,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 2,
     example: { de: "Es ist seltsam, dass mein Bruder noch nicht hier ist.", en: "It's strange that my brother isn't here yet." }
   },
   {
     id: 1937,
     de: "sichern",
-    en: "to back up, to secure",
+    en: "to back up / to secure",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "sichert", "präteritum": "sicherte", "perfekt": "hat gesichert" },
     lesson: 0,
     category: "media_technology",
+    level: "B1",
+    freq: 2,
     example: { de: "Du musst immer alle Daten im Computer sichern.", en: "You must always back up all the data on the computer." }
   },
   {
     id: 1938,
     de: "sodass",
-    en: "so that, with the result that",
+    en: "so that / with the result that",
     type: "conjunction",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Der Zug hatte zwei Stunden Verspätung, sodass ich erst um 23 Uhr nach Hause kam.", en: "The train was two hours late, so that I didn't get home until 11 p.m." }
   },
   {
@@ -15571,6 +18183,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Willst du mir den Brief mitgeben? Ich gehe sowieso zur Post.", en: "Do you want to give me the letter? I'm going to the post office anyway." }
   },
   {
@@ -15579,34 +18193,40 @@ var B1_WORDS = [
     en: "game",
     type: "noun",
     gender: "n",
-    plural: null,
+    plural: "die Spiele",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 1,
     example: { de: "Nach 20 Minuten stand das Spiel 2:1.", en: "After 20 minutes the score was 2:1." }
   },
   {
     id: 1941,
     de: "die Spur",
-    en: "lane, trace",
+    en: "lane / trace",
     type: "noun",
     gender: "f",
     plural: "die Spuren",
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Fahren Sie bitte auf der linken Spur, wenn Sie schneller fahren.", en: "Please drive in the left lane if you want to go faster." }
   },
   {
     id: 1942,
     de: "starten",
-    en: "to start, to take off",
+    en: "to start / to take off",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "startet", "präteritum": "startete", "perfekt": "ist gestartet" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Flugzeug ist pünktlich gestartet.", en: "The plane took off on time." }
   },
   {
@@ -15619,30 +18239,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Kinder werfen Steine ins Wasser.", en: "The children are throwing stones into the water." }
   },
   {
     id: 1944,
     de: "die Stewardess",
-    en: "flight attendant",
+    en: "flight attendant (female) / stewardess",
     type: "noun",
     gender: "f",
     plural: "die Stewardessen",
     conjugation: null,
     lesson: 0,
     category: "jobs_work",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Stewardess bringt das Mittagessen.", en: "The flight attendant brings the lunch." }
   },
   {
     id: 1945,
     de: "stoppen",
-    en: "to stop",
+    en: "to stop (something)",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "stoppt", "präteritum": "stoppte", "perfekt": "hat gestoppt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Die Polizei hat mich gestoppt, weil ich bei Rot über die Ampel gefahren bin.", en: "The police stopped me because I drove through a red light." }
   },
   {
@@ -15655,6 +18281,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "education",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir führen eine Studie über Arbeitslosigkeit durch.", en: "We are conducting a study on unemployment." }
   },
   {
@@ -15667,6 +18295,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Das Herz ist ein Symbol für die Liebe.", en: "The heart is a symbol of love." }
   },
   {
@@ -15679,6 +18309,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
+    level: "B1",
+    freq: 2,
     example: { de: "Sie hat großes Talent für Musik.", en: "She has great talent for music." }
   },
   {
@@ -15691,18 +18323,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "abstract_concepts",
-    example: { de: "Das widerspricht den Tatsachen. tatsächlich Die Hose ist tatsächlich zu klein, obwohl sie so groß aussieht.", en: "That contradicts the facts. actually: The pants are indeed too small, even though they look so big." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Das widerspricht den Tatsachen.", en: "That contradicts the facts." }
   },
   {
     id: 1950,
     de: "die Terrasse",
-    en: "terrace, patio",
+    en: "terrace / patio",
     type: "noun",
     gender: "f",
     plural: "die Terrassen",
     conjugation: null,
     lesson: 0,
     category: "housing",
+    level: "B1",
+    freq: 2,
     example: { de: "Setzen wir uns auf die Terrasse!", en: "Let's sit on the terrace!" }
   },
   {
@@ -15715,66 +18351,78 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "weather_nature",
+    level: "B1",
+    freq: 1,
     example: { de: "Er mag Tiere sehr und geht darum oft in den Zoo.", en: "He likes animals a lot, which is why he often goes to the zoo." }
   },
   {
     id: 1952,
     de: "die Torte",
-    en: "cake, gateau",
+    en: "cake / gateau",
     type: "noun",
     gender: "f",
     plural: "die Torten",
     conjugation: null,
     lesson: 0,
     category: "food_drink",
+    level: "B1",
+    freq: 1,
     example: { de: "Zum Geburtstag backe ich dir eine Torte.", en: "For your birthday I'll bake you a cake." }
   },
   {
     id: 1953,
     de: "treten",
-    en: "to step, to kick",
+    en: "to step / to kick",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "tritt", "präteritum": "trat", "perfekt": "hat/ist getreten" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich bin in ein Stück Glas getreten.", en: "I stepped on a piece of glass." }
   },
   {
     id: 1954,
     de: "die Tüte",
-    en: "bag",
+    en: "bag (paper / plastic)",
     type: "noun",
     gender: "f",
     plural: "die Tüten",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Brauchen Sie eine Tüte für den Salat?", en: "Do you need a bag for the salad?" }
   },
   {
     id: 1955,
     de: "überprüfen",
-    en: "to check, to verify",
+    en: "to check / to verify",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "überprüft", "präteritum": "überprüfte", "perfekt": "hat überprüft" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Bitte überprüfen Sie, ob Ihr Name richtig geschrieben ist.", en: "Please check whether your name is spelled correctly." }
   },
   {
     id: 1956,
     de: "übrig",
-    en: "left over, remaining",
+    en: "left over / remaining",
     type: "adjective",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Ist noch etwas zu essen übrig?", en: "Is there anything left to eat?" }
   },
   {
@@ -15787,42 +18435,50 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 1,
     example: { de: "Es gibt wegen des Unfalls eine Umleitung.", en: "There is a detour because of the accident." }
   },
   {
     id: 1958,
     de: "das Unglück",
-    en: "accident, misfortune",
+    en: "accident / misfortune",
     type: "noun",
     gender: "n",
     plural: "die Unglücke",
     conjugation: null,
     lesson: 0,
     category: "health",
+    level: "B1",
+    freq: 2,
     example: { de: "Bei dem Unglück gab es viele Verletzte.", en: "There were many injured in the accident." }
   },
   {
     id: 1959,
     de: "unterscheiden",
-    en: "to distinguish, to tell apart",
+    en: "to distinguish / to tell apart",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "unterscheidet", "präteritum": "unterschied", "perfekt": "hat unterschieden" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ihr seid euch sehr ähnlich. Auf dem Foto kann man euch beide nicht unterscheiden.", en: "You two are very similar. You can't tell the two of you apart in the photo." }
   },
   {
     id: 1960,
     de: "die Urkunde",
-    en: "certificate, document",
+    en: "certificate / document",
     type: "noun",
     gender: "f",
     plural: "die Urkunden",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 2,
     example: { de: "Wenn wir das Spiel gewinnen, bekommen wir eine Urkunde.", en: "If we win the game, we'll get a certificate." }
   },
   {
@@ -15835,30 +18491,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie sind für Ihre Kinder verantwortlich.", en: "You are responsible for your children." }
   },
   {
     id: 1962,
     de: "vereinbaren",
-    en: "to arrange, to agree on",
+    en: "to arrange / to agree on",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "vereinbart", "präteritum": "vereinbarte", "perfekt": "hat vereinbart" },
     lesson: 0,
     category: "work_study_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Können wir einen Termin vereinbaren?", en: "Can we arrange an appointment?" }
   },
   {
     id: 1963,
     de: "das Verhältnis",
-    en: "relationship",
+    en: "relationship / ratio",
     type: "noun",
     gender: "n",
     plural: "die Verhältnisse",
     conjugation: null,
     lesson: 0,
     category: "feelings_relationships",
+    level: "B1",
+    freq: 2,
     example: { de: "Ich habe ein gutes Verhältnis zu meinen Eltern.", en: "I have a good relationship with my parents." }
   },
   {
@@ -15871,7 +18533,9 @@ var B1_WORDS = [
     conjugation: { "er": "verliebt sich", "präteritum": "verliebte sich", "perfekt": "hat sich verliebt" },
     lesson: 0,
     category: "emotion_verbs",
-    example: { de: "Ich habe mich verliebt. verliebt Ich bin in Francesco verliebt.", en: "I have fallen in love. in love: I am in love with Francesco." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Ich habe mich verliebt.", en: "I've fallen in love." }
   },
   {
     id: 1965,
@@ -15883,30 +18547,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_descriptive",
+    level: "B1",
+    freq: 1,
     example: { de: "Bist du verrückt geworden?!", en: "Have you gone crazy?!" }
   },
   {
     id: 1966,
     de: "verteilen",
-    en: "to distribute, to hand out",
+    en: "to distribute / to hand out",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verteilt", "präteritum": "verteilte", "perfekt": "hat verteilt" },
     lesson: 0,
     category: "other_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Kannst du bitte schon mal die Gläser verteilen?", en: "Could you please go ahead and hand out the glasses?" }
   },
   {
     id: 1967,
     de: "verwenden",
-    en: "to use",
+    en: "to use / to employ",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "verwendet", "präteritum": "verwendete", "perfekt": "hat verwendet" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Dieses Wort wird oft verwendet.", en: "This word is often used." }
   },
   {
@@ -15919,6 +18589,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "law_administration",
+    level: "B1",
+    freq: 1,
     example: { de: "Das Visum ist für drei Monate gültig.", en: "The visa is valid for three months." }
   },
   {
@@ -15927,46 +18599,54 @@ var B1_WORDS = [
     en: "preparation",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Vorbereitungen",
     conjugation: null,
     lesson: 0,
     category: "education",
-    example: { de: "Vorbereitung für die Prüfung.", en: "Preparation for the exam." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Nächste Woche beginnen wir mit der Vorbereitung für die Prüfung.", en: "Next week we'll start preparing for the exam." }
   },
   {
     id: 1970,
     de: "die Vorstellung",
-    en: "performance, show",
+    en: "performance / show",
     type: "noun",
     gender: "f",
-    plural: null,
+    plural: "die Vorstellungen",
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
-    example: { de: "Vorstellung ist um 15 Uhr.", en: "The performance is at 3 p.m." }
+    level: "B1",
+    freq: 1,
+    example: { de: "Wann läuft der Film? – Die nächste Vorstellung ist um 15 Uhr.", en: "When is the film on? – The next showing is at 3 p.m." }
   },
   {
     id: 1971,
     de: "wählen",
-    en: "to choose, to vote",
+    en: "to choose / to vote",
     type: "verb",
     gender: null,
     plural: null,
     conjugation: { "er": "wählt", "präteritum": "wählte", "perfekt": "hat gewählt" },
     lesson: 0,
     category: "basic_verbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Sie können wählen: Als Vorspeise gibt es Suppe oder Salat.", en: "You can choose: as a starter there is soup or salad." }
   },
   {
     id: 1972,
     de: "die Ware",
-    en: "goods, merchandise",
+    en: "goods / merchandise",
     type: "noun",
     gender: "f",
     plural: "die Waren",
     conjugation: null,
     lesson: 0,
     category: "money_shopping",
+    level: "B1",
+    freq: 1,
     example: { de: "Wir liefern Ihnen die Ware direkt ins Haus.", en: "We deliver the goods directly to your home." }
   },
   {
@@ -15979,6 +18659,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adjectives_basic",
+    level: "B1",
+    freq: 1,
     example: { de: "Wie weit ist es noch bis München?", en: "How much further is it to Munich?" }
   },
   {
@@ -15991,6 +18673,8 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "culture_free_time",
+    level: "B1",
+    freq: 2,
     example: { de: "Meine Tochter hat bei einem Wettbewerb gewonnen. Sie hat das beste Bild gemalt.", en: "My daughter won a competition. She painted the best picture." }
   },
   {
@@ -16003,6 +18687,8 @@ var B1_WORDS = [
     conjugation: { "er": "winkt", "präteritum": "winkte", "perfekt": "hat gewinkt" },
     lesson: 0,
     category: "movement_verbs",
+    level: "B1",
+    freq: 2,
     example: { de: "Alle standen auf dem Bahnsteig und winkten zum Abschied.", en: "Everyone stood on the platform and waved goodbye." }
   },
   {
@@ -16015,18 +18701,22 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Wohin kommt der Schrank?", en: "Where does the wardrobe go?" }
   },
   {
     id: 1977,
     de: "die Zahl",
-    en: "number",
+    en: "number / figure",
     type: "noun",
     gender: "f",
     plural: "die Zahlen",
     conjugation: null,
     lesson: 0,
     category: "numbers",
+    level: "B1",
+    freq: 1,
     example: { de: "Können Sie die Zahl bitte wiederholen?", en: "Could you please repeat the number?" }
   },
   {
@@ -16039,19 +18729,23 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "travel_transport",
+    level: "B1",
+    freq: 2,
     example: { de: "Wir machen Camping-Urlaub und nehmen ein Zelt mit.", en: "We're going camping and taking a tent with us." }
   },
   {
     id: 1979,
     de: "die Zeugin",
-    en: "witness",
+    en: "witness (female)",
     type: "noun",
     gender: "f",
     plural: "die Zeuginnen",
     conjugation: null,
     lesson: 0,
     category: "law_administration",
-    example: { de: "Die Polizei sucht noch Zeugen für den Unfall.", en: "The police are still looking for witnesses to the accident." }
+    level: "B1",
+    freq: 2,
+    example: { de: "Eine Zeugin hat den Unfall genau gesehen.", en: "A witness saw the accident clearly." }
   },
   {
     id: 1980,
@@ -16063,30 +18757,36 @@ var B1_WORDS = [
     conjugation: null,
     lesson: 0,
     category: "city_places",
+    level: "B1",
+    freq: 2,
     example: { de: "Hier können wir nicht fahren. Das ist eine Fußgängerzone.", en: "We can't drive here. This is a pedestrian zone." }
   },
   {
     id: 1981,
     de: "zumindest",
-    en: "at least",
+    en: "at least / at any rate",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "adverbs",
+    level: "B1",
+    freq: 1,
     example: { de: "Ich möchte nicht in der Stadt wohnen, zumindest jetzt nicht, wenn die Kinder noch so klein sind.", en: "I don't want to live in the city, at least not now, while the children are still so small." }
   },
   {
     id: 1982,
     de: "zwar",
-    en: "indeed, though",
+    en: "indeed / though",
     type: "adverb",
     gender: null,
     plural: null,
     conjugation: null,
     lesson: 0,
     category: "conjunctions",
+    level: "B1",
+    freq: 1,
     example: { de: "Diese Schuhe sind zwar teuer, aber gut.", en: "These shoes are indeed expensive, but good." }
   },
 ];
@@ -16099,5 +18799,7 @@ var B1_CATEGORIES = {
   abstract_concepts: { name: "Abstract Concepts", emoji: "\ud83d\udcad" },
   law_administration: { name: "Law & Administration", emoji: "\ud83c\udfdb\ufe0f" },
   culture_free_time: { name: "Culture & Free Time", emoji: "\ud83c\udfad" },
-  business_economy: { name: "Business & Economy", emoji: "\ud83d\udcc8" }
+  business_economy: { name: "Business & Economy", emoji: "\ud83d\udcc8" },
+  // Overrides the A1 entry, whose name and emoji clashed with daily_verbs.
+  daily_life_verbs: { name: "Routine & Shopping Verbs", emoji: "\ud83d\uded2" }
 };
