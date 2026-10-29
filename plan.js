@@ -413,6 +413,23 @@ function planLearnedPace(learnedEver) {
     return learnedEver / elapsed;
 }
 
+// Words you knew before toMs: learned in cards or ticked as known (a word
+// counted once). null when the app can't date learned words.
+function planKnownWordsBefore(toMs) {
+    var learned = planIdsBetween(typeof wordsLearnedBetween === 'function' ? wordsLearnedBetween : null, 0, toMs);
+    if (!learned) return null;
+    var ticked = planIdsBetween(typeof wordsKnownBetween === 'function' ? wordsKnownBetween : null, 0, toMs) || [];
+    var seen = {};
+    return learned.concat(ticked).filter(function(id) {
+        var k = String(id);
+        if (seen[k]) return false;
+        seen[k] = true;
+        return true;
+    });
+}
+
+// A milestone like "800 words" counts every word you know; the pace that
+// projects it forward stays card learning only (planLearnedPace).
 function planMilestoneStatus(week, stats) {
     var target = planWordTarget(week.milestone);
     if (!target || !stats) return null;
@@ -421,7 +438,7 @@ function planMilestoneStatus(week, stats) {
     var endExcl = planWeekEndExcl(week);
     var endLabel = planFmtDate(planAddDays(endExcl, -1));
     if (today >= endExcl) {
-        var then = planIdsBetween(typeof wordsLearnedBetween === 'function' ? wordsLearnedBetween : null, 0, endExcl.getTime());
+        var then = planKnownWordsBefore(endExcl.getTime());
         if (!then) return { cls: learned >= target ? 'ok' : 'behind', target: target, text: learned + ' learned now' };
         return { cls: then.length >= target ? 'ok' : 'behind', target: target,
             text: then.length + ' learned by ' + endLabel + (then.length >= target ? ' · reached ✓' : ' · target missed') + ' · ' + learned + ' now' };
@@ -644,7 +661,9 @@ var PLAN_WORD_STATES = { learning: 1, learned: 1, mastered: 1 };
 
 function planRenderWordCard(w) {
     var deClass = 'word-de';
-    if (w.type === 'noun' && w.gender && w.plural !== w.de) deClass += ' word-de-gender-' + planSafeArg(w.gender);
+    // Same rule as the rest of the app (no colour for plural-only nouns).
+    var gender = typeof wordGenderColor === 'function' ? planTry(function() { return wordGenderColor(w); }) : null;
+    if (gender) deClass += ' word-de-gender-' + planSafeArg(gender);
     var state = typeof wordState === 'function' ? planTry(function() { return wordState(w.id); }) : null;
     return '<div class="plan-word-card">' +
         '<div class="plan-word-top">' +

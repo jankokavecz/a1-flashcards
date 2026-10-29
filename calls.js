@@ -138,16 +138,15 @@ var callsRecognition = null;        // SpeechRecognition of the current listen, 
 var callsSRCtor = null;             // SpeechRecognition constructor; null = typed answers only
 var callsListening = false;
 var callsEnded = true;
-var callsSelectedVoice = null;      // best German TTS voice found on device
 var callsCallId = 0;                // bumped on every start/stop: stale async callbacks compare against it
 var callsFinishedId = -1;           // call whose feedback was already shown (guards double counting)
 var callsUtterSeq = 0;
-var callsUtterance = null;          // keeps the utterance referenced so its onend still fires
 var callsTtsTimer = null;
 var callsTtsActive = false;
 var callsFetchAbort = null;
 var callsTurn = 'idle';             // 'ai' | 'listening' | 'thinking' | 'user' | 'idle'
 var callsTyping = false;            // typed-answer box open
+var callsTapToListen = false;       // iOS refused to start the mic by itself after the AI spoke: tap 🎤
 var callsView = 'list';             // 'setup' | 'list' | 'settings' | 'call' | 'feedback'
 var callsListNotice = null;         // { text, at }
 var callsLastCall = null;           // { scenario, conversation } of the finished call
@@ -231,31 +230,31 @@ function callsDismissNotice() {
 // ── Init / storage ─────────────────────────────────────────────
 
 function initCalls() {
-    var ss = window.speechSynthesis;
-    // Priority: Enhanced > Premium > female name 'Anna' (iOS) > any de-DE > any de-*
-    function pickBestGermanVoice() {
-        var voices = [];
-        try { voices = ss.getVoices() || []; } catch (e) {}
-        if (!voices.length) return;
-        var tiers = [
-            function(v) { return v.lang === 'de-DE' && /enhanced/i.test(v.name); },
-            function(v) { return v.lang === 'de-DE' && /premium/i.test(v.name); },
-            function(v) { return v.lang === 'de-DE' && /anna/i.test(v.name); },
-            function(v) { return v.lang === 'de-DE'; },
-            function(v) { return String(v.lang || '').indexOf('de') === 0; }
-        ];
-        for (var i = 0; i < tiers.length; i++) {
-            var found = voices.filter(tiers[i]);
-            if (found.length) { callsSelectedVoice = found[0]; return; }
-        }
-    }
-    if (ss) {
-        pickBestGermanVoice();
-        if (typeof ss.addEventListener === 'function') ss.addEventListener('voiceschanged', pickBestGermanVoice);
-        else if (ss.onvoiceschanged !== undefined) ss.onvoiceschanged = pickBestGermanVoice;
-    }
+    // The German voice is picked for every line by speechSay (app.js): on
+    // iOS getVoices() can stay empty and 'voiceschanged' may never fire.
     callsSRCtor = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    document.addEventListener('visibilitychange', callsOnVisibility);
     renderCallsScreen();
+}
+
+// The Speech check found voice input off (app.js): calls start in typing mode.
+function callsVoiceInputOff() {
+    return typeof speechVoiceInputOff === 'function' && speechVoiceInputOff();
+}
+
+// iOS cuts off speech (app.js stops it) and the mic in the background: the
+// call stays open, on the learner's turn.
+function callsOnVisibility() {
+    if (document.visibilityState !== 'hidden' || !callsIsLive()) return;
+    if (callsTurn !== 'ai' && callsTurn !== 'listening') return;
+    callsUtterSeq++;
+    if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
+    callsTtsActive = false;
+    var rec = callsRecognition;
+    callsRecognition = null;
+    callsListening = false;
+    if (rec) { try { if (rec.abort) rec.abort(); else rec.stop(); } catch (e) {} }
+    callsShowUserTurn('Paused while the app was in the background. ' + (callsSRCtor ? 'Tap 🎤 to answer, or type.' : 'Type your answer.'));
 }
 
 function callsGetApiKey() {
@@ -538,7 +537,7 @@ function callsStartScenario(scenarioId) {
     callsConversation = [];
     callsEnded = false;
     callsCallId++;
-    callsTyping = false;
+    callsTyping = callsVoiceInputOff();
     callsView = 'call';
 
     var typeIcon = s.type === 'phone' ? '📞' : '💬';
@@ -549,7 +548,7 @@ function callsStartScenario(scenarioId) {
                 '<div class="calls-active-title">' + typeIcon + ' ' + callsEsc(s.title) + '</div>' +
             '</div>' +
             '<div class="calls-goal-banner">🎯 ' + callsEsc(s.goalEn) + '</div>' +
-            '<div class="calls-transcript" id="calls-transcript"></div>' +
+            '<div class="calls-transcript" id="calls-transcript">' + callsSilentHintHtml() + '</div>' +
             '<div class="calls-mic-area" id="calls-mic-area">' +
                 '<div class="calls-turn-note hidden" id="calls-turn-note"></div>' +
                 '<div class="calls-mic-indicator hidden" id="calls-mic-indicator">' +
@@ -569,6 +568,21 @@ function callsStartScenario(scenarioId) {
     callsConversation.push({ role: 'assistant', content: s.firstLine });
     callsSetTurn('ai');
     callsSpeakAI(s.firstLine, callsAfterAiTurn);
+}
+
+// The voice was silent in the Speech check: a note at the top of the
+// transcript (it scrolls away with the replies and can be closed). No link to
+// Settings here -- leaving Speak would end the call.
+function callsSilentHintHtml() {
+    if (typeof speechTtsSilent !== 'function' || !speechTtsSilent()) return '';
+    return '<div class="speech-hint">' +
+        '<button type="button" class="speech-hint-close" aria-label="Close" onclick="callsDismissSilentHint(this)">×</button>' +
+        '🔇 The voice was silent in your Speech check, so read the replies here. After the call you can test again in Settings → Speech check.</div>';
+}
+
+function callsDismissSilentHint(btn) {
+    var hint = btn && btn.parentNode;
+    if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
 }
 
 function callsAddBubble(speaker, de, en) {
@@ -674,8 +688,20 @@ function callsShowUserTurn(note, openTyping) {
     if (row) row.classList.toggle('hidden', !callsTyping);
     if (send) send.disabled = false;
     if (toggle) toggle.classList.toggle('hidden', !callsSRCtor || callsTyping);
-    callsSetNote(note || (callsSRCtor ? '' : 'Voice input isn’t available on this device — type your answer.'));
+    callsSetNote(note || callsTypingNote());
     callsKeepTranscriptEnd(atEnd);
+}
+
+// Why this turn is typed, if voice input is off.
+function callsTypingNote() {
+    if (callsTyping && callsVoiceInputOff()) {
+        return 'Voice input didn’t work in your Speech check, so this call is typed' +
+            (callsSRCtor ? '. Tap 🎤 to try anyway, or test again in Settings → Speech check.' : ' (details in Settings → Speech check).');
+    }
+    if (!callsSRCtor) {
+        return typeof speechRecError === 'function' ? speechRecError('unsupported').text : 'Voice input isn’t available on this device — type your answer.';
+    }
+    return '';
 }
 
 function callsShowTyping() {
@@ -714,69 +740,46 @@ function callsSubmitTyped() {
     return false;
 }
 
+// speechSay (app.js) copes with the iOS quirks: a dropped line, onend that
+// never fires (its watchdog ends the turn anyway), a paused engine.
 function callsSpeakAI(text, onDone) {
     var myId = callsCallId;
     var seq = ++callsUtterSeq;
-    var ss = window.speechSynthesis;
     if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
-
-    var fired = false;
-    function finish() {
-        if (fired) return;
-        fired = true;
-        if (seq === callsUtterSeq) {
-            callsTtsActive = false;
-            if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
-        }
-        // Deferred so a cancel() fired by a tab switch is seen as stale first.
-        setTimeout(function() {
-            if (seq !== callsUtterSeq || myId !== callsCallId || callsEnded) return;
-            if (onDone) onDone();
-        }, 0);
-    }
-
-    if (!ss || typeof SpeechSynthesisUtterance === 'undefined') { finish(); return; }
-    var u;
-    try {
-        try { ss.cancel(); } catch (e) {}
-        u = new SpeechSynthesisUtterance(text);
-        u.lang = 'de-DE';
-        u.rate = 0.88;
-        u.pitch = 1.05;
-        if (callsSelectedVoice) u.voice = callsSelectedVoice;
-    } catch (e) { finish(); return; }
-    u.onend = finish;
-    u.onerror = finish;
-    callsUtterance = u;
     callsTtsActive = true;
 
-    // onend is unreliable on iOS: after the estimated length, finish once
-    // the engine reports it is no longer speaking, and meanwhile let the
-    // learner take their turn in case the engine is stuck.
-    var started = Date.now();
-    var cap = Math.max(5000, text.length * 160 + 4000);
-    function check() {
-        callsTtsTimer = null;
-        if (fired || seq !== callsUtterSeq) return;
-        if (ss.speaking && Date.now() - started < cap) {
-            var btn = callsEl('calls-speak-btn');
-            if (btn && callsTurn === 'ai' && callsSRCtor && !callsTyping) { btn.disabled = false; btn.textContent = '🎤 Answer now'; }
-            callsTtsTimer = setTimeout(check, 500);
-            return;
-        }
-        finish();
+    function finish(how) {
+        if (seq !== callsUtterSeq) return;   // halted or cut short by "Answer now"
+        callsTtsActive = false;
+        if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
+        if (myId !== callsCallId || callsEnded) return;
+        // Stopped by something else (other audio): the learner's turn, no dead end.
+        if (how === 'stopped') { callsShowUserTurn(''); return; }
+        if (onDone) onDone();
     }
-    callsTtsTimer = setTimeout(check, Math.max(2500, text.length * 75 + 1000));
-    try { ss.speak(u); } catch (e) { finish(); }
+
+    // Once the line should be over, the learner may cut in (the engine can
+    // keep reporting "speaking" on iOS).
+    callsTtsTimer = setTimeout(function() {
+        callsTtsTimer = null;
+        if (seq !== callsUtterSeq || !callsTtsActive) return;
+        var btn = callsEl('calls-speak-btn');
+        if (btn && callsTurn === 'ai' && callsSRCtor && !callsTyping) { btn.disabled = false; btn.textContent = '🎤 Answer now'; }
+    }, Math.max(2500, String(text).length * 75 + 1000));
+
+    if (typeof speechSay === 'function') speechSay(text, { lang: 'de-DE', rate: 0.88, pitch: 1.05 }, finish);
+    else setTimeout(function() { finish('none'); }, 0);
 }
 
 function callsAfterAiTurn() {
     if (!callsIsLive()) return;
-    if (callsTyping || !callsSRCtor) callsShowUserTurn('');
-    else callsStartListening();
+    if (callsTyping || !callsSRCtor || callsTapToListen || document.visibilityState === 'hidden') callsShowUserTurn('');
+    else callsStartListening(true);
 }
 
-function callsStartListening() {
+// auto: started by itself after the AI spoke, i.e. outside a tap.
+function callsStartListening(auto) {
+    auto = auto === true;
     if (!callsIsLive() || callsListening || callsTurn === 'thinking') return;
     if (!callsSRCtor) { callsShowUserTurn(''); return; }
     if (callsTurn === 'ai' && callsTtsActive) {
@@ -784,13 +787,24 @@ function callsStartListening() {
         callsUtterSeq++;
         if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
         callsTtsActive = false;
-        try { window.speechSynthesis.cancel(); } catch (e) {}
     }
+    var myId = callsCallId;
+    callsListening = true;              // a second tap meanwhile does nothing
+    callsSetTurn('listening');
+    // Never over the AI's voice (iOS audio session); from a tap with nothing
+    // speaking, start() still runs inside the tap.
+    speechThenListen(function(inTap) {
+        if (myId !== callsCallId || !callsIsLive() || callsTurn !== 'listening' || callsRecognition) return;
+        callsBeginRecognition(!inTap);
+    }, !auto);
+}
 
+// auto: start() runs outside a tap (iOS may refuse it with 'not-allowed').
+function callsBeginRecognition(auto) {
     var myId = callsCallId;
     var rec;
     try { rec = new callsSRCtor(); }
-    catch (e) { callsShowUserTurn('Voice input couldn’t start on this device — type your answer instead.', true); return; }
+    catch (e) { callsShowUserTurn(speechRecError('start-failed').text, true); return; }
     rec.lang = 'de-DE';
     rec.continuous = false;
     rec.interimResults = false;
@@ -805,13 +819,14 @@ function callsStartListening() {
         heard = true;
         callsRecognition = null;
         callsListening = false;
+        if (typeof speechNoteVoiceWorked === 'function') speechNoteVoiceWorked();
         callsHandleUserSpeech(text);
     };
     rec.onerror = function(e) {
         if (!current()) return;
         callsRecognition = null;
         callsListening = false;
-        callsHandleRecognitionError(e && e.error);
+        callsHandleRecognitionError(e && e.error, auto);
     };
     rec.onend = function() {
         if (!current()) return;
@@ -821,29 +836,26 @@ function callsStartListening() {
     };
 
     callsRecognition = rec;
-    callsSetTurn('listening');
+    callsListening = true;
     try {
         rec.start();
-        callsListening = true;
     } catch (e) {
         callsRecognition = null;
         callsListening = false;
-        callsShowUserTurn('The microphone couldn’t start. Tap to try again, or type your answer.');
+        callsShowUserTurn(speechRecError('start-failed').text);
     }
 }
 
-function callsHandleRecognitionError(err) {
-    var messages = {
-        'no-speech': ['I didn’t hear anything. Tap to speak again.', false],
-        'aborted': ['', false],
-        'not-allowed': ['Couldn’t use the microphone. Tap Try again — if it keeps failing, allow microphone and speech recognition for this app in the iPhone Settings, or type your answer below.', true],
-        'service-not-allowed': ['Speech recognition isn’t allowed here (on iPhone it needs Dictation turned on). Type your answer below, or tap Try again.', true],
-        'audio-capture': ['No microphone is available. Type your answer below, or tap Try again.', true],
-        'network': ['Speech recognition needs an internet connection. Tap Try again, or type your answer.', false],
-        'language-not-supported': ['German speech recognition isn’t available on this device — type your answer below.', true]
-    };
-    var m = messages[err] || ['Speech recognition stopped' + (err ? ' (' + err + ')' : '') + '. Tap Try again, or type your answer.', false];
-    callsShowUserTurn(m[0], m[1]);
+// Messages and fixes come from speechRecError (app.js). A setting that
+// blocks voice input opens the typing row.
+function callsHandleRecognitionError(err, auto) {
+    if (err === 'no-speech') { callsShowUserTurn('I didn’t hear anything. Tap to speak again.'); return; }
+    if (err === 'aborted') { callsShowUserTurn(''); return; }
+    // iOS may refuse a start that didn't come from a tap: from now on the
+    // learner taps 🎤 (a refusal from a tap is a real "blocked").
+    if (err === 'not-allowed' && auto) { callsTapToListen = true; callsShowUserTurn('Tap 🎤 to answer.'); return; }
+    var info = speechRecError(err);
+    callsShowUserTurn(info.text, info.kind === 'blocked' || info.kind === 'no-mic' || info.kind === 'unsupported');
 }
 
 function callsHangUp() {
@@ -857,7 +869,7 @@ function callsHaltMedia() {
     if (callsTtsTimer) { clearTimeout(callsTtsTimer); callsTtsTimer = null; }
     if (callsTtsActive || callsView === 'call') {
         callsTtsActive = false;
-        try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
+        if (typeof speechStop === 'function') speechStop();
     }
     var rec = callsRecognition;
     callsRecognition = null;

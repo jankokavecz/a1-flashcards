@@ -7,9 +7,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css?v=2026-10-28.1348.59b3bb7">
+    <link rel="stylesheet" href="styles.css?v=2026-10-29.0801.ed37a67">
 </head>
 <body>
     <div id="app">
@@ -43,7 +43,7 @@
                 <button type="button" onclick="exitPracticeSession()">✕ Done</button>
             </div>
             <div class="cards-toolbar">
-                <button type="button" class="cards-counters" id="cards-introduced-counter" onclick="openMyWords({state:'learned', sort:'learned'})"></button>
+                <button type="button" class="cards-counters" id="cards-introduced-counter" onclick="openMyWords({state:'seen'})"></button>
                 <label title="New words come only from A1 and the B1 core list; reviews are not affected"><input type="checkbox" id="core-only-toggle" onchange="toggleCoreOnly()"> New: core only</label>
                 <label><input type="checkbox" id="speak-on-flip-toggle" onchange="toggleSpeakOnFlip()"> 🔊 Speak on flip</label>
             </div>
@@ -226,24 +226,29 @@
                 <div class="word-sheet-body" id="word-sheet-body"></div>
             </div>
         </div>
+
+        <!-- Tick what you know (My Words): full-screen sorting list, built by openTickView() in app.js -->
+        <div id="tick-view" class="tick-view" role="dialog" aria-modal="true" aria-label="Tick what you know" aria-hidden="true"></div>
     </div>
 
-    <script src="version.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="words.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="grammar.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="scenarios.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="exam.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="calls.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-plan.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-tracks.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-exam-data.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-words.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-grammar.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-scenes.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="b1-calls.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="plan.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="tracks.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="log.js?v=2026-10-28.1348.59b3bb7"></script>
-    <script src="app.js?v=2026-10-28.1348.59b3bb7"></script>
+    <script src="version.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="words.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="a1-verb-forms.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="grammar.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="scenarios.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="exam.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="calls.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-plan.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-tracks.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-tracks-2.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-exam-data.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-words.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-grammar.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-scenes.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="b1-calls.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="plan.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="tracks.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="log.js?v=2026-10-29.0801.ed37a67"></script>
+    <script src="app.js?v=2026-10-29.0801.ed37a67"></script>
 </body>
 </html>

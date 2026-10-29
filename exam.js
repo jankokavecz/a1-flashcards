@@ -1433,6 +1433,10 @@ function checkpointPracticeMissed() {
 // Results are written into a textarea the user can also type into. Starts
 // happen only from a tap or from 'end' (never inside onresult), and late
 // events from an earlier request are ignored via examRecOwner.
+// iOS: every session is continuous=false (continuous mode is unreliable
+// there); B1 keeps listening by starting a new session on 'end' until
+// Stopp. Messages for errors come from speechRecError (app.js), and when
+// the Speech check found voice input off the panel starts as a typing box.
 
 var examMic = null;
 var examRecRunning = false;
@@ -1446,11 +1450,15 @@ function examRecGet() {
     if (!SR) return null;
     try { examRecognition = new SR(); } catch (e) { return null; }
     examRecognition.lang = 'de-DE';
+    examRecognition.onstart = examRecOnStart;
+    examRecognition.onaudiostart = examRecOnStart;
     examRecognition.onresult = examRecOnResult;
     examRecognition.onerror = examRecOnError;
     examRecognition.onend = examRecOnEnd;
     return examRecognition;
 }
+
+function examSpeechErr(code) { return speechRecError(code).text; }
 
 function examMicJoin(a, b) {
     a = String(a || '').trim();
@@ -1474,13 +1482,14 @@ function examMicToggle() {
 function examMicStart() {
     var s = examSession;
     if (!s || !s.speech || !examLive(s)) return;
-    if (!examRecGet()) { examMicPaint('error', 'Speech recognition is not available here, so type your answer.'); return; }
+    if (!examRecGet()) { examMicPaint('error', examSpeechErr('unsupported')); return; }
     if (examMic) examMicAbort(true);
+    examPauseAudio(); // the mic and a playing <audio> fight over the iOS audio session
     var ta = document.getElementById('exam-speech-text');
     var m = {
         s: s, token: s.itemToken, base: ta ? ta.value : (s.speechText || ''),
         committed: '', session: '', interim: '', listening: true, finishing: false,
-        continuous: s.speech.mode === 'b1', quiet: 0, heard: false, lastError: null
+        keep: s.speech.mode === 'b1', quiet: 0, heard: false, lastError: null
     };
     examMic = m;
     s.progressed = true;
@@ -1488,8 +1497,14 @@ function examMicStart() {
         s.speech.timerStarted = true;
         examTimerStart(s, s.speech.timerSeconds);
     }
-    examMicBegin(m);
-    if (examMic === m) examMicPaint();
+    examMicPaint();
+    // Not over speech; with nothing speaking start() runs inside this tap,
+    // which iOS may require.
+    speechThenListen(function(inTap) {
+        m.inTap = inTap;
+        examMicBegin(m);
+        if (examMic === m) examMicPaint();
+    }, true);
 }
 
 function examMicBegin(m) {
@@ -1512,21 +1527,39 @@ function examMicBegin(m) {
     m.pending = false;
     m.heard = false;
     try {
-        rec.continuous = m.continuous;
+        rec.continuous = false;
         rec.interimResults = true;
         rec.lang = 'de-DE';
         rec.start();
         examRecRunning = true;
         examRecOwner = m;
         m.retried = false;
+        m.gotStart = false;
+        clearTimeout(m.startWatch);
+        m.startWatch = setTimeout(function() { examMicNoResponse(m); }, 8000);
     } catch (e) {
         if (!m.retried) {
             m.retried = true;
             setTimeout(function() { examMicBegin(m); }, 400);
             return;
         }
-        examMicEnded(m, 'error', 'The microphone could not start. Tap 🎤 to try again, or type your answer.');
+        examMicEnded(m, 'error', examSpeechErr('start-failed'));
     }
+}
+
+function examRecOnStart() {
+    var m = examRecOwner;
+    if (m) { m.gotStart = true; clearTimeout(m.startWatch); }
+}
+
+// start() went through but the recognizer never started or heard anything
+// (seen on iOS): don't leave the learner looking at "Listening…".
+function examMicNoResponse(m) {
+    if (examMic !== m || examRecOwner !== m || m.gotStart || m.heard) return;
+    examRecRunning = false;
+    examRecOwner = null;
+    try { examRecognition.abort(); } catch (e) {}
+    examMicEnded(m, 'error', examSpeechErr('no-response'));
 }
 
 function examRecOnResult(e) {
@@ -1546,7 +1579,12 @@ function examRecOnResult(e) {
     }
     m.session = finals.join(' ');
     m.interim = interim;
-    if (m.session || m.interim) { m.heard = true; m.quiet = 0; }
+    if (m.session || m.interim) {
+        m.heard = true;
+        m.quiet = 0;
+        m.gotStart = true;
+        if (!m.noted) { m.noted = true; speechNoteVoiceWorked(); }
+    }
     examMicPaintText(m);
 }
 
@@ -1570,14 +1608,22 @@ function examRecOnEnd() {
         return;
     }
     if (!m || m !== cur) return;
+    clearTimeout(m.startWatch);
     var err = m.lastError;
     m.lastError = null;
-    if (err === 'not-allowed' || err === 'service-not-allowed') {
-        examMicEnded(m, 'error', 'The microphone or speech recognition is blocked. Allow it in Settings › Safari (Microphone and Speech Recognition), or type your answer.');
+    var info = err ? speechRecError(err) : null;
+    if (err === 'not-allowed' && (m.restarted || !m.inTap)) {
+        // iOS may refuse a session that wasn't started inside a tap: one
+        // more tap on 🎤 goes on.
+        examMicEnded(m, 'paused', m.restarted ? '' : 'Tap 🎤 once more to start the microphone.');
         return;
     }
-    if (m.listening && m.continuous && examMicMayContinue(m)) {
-        // iOS ends a session after a pause or ~60s; keep listening until Stopp.
+    if (info && (info.kind === 'blocked' || info.kind === 'no-mic')) {
+        examMicEnded(m, 'error', info.text);
+        return;
+    }
+    if (m.listening && m.keep && examMicMayContinue(m)) {
+        // Each session ends after a pause; keep listening until Stopp.
         m.committed = examMicJoin(m.committed, m.session || m.interim);
         m.session = '';
         m.interim = '';
@@ -1585,6 +1631,7 @@ function examRecOnEnd() {
         if (m.quiet >= 3) { examMicEnded(m, 'quiet'); return; }
         setTimeout(function() {
             if (examMic !== m) return;
+            m.restarted = true;
             if (m.listening && examMicMayContinue(m)) examMicBegin(m);
             else examMicEnded(m, 'paused');
         }, 250);
@@ -1592,7 +1639,7 @@ function examRecOnEnd() {
     }
     var any = m.session || m.interim || m.committed;
     if (err === 'network' && !any) {
-        examMicEnded(m, 'error', 'Speech recognition needs an internet connection. Check it and tap 🎤 again, or type your answer.');
+        examMicEnded(m, 'error', info.text);
         return;
     }
     examMicEnded(m, m.finishing ? 'user' : (any ? 'done' : 'nothing'));
@@ -1604,6 +1651,7 @@ function examMicEnded(m, reason, msg) {
     m.pending = false;
     clearTimeout(m.finishTimer);
     clearTimeout(m.watchdog);
+    clearTimeout(m.startWatch);
     m.committed = examMicJoin(m.committed, m.session || m.interim);
     m.session = '';
     m.interim = '';
@@ -1647,6 +1695,7 @@ function examMicAbort(commit) {
             m.listening = false;
             clearTimeout(m.finishTimer);
             clearTimeout(m.watchdog);
+            clearTimeout(m.startWatch);
             examMic = null;
         }
     }
@@ -1662,7 +1711,9 @@ function examMicPaintText(m) {
 
 function examMicHint(reason, msg, mode) {
     if (msg) return msg;
-    if (!examSpeechSupported()) return 'Speech recognition is not available in this browser, so type what you would say.';
+    var off = speechVoiceInputOff();
+    if (!examSpeechSupported()) return off ? SPEECH_OFF_NOTE : examSpeechErr('unsupported');
+    if (!reason && off) return SPEECH_OFF_NOTE;
     if (reason === 'nothing') return 'Nothing heard. Tap 🎤 and try again' + (mode === 'a1' ? ', or tap Überspringen.' : ', or type your answer.');
     if (reason === 'quiet') return 'Long pause, so the mic stopped. Tap 🎤 to keep going.';
     if (reason === 'paused') return 'Mic paused. Tap 🎤 to keep going.';

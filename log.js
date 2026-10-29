@@ -42,6 +42,43 @@ function dailyLogRecord(category, id) {
     dailyLogSave(data);
 }
 
+// Several ids at once (e.g. "Tick all" in My Words): one read, one write.
+function dailyLogRecordMany(category, ids) {
+    ids = (ids || []).filter(function(id) { return id !== undefined && id !== null && id !== ''; });
+    if (!ids.length) return;
+    var data = dailyLogLoad();
+    var key = dailyLogToday();
+    var day = data[key];
+    if (!day || typeof day !== 'object' || Array.isArray(day)) day = data[key] = {};
+    if (!Array.isArray(day[category])) day[category] = [];
+    var have = {};
+    day[category].forEach(function(x) { have[String(x)] = true; });
+    ids.forEach(function(id) {
+        if (have[String(id)]) return;
+        have[String(id)] = true;
+        day[category].push(id);
+    });
+    dailyLogSave(data);
+}
+
+// Takes ids back out of today's list (an untick undoes its "ticked" entry).
+// A day left with nothing in it goes too, so the Log shows no empty card.
+function dailyLogRemove(category, ids) {
+    if (!Array.isArray(ids)) ids = [ids];
+    var data = dailyLogLoad();
+    var key = dailyLogToday();
+    var day = data[key];
+    if (!day || typeof day !== 'object' || !Array.isArray(day[category])) return;
+    var drop = {};
+    ids.forEach(function(id) { drop[String(id)] = true; });
+    var kept = day[category].filter(function(x) { return !drop[String(x)]; });
+    if (kept.length === day[category].length) return;
+    if (kept.length) day[category] = kept;
+    else delete day[category];
+    if (!Object.keys(day).length) delete data[key];
+    dailyLogSave(data);
+}
+
 // ── Render ──────────────────────────────────────────────────────
 
 var LOG_SECTIONS = [
@@ -50,6 +87,7 @@ var LOG_SECTIONS = [
     { cat: 'wordsAgain',  label: 'Pressed Again',  kind: 'word',    unit: 'pressed Again' },
     { cat: 'practiced',   label: 'Practised',      kind: 'word',    unit: 'practised' },
     { cat: 'wordsMarked', label: 'Marked by hand', kind: 'word',    unit: 'marked by hand' },
+    { cat: 'wordsKnown',  label: 'Ticked as known', kind: 'word',   unit: 'ticked as known' },
     { cat: 'grammar',     label: 'Grammar',        kind: 'grammar', unit: 'grammar chapter', plural: true },
     { cat: 'tracks',      label: 'Tracks',         kind: 'track',   unit: 'track',           plural: true, suffix: ' played' },
     { cat: 'scenes',      label: 'Scenes',         kind: 'text',    unit: 'scene',           plural: true },
@@ -145,16 +183,36 @@ function logSummaryText(info) {
     return parts.length ? parts.join(' · ') : 'No activity logged';
 }
 
+// Long lists (ticking 600 words in one go) show the count and the first
+// LOG_LIST_MAX names; the rest open with "+N more".
+var LOG_LIST_MAX = 30;
+
 function logDetailHtml(info) {
     var html = '';
     info.sections.forEach(function(s) {
-        html += '<div class="log-detail-row"><span class="log-detail-label">' + logEsc(s.sec.label) + '</span>' + logEsc(s.names.join(', ')) + '</div>';
+        var names = s.names;
+        if (names.length <= LOG_LIST_MAX) {
+            html += '<div class="log-detail-row"><span class="log-detail-label">' + logEsc(s.sec.label) + '</span>' + logEsc(names.join(', ')) + '</div>';
+            return;
+        }
+        html += '<div class="log-detail-row log-detail-long" data-cat="' + logEsc(s.sec.cat) + '"><span class="log-detail-label">' + logEsc(s.sec.label) + ' · ' + names.length + '</span>' +
+            logEsc(names.slice(0, LOG_LIST_MAX).join(', ')) +
+            '<span class="log-detail-rest hidden">, ' + logEsc(names.slice(LOG_LIST_MAX).join(', ')) + '</span> ' +
+            '<button type="button" class="link-btn log-detail-more" onclick="logShowAllNames(event, this)">+' + (names.length - LOG_LIST_MAX) + ' more</button></div>';
     });
     if (info.checkpoints.length) {
         html += '<div class="log-detail-row"><span class="log-detail-label">Checkpoint quiz</span>' +
             logEsc(info.checkpoints.map(function(a) { return (Math.round(a.percentage) || 0) + '%'; }).join(', ')) + '</div>';
     }
     return html || '<div class="log-detail-row">No detail recorded.</div>';
+}
+
+// "+N more" inside a day card: shows the rest without collapsing the card.
+function logShowAllNames(e, btn) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    var rest = btn && btn.parentNode ? btn.parentNode.querySelector('.log-detail-rest') : null;
+    if (rest) rest.classList.remove('hidden');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
 }
 
 function logValidKey(k) {
@@ -179,7 +237,11 @@ function renderLogScreen() {
 
     var data = dailyLogLoad();
     var checkpointHist = logCheckpointHistory();
-    var dates = Object.keys(data).filter(logValidKey);
+    // An empty day ({} left behind by a tick + untick in an older version)
+    // is not shown.
+    var dates = Object.keys(data).filter(function(k) {
+        return logValidKey(k) && !(data[k] && typeof data[k] === 'object' && !Array.isArray(data[k]) && !Object.keys(data[k]).length);
+    });
     checkpointHist.forEach(function(a) { if (logValidKey(a.date) && dates.indexOf(a.date) === -1) dates.push(a.date); });
     dates.sort().reverse();
 

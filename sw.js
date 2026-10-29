@@ -11,10 +11,10 @@ var SHELL_CACHE = 'deutsch-b1-shell-' + APP_VERSION;
 var AUDIO_CACHE = 'deutsch-b1-audio';     // survives version bumps on purpose
 var NETWORK_TIMEOUT_MS = 3000;
 var SHELL = [
-  './', './index.html', './styles.css', './version.js', './app.js', './words.js', './grammar.js',
+  './', './index.html', './styles.css', './version.js', './app.js', './words.js', './a1-verb-forms.js', './grammar.js',
   './scenarios.js', './exam.js', './calls.js', './plan.js', './tracks.js', './log.js',
-  './b1-plan.js', './b1-tracks.js', './b1-exam-data.js', './b1-words.js', './b1-grammar.js',
-  './b1-scenes.js', './b1-calls.js', './icon-192.png', './icon-512.png', './manifest.json'
+  './b1-plan.js', './b1-tracks.js', './b1-tracks-2.js', './b1-exam-data.js', './b1-words.js', './b1-grammar.js',
+  './b1-scenes.js', './b1-calls.js', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './manifest.json'
 ];
 
 self.addEventListener('install', function(e) {
@@ -66,16 +66,20 @@ function networkFirst(req) {
 }
 
 // Audio: <audio> sends Range requests and GitHub Pages answers 206, which
-// Cache Storage refuses to store. So fetch the WHOLE file once (no Range),
-// keep the 200 in AUDIO_CACHE, and answer every Range request with a 206
-// sliced from it (iOS Safari will not play media from a SW without 206s).
+// Cache Storage refuses to store. So a file that is not stored yet is played
+// straight from the network (its Range requests pass through, so playback
+// starts at once), and meanwhile the WHOLE file is fetched once more without
+// Range, in the background (waitUntil), and kept in AUDIO_CACHE. Once it is
+// there, every Range request is answered with a 206 sliced from it -- offline
+// too (iOS Safari will not play media from a SW without 206s).
 //
 // A cached file is never revalidated, so a replaced MP3 gets a new URL
-// instead: tracks.js adds ?v=N (TRACK_AUDIO_REV). The cache is keyed by the
-// full URL, so a new revision misses, is fetched once, and once it is stored
-// the older copies of the same file are deleted. Until then -- e.g. offline
-// -- the older copy is played rather than nothing.
-var audioPending = {};    // url -> the one in-flight download of that file
+// instead: tracks.js adds ?v=<rev> (TRACK_AUDIO_REV, the start of the file's
+// sha1, written by scripts/generate_audio.py). The cache is keyed by the full
+// URL, so a new revision misses, is fetched once, and once it is stored the
+// older copies of the same path (any other ?v=, or none) are deleted. Until
+// then -- e.g. offline -- the older copy is played rather than nothing.
+var audioPending = {};    // url -> the one background download of that file
 
 function audioDropOtherRevisions(cache, url) {
   var path = new URL(url).pathname;
@@ -86,63 +90,82 @@ function audioDropOtherRevisions(cache, url) {
   });
 }
 
-// Parallel Range requests for a file that is not cached yet share one
-// download. Each caller gets its own clone of the response.
+// Range requests that miss while the file is downloading share that one
+// download. A dropped connection stores nothing; the next play tries again.
 function audioFetchOnce(cache, url) {
   if (!audioPending[url]) {
-    var done = function() { delete audioPending[url]; };
-    audioPending[url] = fetch(url, { cache: 'no-cache' }).then(function(full) {
-      if (full.status === 200) {
-        // Stays pending until stored, so a later request finds it in the cache.
-        cache.put(url, full.clone()).then(function() {
-          return audioDropOtherRevisions(cache, url);
-        }).catch(function() {}).then(done);
-      } else {
-        done();
-      }
-      return full;
-    });
-    audioPending[url].catch(done);
+    audioPending[url] = fetch(url, { cache: 'no-store' }).then(function(full) {
+      if (full.status !== 200) return;
+      return cache.put(url, full).then(function() { return audioDropOtherRevisions(cache, url); });
+    }).catch(function() {}).then(function() { delete audioPending[url]; });
   }
-  return audioPending[url].then(function(full) { return full.clone(); });
+  return audioPending[url];
 }
 
-function audioWhole(url) {
-  return caches.open(AUDIO_CACHE).then(function(cache) {
-    return cache.match(url).then(function(hit) {
-      if (hit) return hit;
-      var older = function() { return cache.match(url, { ignoreSearch: true }); };
-      return audioFetchOnce(cache, url).then(function(full) {
-        if (full.status === 200) return full;
-        return older().then(function(old) { return old || full; });
-      }, function(err) {
-        return older().then(function(old) { if (old) return old; throw err; });
-      });
-    });
+// A 206 for `range` from a stored 200. Sliced as a Blob, so a seek does not
+// copy the whole file into memory first.
+function audioSlice(full, range) {
+  var type = full.headers.get('Content-Type') || 'audio/mpeg';
+  var etag = full.headers.get('ETag'), modified = full.headers.get('Last-Modified');
+  return full.blob().then(function(blob) {
+    var m = /bytes=(\d*)-(\d*)/.exec(range) || [];
+    var size = blob.size;
+    var start = m[1] ? parseInt(m[1], 10) : 0;
+    var end = m[2] ? Math.min(parseInt(m[2], 10), size - 1) : size - 1;
+    if (!m[1] && m[2]) { start = Math.max(0, size - parseInt(m[2], 10)); end = size - 1; }   // 'bytes=-N': the last N bytes
+    var headers = { 'Content-Type': type, 'Accept-Ranges': 'bytes' };
+    if (start >= size || start > end) {
+      headers['Content-Range'] = 'bytes */' + size;
+      return new Response(null, { status: 416, statusText: 'Range Not Satisfiable', headers: headers });
+    }
+    headers['Content-Range'] = 'bytes ' + start + '-' + end + '/' + size;
+    headers['Content-Length'] = String(end - start + 1);
+    if (etag) headers['ETag'] = etag;
+    if (modified) headers['Last-Modified'] = modified;
+    return new Response(blob.slice(start, end + 1), { status: 206, statusText: 'Partial Content', headers: headers });
   });
 }
 
-function audioResponse(req) {
+// A network (or stored) answer passed on as a constructed Response, like the
+// 206s sliced from the cache. Chrome's media player fails with "data source
+// error" when the responses for one file mix the two kinds -- e.g. the file
+// was streamed from the network, stored meanwhile, and then a seek is
+// answered from the cache. The body is still the original stream: nothing
+// waits for it.
+function audioPass(resp) {
+  var headers = new Headers();
+  ['Content-Type', 'Content-Range', 'Accept-Ranges', 'ETag', 'Last-Modified'].forEach(function(h) {
+    var v = resp.headers.get(h);
+    if (v) headers.set(h, v);
+  });
+  var len = resp.headers.get('Content-Length');
+  if (len && !resp.headers.get('Content-Encoding')) headers.set('Content-Length', len);
+  return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: headers });
+}
+
+function audioHandle(e) {
+  var req = e.request;
   var url = req.url.split('#')[0];
-  return audioWhole(url).then(function(full) {
-    var range = req.headers.get('range');
-    if (!range || full.status !== 200) return full;
-    return full.arrayBuffer().then(function(buf) {
-      var m = /bytes=(\d*)-(\d*)/.exec(range) || [];
-      var size = buf.byteLength;
-      var start = m[1] ? parseInt(m[1], 10) : 0;
-      var end = m[2] ? Math.min(parseInt(m[2], 10), size - 1) : size - 1;
-      if (!m[1] && m[2]) { start = Math.max(0, size - parseInt(m[2], 10)); end = size - 1; }   // 'bytes=-N': the last N bytes
-      var headers = { 'Content-Type': full.headers.get('Content-Type') || 'audio/mpeg', 'Accept-Ranges': 'bytes' };
-      if (start >= size || start > end) {
-        headers['Content-Range'] = 'bytes */' + size;
-        return new Response(null, { status: 416, statusText: 'Range Not Satisfiable', headers: headers });
-      }
-      headers['Content-Range'] = 'bytes ' + start + '-' + end + '/' + size;
-      headers['Content-Length'] = String(end - start + 1);
-      return new Response(buf.slice(start, end + 1), { status: 206, statusText: 'Partial Content', headers: headers });
-    });
+  var range = req.headers.get('range');
+  var lookup = caches.open(AUDIO_CACHE).then(function(cache) {
+    return cache.match(url).then(function(hit) { return { cache: cache, hit: hit }; });
   });
+  // Not stored yet: keep the whole file for next time, without holding up this request.
+  e.waitUntil(lookup.then(function(c) { if (!c.hit) return audioFetchOnce(c.cache, url); }).catch(function() {}));
+  e.respondWith(lookup.then(function(c) {
+    if (c.hit) return range ? audioSlice(c.hit, range) : audioPass(c.hit);
+    var older = function() {
+      return c.cache.match(url, { ignoreSearch: true }).then(function(old) {
+        return old && (range ? audioSlice(old, range) : audioPass(old));
+      });
+    };
+    return fetch(req).then(function(resp) {
+      if (resp.ok) return audioPass(resp);
+      return older().then(function(old) { return old || resp; });
+    }, function(err) {
+      return older().then(function(old) { if (old) return old; throw err; });
+    });
+  }));
 }
 
 self.addEventListener('fetch', function(e) {
@@ -151,7 +174,10 @@ self.addEventListener('fetch', function(e) {
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;        // cross-origin: browser default
   if (url.search.indexOf('check=') !== -1) return;       // 'Check for updates' probe: network only, never the cache
-  if (url.pathname.indexOf('/audio/') !== -1) { e.respondWith(audioResponse(req)); return; }
+  // Audiobooks (audio/books/*.m4b, tens of MB, opened in Safari/Books): network
+  // only -- never stored in AUDIO_CACHE, never Range-sliced from it.
+  if (/\.m4b$/i.test(url.pathname)) return;
+  if (url.pathname.indexOf('/audio/') !== -1) { audioHandle(e); return; }
   if (/\.png$/.test(url.pathname)) {
     e.respondWith(caches.match(req).then(function(c) { return c || fetch(req); }));
     return;

@@ -19,6 +19,20 @@ function mergeMaps() {
     return merged;
 }
 
+// words.js only has present-tense tables for its verbs; a1-verb-forms.js adds
+// Präteritum and Perfekt in memory (words.js itself is never edited).
+if (typeof A1_VERB_FORMS !== 'undefined') {
+    WORDS.forEach(function(w) {
+        var past = A1_VERB_FORMS[w.id];
+        if (!past || w.type !== 'verb') return;
+        var conj = {};
+        var k;
+        for (k in (w.conjugation || {})) conj[k] = w.conjugation[k];
+        for (k in past) conj[k] = past[k];
+        w.conjugation = conj;
+    });
+}
+
 var ALL_WORDS = WORDS.concat(typeof B1_WORDS !== 'undefined' ? B1_WORDS : []);
 var ALL_CATEGORIES = mergeMaps(CATEGORIES, typeof B1_CATEGORIES !== 'undefined' ? B1_CATEGORIES : null);
 var ALL_GRAMMAR = GRAMMAR_SECTIONS.concat(typeof B1_GRAMMAR_SECTIONS !== 'undefined' ? B1_GRAMMAR_SECTIONS : []);
@@ -30,6 +44,25 @@ var WORD_BY_ID = {};
 var A1_WORD_IDS = {};
 ALL_WORDS.forEach(function(w, i) { WORD_BY_ID[w.id] = w; w._order = i; });
 WORDS.forEach(function(w) { A1_WORD_IDS[w.id] = true; });
+
+// Official Goethe list level of a word: "A1" | "A2" | "B1". words.js is the
+// A1 course; B1_WORDS carry their own level (missing = "B1").
+function wordLevel(w) {
+    if (!w) return 'B1';
+    if (A1_WORD_IDS[w.id]) return 'A1';
+    return w.level === 'A1' || w.level === 'A2' ? w.level : 'B1';
+}
+
+// Gender colour of a noun ('m' / 'f' / 'n'), or null. Plural-only nouns get
+// none: in B1_WORDS they have gender null, but words.js marks its own
+// (die Eltern, die Leute) gender 'f' with plural === de. A B1 noun whose
+// plural equals the singular (die SMS) is singular and keeps its colour.
+// Every gender-coloured headword (card, sheet, lists, plan) uses this.
+function wordGenderColor(w) {
+    if (!w || w.type !== 'noun' || !w.gender) return null;
+    if (w.plural === w.de && A1_WORD_IDS[w.id]) return null;
+    return w.gender;
+}
 
 var DAY_MS = 24 * 60 * 60 * 1000;
 var SRS_DAY_START_HOUR = 4;  // reviews scheduled for a day become due at 04:00 local
@@ -242,9 +275,10 @@ function switchTab(tabName) {
     if (!screenEl) return;
     closeMoreSheet();
     closeWordSheet();
+    closeTickView(true);
     var isReTap = currentTab === tabName;
     if (!isReTap && currentTab) {
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        speechStop();
         leaveTab(currentTab);
     }
 
@@ -293,6 +327,7 @@ var cardsMode = 'daily';
 var cardsPracticeIds = [];
 var cardsPracticeLabel = '';
 var cardsDeckDay = '';
+var cardsStale = false;   // My Words changed something: refresh the deck on the next visit
 var cardsBacklog = 0;
 
 function populateCategoryFilter() {
@@ -365,50 +400,106 @@ function cardsWordPool() {
     return cat === 'all' ? ALL_WORDS.slice() : ALL_WORDS.filter(function(w) { return w.category === cat; });
 }
 
-function cardsRebuild() {
+// refresh === true (after a change in My Words, see cardsInvalidate) keeps
+// the running deck: the cards already done, so the progress bar stays, and
+// the cards still ahead, this session's "Again" cards included.
+function cardsRebuild(refresh) {
     var now = Date.now();
+    refresh = refresh === true && cardsMode !== 'practice' && cardsHasCard();
+    var done = refresh ? currentDeck.slice(0, currentIndex) : [];
+    var ahead = refresh ? currentDeck.slice(currentIndex) : [];
+    var inDeck = {};
     cardsBacklog = 0;
     if (cardsMode === 'practice') {
         currentDeck = shuffle(cardsPracticeIds.map(function(id) { return WORD_BY_ID[id]; }).filter(Boolean));
     } else if (cardsMode === 'mydeck') {
-        currentDeck = shuffle(cardsWordPool().filter(function(w) { return !!wordProgress[w.id]; }));
+        // Refresh: ticked or reset words leave, newly studied ones go last.
+        done.concat(ahead).forEach(function(w) { inDeck[w.id] = true; });
+        currentDeck = done.concat(ahead.filter(cardsInMyDeck),
+            shuffle(cardsWordPool().filter(function(w) { return !inDeck[w.id] && cardsInMyDeck(w); })));
     } else {
+        // Ticked words have progress, so they never come in as new cards;
+        // their spot checks are left out while "known-checks" is off.
+        var checks = knownChecksEnabled();
+        // Refresh: a card still ahead stays unless it is a ticked word whose
+        // check isn't due (it was just ticked, or checks went off).
+        ahead = ahead.filter(function(w) {
+            var p = wordProgress[w.id];
+            if (p && p.known && (!checks || (p.due || 0) > now)) return false;
+            inDeck[w.id] = true;
+            return true;
+        });
+        var aheadReviews = ahead.filter(function(w) { return !!wordProgress[w.id]; }).length;
         var due = [];
+        var checksDue = [];
         var fresh = [];
         // "Core only" limits which new words come in; reviews of words
         // already studied always show.
         var coreOnly = coreOnlyEnabled() && hasFreqData();
         cardsWordPool().forEach(function(w) {
+            if (inDeck[w.id]) return;
             var prog = wordProgress[w.id];
             if (!prog) { if (!coreOnly || w.freq !== 2) fresh.push(w); }
-            else if ((prog.due || 0) <= now) due.push(w);
+            else if ((prog.due || 0) <= now) {
+                if (!prog.known) due.push(w);
+                else if (checks) checksDue.push(w);
+            }
         });
-        due.sort(function(a, b) { return (wordProgress[a.id].due || 0) - (wordProgress[b.id].due || 0); });
+        var byDue = function(a, b) { return (wordProgress[a.id].due || 0) - (wordProgress[b.id].due || 0); };
+        due.sort(byDue);
+        checksDue.sort(byDue);
 
         // Respect the daily review cap; while a backlog of overdue reviews is
-        // left over, don't pile new words on top of it.
+        // left over, don't pile new words on top of it. Spot checks of ticked
+        // words only take the review slots left over: they never push a real
+        // review out, and never hold back new words.
         var todayCounts = srsTodayCounts();
-        var reviewsLeft = Math.max(0, srsReviewCap() - todayCounts.reviews);
-        cardsBacklog = Math.max(0, due.length - reviewsLeft);
+        var reviewsLeft = Math.max(0, srsReviewCap() - todayCounts.reviews - aheadReviews);
+        var overdue = Math.max(0, due.length - reviewsLeft);
         due = due.slice(0, reviewsLeft);
-        var newLeft = cardsBacklog > 0 ? 0 : Math.max(0, srsNewPerDay() - todayCounts['new']);
+        var checkSlots = reviewsLeft - due.length;
+        cardsBacklog = overdue + Math.max(0, checksDue.length - checkSlots);
+        due = due.concat(checksDue.slice(0, checkSlots)).sort(byDue);
+        var newLeft = overdue > 0 ? 0 : Math.max(0, srsNewPerDay() - todayCounts['new'] - (ahead.length - aheadReviews));
         var newSlice = shuffle(srsOrderNew(fresh).slice(0, newLeft));
-        currentDeck = due.concat(newSlice);
+        currentDeck = done.concat(ahead, due, newSlice);
     }
-    currentIndex = 0;
+    currentIndex = done.length;
     isFlipped = false;
     cardsDeckDay = srsToday();
+    cardsStale = false;
     cardsRenderModeBar();
     updateIntroducedCounter();
     showCurrentCard();
 }
 
-// New words come easiest-first: all of A1 in its lesson order, then B1
-// Core (freq 1), then the rest of B1 -- not a random draw from all 1983.
+// My Deck is every word studied in cards; words ticked as known stay out
+// (they were never studied here -- the Known list in My Words has them).
+function cardsInMyDeck(w) {
+    var p = wordProgress[w.id];
+    return !!p && !p.known;
+}
+
+// The Today deck is built once per study day. After words are ticked,
+// unticked, sent back to review or reset (or the checks setting changes)
+// it is refreshed on the next visit -- cardsRebuild(true) -- so a word
+// ticked in My Words never turns up as a new card from a deck built
+// before, and the session's "Again" cards and progress are kept.
+function cardsInvalidate() {
+    if (cardsMode !== 'practice') cardsStale = true;
+}
+
+// New words come easiest-first: all of A1 in its lesson order, then the
+// B1 list by frequency and official level -- core A1/A2 words, core B1,
+// the other A1/A2 words, the other B1 words -- and regional (A/CH) words
+// last. Not a random draw from the whole list.
 function srsOrderNew(words) {
     function rank(w) {
         if (A1_WORD_IDS[w.id]) return 0;
-        return w.freq === 2 ? 2 : 1;
+        if (w.region) return 5;
+        var basic = wordLevel(w) !== 'B1';
+        if (w.freq !== 2) return basic ? 1 : 2;
+        return basic ? 3 : 4;
     }
     return words.slice().sort(function(a, b) {
         return (rank(a) - rank(b)) || (a._order - b._order);
@@ -449,6 +540,8 @@ function cardsOnEnter(isReTap) {
         cardsRebuild();
     } else if (finished && cardsMode !== 'practice') {
         cardsRebuild();
+    } else if (cardsStale && cardsMode !== 'practice') {
+        cardsRebuild(true);
     } else {
         cardsRenderModeBar();
         updateIntroducedCounter();
@@ -466,7 +559,7 @@ function cardsRenderModeBar() {
     var deckCount = document.getElementById('cards-mydeck-count');
     if (deckCount) {
         var n = 0;
-        cardsWordPool().forEach(function(w) { if (wordProgress[w.id]) n++; });
+        cardsWordPool().forEach(function(w) { if (cardsInMyDeck(w)) n++; });
         deckCount.textContent = n;
     }
     var banner = document.getElementById('cards-practice-banner');
@@ -490,9 +583,10 @@ function cardsDueInOtherTopics() {
     if (cardsCategory() === 'all') return 0;
     var now = Date.now();
     var n = 0;
+    var checks = knownChecksEnabled();
     ALL_WORDS.forEach(function(w) {
         var p = wordProgress[w.id];
-        if (p && w.category !== cardsCategory() && (p.due || 0) <= now) n++;
+        if (p && w.category !== cardsCategory() && (p.due || 0) <= now && (checks || !p.known)) n++;
     });
     return n;
 }
@@ -511,7 +605,7 @@ function updateIntroducedCounter() {
     var introducedEl = document.getElementById('cards-introduced-counter');
     if (!introducedEl) return;
     var s = wordStats();
-    var text = 'Learned ' + s.learnedEver + ' · Seen ' + s.seen + ' / ' + s.total;
+    var text = 'You know ' + s.learnedEver + ' · ' + s['new'] + ' new';
     if (hasFreqData()) {
         var coreTotal = 0;
         var coreSeen = 0;
@@ -552,6 +646,20 @@ function shuffle(arr) {
     return a;
 }
 
+// A word's usage note ("mit Absicht = on purpose"), small under the
+// translation on the card back. index.html has no slot for it, so the
+// element is added next to the translation the first time it is needed.
+function cardsNoteEl() {
+    var el = document.getElementById('card-note');
+    if (el) return el;
+    var tr = document.getElementById('card-translation');
+    el = document.createElement('div');
+    el.id = 'card-note';
+    el.className = 'card-note';
+    tr.parentNode.insertBefore(el, tr.nextSibling);
+    return el;
+}
+
 function cardsShowMessage(title, hint, counter, progressPct) {
     var flashcard = document.getElementById('flashcard');
     var cardFront = flashcard.querySelector('.card-front');
@@ -563,6 +671,7 @@ function cardsShowMessage(title, hint, counter, progressPct) {
     document.getElementById('card-front-word').textContent = title;
     document.getElementById('card-hint').textContent = hint;
     document.getElementById('card-translation').textContent = '';
+    cardsNoteEl().textContent = '';
     document.getElementById('card-example-de').textContent = '';
     document.getElementById('card-example-en').textContent = '';
     document.getElementById('card-details').textContent = '';
@@ -607,9 +716,8 @@ function showCurrentCard() {
     // Gender coloring for nouns (not for plural-only nouns like "die Eltern")
     var cardFront = flashcard.querySelector('.card-front');
     cardFront.classList.remove('gender-m', 'gender-f', 'gender-n');
-    if (word.type === 'noun' && word.gender && word.plural !== word.de) {
-        cardFront.classList.add('gender-' + word.gender);
-    }
+    var gender = wordGenderColor(word);
+    if (gender) cardFront.classList.add('gender-' + gender);
 
     // Front side
     document.getElementById('card-type').textContent = word.type;
@@ -624,10 +732,11 @@ function showCurrentCard() {
         if (!prog) {
             levelEl.textContent = 'new word';
         } else {
-            var st = wordIsRelearning(word.id) ? 'relearning' : wordState(word.id);
+            // A ticked word coming back for its spot check says so.
+            var st = prog.known ? 'known' : (wordIsRelearning(word.id) ? 'relearning' : wordState(word.id));
             var dots = '';
             for (var i = 0; i < 5; i++) dots += i < level ? '●' : '○';
-            levelEl.innerHTML = '<span class="card-state card-state-' + st + '">' + st + '</span>' + dots;
+            levelEl.innerHTML = '<span class="card-state card-state-' + st + '">' + (st === 'known' ? 'Known · check' : st) + '</span>' + dots;
         }
         levelEl.className = 'card-level level-' + level;
     }
@@ -636,6 +745,7 @@ function showCurrentCard() {
 
     // Back side
     document.getElementById('card-translation').textContent = word.en;
+    cardsNoteEl().textContent = word.note || '';
     document.getElementById('card-example-de').textContent = word.example ? word.example.de : '';
     document.getElementById('card-example-en').textContent = word.example ? word.example.en : '';
 
@@ -644,14 +754,26 @@ function showCurrentCard() {
     if (word.type === 'noun' && word.plural) {
         details = 'Plural: ' + word.plural;
     } else if (word.type === 'verb' && word.conjugation) {
-        details = Object.keys(word.conjugation).map(function(k) {
-            return k + ': ' + word.conjugation[k];
-        }).join(' | ');
+        details = conjugationParts(word.conjugation).join(' | ');
     }
     document.getElementById('card-details').textContent = details;
 
     document.getElementById('session-progress').style.width = ((currentIndex + 1) / currentDeck.length * 100) + '%';
     cardsUpdateCounter();
+}
+
+// "ich bin · du bist · … | Präteritum: war | Perfekt: ist gewesen" -- present
+// forms first (A1 tables have six, B1 verbs just the er-form), then the past.
+var CONJ_PAST_LABELS = { 'präteritum': 'Präteritum', 'perfekt': 'Perfekt' };
+
+function conjugationParts(conj) {
+    var present = [];
+    var past = [];
+    Object.keys(conj || {}).forEach(function(k) {
+        if (CONJ_PAST_LABELS[k]) past.push(CONJ_PAST_LABELS[k] + ': ' + conj[k]);
+        else present.push(k + ' ' + conj[k]);
+    });
+    return (present.length ? [present.join(' · ')] : []).concat(past);
 }
 
 function flipCard() {
@@ -671,7 +793,7 @@ var cardsSpeakGen = 0; // bumped when leaving Cards: a queued example sentence i
 
 function cardsOnLeave() {
     cardsSpeakGen++;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    speechStop();
 }
 
 // Front: the word. Back: the word, then its example sentence.
@@ -680,7 +802,9 @@ function speakCurrentWord() {
     var word = currentDeck[currentIndex];
     var gen = ++cardsSpeakGen;
     if (isFlipped && word.example && word.example.de) {
-        speakText(word.de, 'de-DE', function() {
+        speakText(word.de, 'de-DE', function(how) {
+            // 'stopped': the app was hidden or other audio started -- no example then.
+            if (how === 'stopped' || document.visibilityState === 'hidden') return;
             if (gen === cardsSpeakGen && currentTab === 'cards' && isFlipped && currentDeck[currentIndex] === word) {
                 speakText(word.example.de, 'de-DE', null);
             }
@@ -852,6 +976,42 @@ function toggleSpeakOnFlip() {
     localStorage.setItem(SPEAK_ON_FLIP_KEY, speakOnFlipEnabled() ? '0' : '1');
 }
 
+// "Check ticked words now and then": ticked words come back in Today on
+// their spot-check day. Off ('0'), due ticked words are left out of the deck.
+var KNOWN_CHECKS_KEY = 'known-checks';
+
+function knownChecksEnabled() {
+    try { return localStorage.getItem(KNOWN_CHECKS_KEY) !== '0'; } catch (e) { return true; }
+}
+
+function setKnownChecks(on) {
+    var wasOn = knownChecksEnabled();
+    try { localStorage.setItem(KNOWN_CHECKS_KEY, on ? '1' : '0'); } catch (e) {}
+    if (on && !wasOn) knownChecksRespread();
+    cardsInvalidate();
+}
+
+// Switched back on after a while: the checks that fell due meanwhile are
+// spread over the coming days, oldest first -- at least KNOWN_CHECKS_PER_DAY
+// a day, over three months at most -- instead of all landing in one deck.
+var KNOWN_CHECKS_PER_DAY = 5;
+
+function knownChecksRespread() {
+    var now = Date.now();
+    var ids = Object.keys(wordProgress).filter(function(id) {
+        var p = wordProgress[id];
+        return WORD_BY_ID[id] && p && typeof p === 'object' && p.known && (p.due || 0) <= now;
+    });
+    if (ids.length <= KNOWN_CHECKS_PER_DAY) return;
+    ids.sort(function(a, b) { return (wordProgress[a].due || 0) - (wordProgress[b].due || 0) || a - b; });
+    var perDay = Math.max(KNOWN_CHECKS_PER_DAY, Math.ceil(ids.length / 91));
+    ids.forEach(function(id, i) {
+        var day = Math.floor(i / perDay);
+        if (day) wordProgress[id].due = srsDueDate(day, now);
+    });
+    saveProgress();
+}
+
 function logWordEvent(category, id) {
     if (typeof dailyLogRecord === 'function') dailyLogRecord(category, id);
 }
@@ -862,6 +1022,7 @@ function gradeCard(grade) {
     var now = Date.now();
     var existing = wordProgress[word.id];
     var wasNew = !existing;
+    var wasKnown = !!(existing && existing.known);
     var prog = existing ? srsMigrateCard(existing) : srsNewCard(now);
     var isDue = wasNew || (prog.due || 0) <= now;
     var browsing = cardsMode !== 'daily' && (wasNew || !isDue);
@@ -874,11 +1035,20 @@ function gradeCard(grade) {
         // today it still counts as a new word, not as a review.
         var newToday = !wasNew && prog.firstSeen && !prog.firstSeenApprox && srsStudyDayKey(prog.firstSeen) === srsToday();
         prog = srsNext(prog, grade, now);
-        if (!prog.firstSeen) prog.firstSeen = now;
+        if (wasKnown && grade === 'again') {
+            // A ticked word you didn't know after all: an ordinary learning
+            // card from now on (knownAt stays as history).
+            delete prog.known;
+            delete prog.knownReps;
+            delete prog.knownPrev;
+        }
+        // Ticked words keep no firstSeen/learnedAt of their own: the charts
+        // and the plan pace measure learning in cards, not ticking.
+        if (!prog.firstSeen && !prog.knownAt) prog.firstSeen = now;
         if (!prog.source) prog.source = 'srs';
         prog.lastReviewed = now;
         delete prog.lastReviewedApprox;
-        if (!prog.learnedAt && prog.intervalDays >= LEARNED_DAYS) prog.learnedAt = now;
+        if (!prog.known && !prog.learnedAt && prog.intervalDays >= LEARNED_DAYS) prog.learnedAt = now;
         wordProgress[word.id] = prog;
         saveProgress();
         if (wasNew) {
@@ -914,10 +1084,14 @@ function gradeCard(grade) {
 //   learned  -- has earned a 7-day interval at least once (sticky: the
 //               learned list only grows; a forgotten word shows "relearning")
 //   mastered -- currently on a 21+ day interval
+// A word ticked as known (wordIsKnown) counts as 'learned' here; wordStats
+// counts it separately as 'known' so the learned/mastered numbers stay
+// about learning in cards.
 
 function wordState(id) {
     var p = wordProgress[id];
     if (!p || typeof p !== 'object') return 'new';
+    if (p.known) return 'learned';
     var iv = p.intervalDays || 0;
     if (iv >= MASTERED_DAYS) return 'mastered';
     if (iv >= LEARNED_DAYS || p.learnedAt) return 'learned';
@@ -929,25 +1103,34 @@ function wordState(id) {
 // on short gaps without ever being forgotten -- those are not relearning.
 function wordIsRelearning(id) {
     var p = wordProgress[id];
-    if (!p || !p.learnedAt || (p.intervalDays || 0) >= LEARNED_DAYS) return false;
+    if (!p || p.known || !p.learnedAt || (p.intervalDays || 0) >= LEARNED_DAYS) return false;
     return !!(p.relearning || p.lapses > 0);
 }
 
+function wordIsKnown(id) {
+    var p = wordProgress[id];
+    return !!(p && typeof p === 'object' && p.known);
+}
+
+// new + learning + learned + mastered + known === total. learned and
+// mastered are words learned in cards; learnedEver ("words you know") also
+// counts the ticked ones.
 function wordStats() {
     var now = Date.now();
     var todayStart = srsStudyDayStart(now);
-    var s = { total: ALL_WORDS.length, seen: 0, 'new': 0, learning: 0, learned: 0, mastered: 0,
+    var checks = knownChecksEnabled();
+    var s = { total: ALL_WORDS.length, seen: 0, 'new': 0, learning: 0, learned: 0, mastered: 0, known: 0,
               learnedEver: 0, newToday: 0, learnedToday: 0, dueNow: 0 };
     ALL_WORDS.forEach(function(w) {
-        var st = wordState(w.id);
+        var p = wordProgress[w.id];
+        var st = p && typeof p === 'object' && p.known ? 'known' : wordState(w.id);
         s[st]++;
         if (st === 'new') return;
-        var p = wordProgress[w.id];
         s.seen++;
-        if (st === 'learned' || st === 'mastered') s.learnedEver++;
+        if (st !== 'learning') s.learnedEver++;
         if (p.firstSeen >= todayStart) s.newToday++;
         if (p.learnedAt >= todayStart) s.learnedToday++;
-        if ((p.due || 0) <= now) s.dueNow++;
+        if ((p.due || 0) <= now && (checks || !p.known)) s.dueNow++;
     });
     return s;
 }
@@ -964,6 +1147,9 @@ function wordsFieldBetween(field, fromMs, toMs) {
 
 function wordsFirstSeenBetween(fromMs, toMs) { return wordsFieldBetween('firstSeen', fromMs, toMs); }
 function wordsLearnedBetween(fromMs, toMs) { return wordsFieldBetween('learnedAt', fromMs, toMs); }
+// Words ticked as known in the window (by knownAt; a ticked word forgotten
+// later keeps its knownAt, like learnedAt stays once learned).
+function wordsKnownBetween(fromMs, toMs) { return wordsFieldBetween('knownAt', fromMs, toMs); }
 
 function isWordLearned(wordId) {
     var st = wordState(wordId);
@@ -974,8 +1160,13 @@ function getLearnedCount() {
     return wordStats().learnedEver;
 }
 
-// "I know this": promote to learned without throwing away any history.
+// "I know this": a new or still-learning word is ticked as known (see
+// wordTickKnown). A word already learned in cards keeps the older
+// behaviour: promoted to a 7-day gap without throwing away any history.
 function markWordKnown(id) {
+    if (wordIsKnown(id)) return;
+    var st = wordState(id);
+    if (st === 'new' || st === 'learning') { wordTickKnown(id); return; }
     var now = Date.now();
     var existing = wordProgress[id];
     var p = existing ? srsMigrateCard(existing) : srsNewCard(now);
@@ -993,22 +1184,115 @@ function markWordKnown(id) {
     logWordEvent('wordsMarked', id);
 }
 
-// "Review again soon": back into today's reviews, history kept.
+// ── Ticking words you already know ──
+// Ticking stores, inside the word's normal 'word-progress' entry:
+//   known: true, knownAt, knownReps (reps at tick time) and knownPrev (a
+//   copy of the entry before the tick, null if there was none),
+// and schedules a spot check 30-120 days out. Unticking before any review
+// puts knownPrev back exactly; after a review the known* fields go and the
+// word is due for review now (see wordUnmarkCore).
+
+// Spot-check gap, spread by id: a batch of 600 ticks comes back a few
+// words a day over three months instead of all on one day.
+function wordKnownGap(id) {
+    return 30 + ((+id * 37) % 91);
+}
+
+function wordTickCore(id, now) {
+    if (!WORD_BY_ID[id]) return false;
+    var existing = wordProgress[id];
+    if (existing && existing.known) return false;
+    var prev = existing ? JSON.parse(JSON.stringify(existing)) : null;
+    var p = existing ? srsMigrateCard(existing) : { level: 0, ease: 2.5, reps: 0, lapses: 0, intervalDays: 0, source: 'known' };
+    var gap = wordKnownGap(id);
+    p.known = true;
+    p.knownAt = now;
+    p.knownReps = p.reps || 0;
+    p.knownPrev = prev;
+    p.level = Math.max(p.level || 0, LEARNED_THRESHOLD);
+    if (!p.ease) p.ease = 2.5;
+    p.intervalDays = gap;
+    p.due = srsDueDate(gap, now);
+    wordProgress[id] = p;
+    return true;
+}
+
+function wordUnmarkCore(id) {
+    var p = wordProgress[id];
+    if (!p || typeof p !== 'object' || !p.known) return false;
+    if ((p.reps || 0) === (p.knownReps || 0) && p.hasOwnProperty('knownPrev')) {
+        if (p.knownPrev && typeof p.knownPrev === 'object') wordProgress[id] = p.knownPrev;
+        else delete wordProgress[id];
+    } else {
+        // Checked since the tick: "I don't know it" sends the word back to
+        // review now, like "Review again soon" -- it must not keep the long
+        // gap it earned as a ticked word. reps/lapses stay as history; a
+        // word that was only ever ticked was first seen in its spot check.
+        var now = Date.now();
+        delete p.known;
+        delete p.knownAt;
+        delete p.knownReps;
+        delete p.knownPrev;
+        if (!p.firstSeen) p.firstSeen = p.lastReviewed || now;
+        if (p.learnedAt) p.relearning = true;
+        p.level = 0;
+        p.intervalDays = 0;
+        p.due = now;
+    }
+    return true;
+}
+
+// Batch versions save once and log once: "Tick all" on 200 words is one write.
+function wordTickKnownMany(ids) {
+    var now = Date.now();
+    var done = (ids || []).filter(function(id) { return wordTickCore(id, now); });
+    if (!done.length) return done;
+    saveProgress();
+    if (typeof dailyLogRecordMany === 'function') dailyLogRecordMany('wordsKnown', done);
+    else done.forEach(function(id) { logWordEvent('wordsKnown', id); });
+    cardsInvalidate();
+    return done;
+}
+
+function wordUnmarkKnownMany(ids) {
+    var done = (ids || []).filter(wordUnmarkCore);
+    if (!done.length) return done;
+    saveProgress();
+    if (typeof dailyLogRemove === 'function') dailyLogRemove('wordsKnown', done);
+    cardsInvalidate();
+    return done;
+}
+
+function wordTickKnown(id) {
+    return wordTickKnownMany([id]).length > 0;
+}
+
+function wordUnmarkKnown(id) {
+    return wordUnmarkKnownMany([id]).length > 0;
+}
+
+// "Review again soon": back into today's reviews, history kept. A ticked
+// word sent back to review is an ordinary card from then on.
 function markWordForReview(id) {
     var p = wordProgress[id];
     if (!p) return;
     p = srsMigrateCard(p);
+    delete p.known;
+    delete p.knownReps;
+    delete p.knownPrev;
     if (p.learnedAt) p.relearning = true;
     p.level = 0;
     p.intervalDays = 0;
     p.due = Date.now();
     wordProgress[id] = p;
     saveProgress();
+    cardsInvalidate();
 }
 
 function resetWord(id) {
     delete wordProgress[id];
     saveProgress();
+    cardsInvalidate();
 }
 
 // ── My Words ────────────────────────────────────────────────────
@@ -1020,7 +1304,8 @@ var MW_PAGE = 120;
 var mwView = { q: '', state: 'seen', level: 'all', category: 'all', sort: 'seen', range: null, limit: MW_PAGE };
 var mwSearchKeys = null;
 var mwLastList = [];
-var MW_STATE_LABEL = { 'new': 'Not started', learning: 'Learning', learned: 'Learned', mastered: 'Mastered' };
+var MW_STATE_LABEL = { 'new': 'New', learning: 'Learning', learned: 'Learned', mastered: 'Mastered', known: 'Known' };
+var MW_LEVELS = ['a1', 'a2', 'b1'];
 var MW_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 var MW_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -1033,7 +1318,7 @@ function mwLoadView() {
         var saved = JSON.parse(localStorage.getItem(MYWORDS_VIEW_KEY) || '{}');
         if (saved.state) mwView.state = saved.state;
         if (saved.sort) mwView.sort = saved.sort;
-        if (saved.level) mwView.level = saved.level;
+        if (saved.level === 'all' || MW_LEVELS.indexOf(saved.level) !== -1) mwView.level = saved.level;
     } catch (e) {}
 }
 
@@ -1093,8 +1378,25 @@ function mwNextReviewText(p) {
     return 'next: in ' + days + ' d';
 }
 
+// "today" / "yesterday" / "on 28 Oct", for sentences.
+function mwOnDate(ms) {
+    var label = mwFormatDate(ms);
+    return label === 'today' || label === 'yesterday' || label === 'tomorrow' ? label : 'on ' + label;
+}
+
+// The state My Words shows: wordState, with ticked words as 'known'.
+function mwState(id) {
+    return wordIsKnown(id) ? 'known' : wordState(id);
+}
+
+// The date a word became one of "my words": first seen in cards, or ticked.
+function mwSeenTime(p, field) {
+    return p ? (p[field] || p.knownAt || 0) : 0;
+}
+
 function mwStateMatches(state, st) {
     if (state === 'seen') return st !== 'new';
+    if (state === 'known') return st === 'known';
     if (state === 'learning') return st === 'learning';
     if (state === 'learned') return st === 'learned' || st === 'mastered';
     if (state === 'mastered') return st === 'mastered';
@@ -1111,8 +1413,7 @@ function mwBaseMatches(w) {
     var v = mwView;
     var q = mwNorm(v.q);
     if (q && mwSearchKey(w).indexOf(q) === -1) return false;
-    if (v.level === 'a1' && !A1_WORD_IDS[w.id]) return false;
-    if (v.level === 'b1' && A1_WORD_IDS[w.id]) return false;
+    if (v.level !== 'all' && wordLevel(w).toLowerCase() !== v.level) return false;
     if (v.category !== 'all' && w.category !== v.category) return false;
     if (v.range) {
         var p = wordProgress[w.id];
@@ -1124,21 +1425,26 @@ function mwBaseMatches(w) {
 
 function mwFilteredWords() {
     var list = ALL_WORDS.filter(function(w) {
-        return mwMatches(w, wordState(w.id));
+        return mwMatches(w, mwState(w.id));
     });
     var sort = mwView.sort;
     function field(w, f) { var p = wordProgress[w.id]; return p && p[f] ? p[f] : 0; }
+    // Ticked words have no firstSeen/learnedAt: they sort by the day they were ticked.
+    function seenAt(w, f) { return mwSeenTime(wordProgress[w.id], f); }
+    // With the checks off a ticked word has no next review: it sorts last.
+    var checks = knownChecksEnabled();
+    function dueAt(w) { var p = wordProgress[w.id]; return p && (checks || !p.known) ? field(w, 'due') : Infinity; }
     list.sort(function(a, b) {
-        if (sort === 'learned') return (field(b, 'learnedAt') - field(a, 'learnedAt')) || (field(b, 'firstSeen') - field(a, 'firstSeen'));
+        if (sort === 'learned') return (seenAt(b, 'learnedAt') - seenAt(a, 'learnedAt')) || (seenAt(b, 'firstSeen') - seenAt(a, 'firstSeen'));
         if (sort === 'due') {
-            var da = wordProgress[a.id] ? field(a, 'due') : Infinity;
-            var db = wordProgress[b.id] ? field(b, 'due') : Infinity;
+            var da = dueAt(a);
+            var db = dueAt(b);
             return da === db ? a._order - b._order : (da < db ? -1 : 1);
         }
         if (sort === 'az') return mwNorm(a.de).localeCompare(mwNorm(b.de));
         if (sort === 'lapses') return (field(b, 'lapses') - field(a, 'lapses')) || (field(b, 'lastReviewed') - field(a, 'lastReviewed'));
         if (sort === 'order') return a._order - b._order;
-        return (field(b, 'firstSeen') - field(a, 'firstSeen')) || (a._order - b._order);
+        return (seenAt(b, 'firstSeen') - seenAt(a, 'firstSeen')) || (a._order - b._order);
     });
     return list;
 }
@@ -1219,7 +1525,7 @@ function mwBuildShell(container) {
         '<div class="mw-search-wrap"><input type="search" id="mw-search" class="mw-search" placeholder="Search German or English…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>' +
         '<div class="mw-chips" id="mw-chips"></div>' +
         '<div class="mw-selects">' +
-            '<select id="mw-level"><option value="all">A1 + B1</option><option value="a1">A1 only</option><option value="b1">B1 only</option></select>' +
+            '<select id="mw-level"><option value="all">All levels</option><option value="a1">A1</option><option value="a2">A2</option><option value="b1">B1</option></select>' +
             '<select id="mw-category">' + catOptions + '</select>' +
             '<select id="mw-sort">' +
                 '<option value="seen">Newest first</option>' +
@@ -1283,26 +1589,37 @@ function mwRenderSummary(s) {
     var el = document.getElementById('mw-summary');
     if (!el) return;
     var pct = function(n) { return s.total ? (n / s.total * 100) : 0; };
+    // Big number: every word you know, ticked or learned in cards.
     el.innerHTML =
         '<div class="mw-hero">' +
             '<div class="mw-hero-main"><span class="mw-hero-num">' + s.learnedEver + '</span>' +
-                '<span class="mw-hero-label">words learned<br><span class="mw-hero-of">of ' + s.total + ' · ' + s.seen + ' seen</span></span></div>' +
+                '<span class="mw-hero-label">words you know<br><span class="mw-hero-of">of ' + s.total + ' · ' + s['new'] + ' new · ' + s.learning + ' learning</span></span></div>' +
             '<div class="mw-stack">' +
+                '<span class="mw-stack-known" style="width:' + pct(s.known) + '%"></span>' +
                 '<span class="mw-stack-mastered" style="width:' + pct(s.mastered) + '%"></span>' +
                 '<span class="mw-stack-learned" style="width:' + pct(s.learned) + '%"></span>' +
                 '<span class="mw-stack-learning" style="width:' + pct(s.learning) + '%"></span>' +
             '</div>' +
             '<div class="mw-legend">' +
+                '<span><i class="mw-dot mw-dot-known"></i>Ticked as known ' + s.known + '</span>' +
+                '<span><i class="mw-dot mw-dot-learned"></i>Learned in cards ' + s.learned + '</span>' +
                 '<span><i class="mw-dot mw-dot-mastered"></i>Mastered ' + s.mastered + '</span>' +
-                '<span><i class="mw-dot mw-dot-learned"></i>Learned ' + s.learned + '</span>' +
                 '<span><i class="mw-dot mw-dot-learning"></i>Learning ' + s.learning + '</span>' +
+                '<span><i class="mw-dot mw-dot-new"></i>New ' + s['new'] + '</span>' +
             '</div>' +
             '<div class="mw-today">' +
                 '<button type="button" onclick="openMyWords({range:\'today\'})"><b>+' + s.newToday + '</b> new today</button>' +
                 '<button type="button" onclick="openMyWords({range:\'today\',by:\'learned\'})"><b>+' + s.learnedToday + '</b> learned today</button>' +
                 '<button type="button" onclick="mwReviewDue()"><b>' + s.dueNow + '</b> due now</button>' +
             '</div>' +
-        '</div>';
+        '</div>' +
+        '<button type="button" class="mw-tick-entry" onclick="openTickView(\'new\')">' +
+            '<span class="mw-tick-entry-icon" aria-hidden="true">✓</span>' +
+            '<span class="mw-tick-entry-text"><b>Tick the words you already know</b>' +
+                '<span id="mw-tick-new">' + s['new'] + ' word' + (s['new'] === 1 ? '' : 's') + ' still new' +
+                (s.known ? ' · ' + s.known + ' ticked' : '') + '</span></span>' +
+            '<span class="mw-tick-entry-chev" aria-hidden="true">›</span>' +
+        '</button>';
     mwRenderWeeks();
 }
 
@@ -1344,15 +1661,17 @@ function mwRenderWeeks() {
 }
 
 // State counts within the current level/topic/search/date filters.
+// learned = learned in cards (incl. mastered); known = ticked as known.
 function mwChipCounts() {
-    var c = { seen: 0, learning: 0, learned: 0, mastered: 0, 'new': 0, all: 0 };
+    var c = { seen: 0, known: 0, learning: 0, learned: 0, mastered: 0, 'new': 0, all: 0 };
     ALL_WORDS.forEach(function(w) {
         if (!mwBaseMatches(w)) return;
-        var st = wordState(w.id);
+        var st = mwState(w.id);
         c.all++;
         if (st === 'new') { c['new']++; return; }
         c.seen++;
-        if (st === 'learning') c.learning++;
+        if (st === 'known') c.known++;
+        else if (st === 'learning') c.learning++;
         else c.learned++;
         if (st === 'mastered') c.mastered++;
     });
@@ -1364,13 +1683,21 @@ function mwRenderControls(s) {
     if (chips) {
         var c = mwChipCounts();
         var defs = [
-            ['seen', 'My words', c.seen], ['learning', 'Learning', c.learning], ['learned', 'Learned', c.learned],
-            ['mastered', 'Mastered', c.mastered], ['new', 'Not started', c['new']], ['all', 'All', c.all]
+            ['seen', 'My words', c.seen], ['known', 'Known', c.known], ['new', 'New', c['new']],
+            ['learning', 'Learning', c.learning], ['learned', 'Learned', c.learned],
+            ['mastered', 'Mastered', c.mastered], ['all', 'All', c.all]
         ];
         chips.innerHTML = defs.map(function(d) {
             return '<button type="button" class="mw-chip' + (mwView.state === d[0] ? ' active' : '') +
                 '" onclick="mwSet(\'state\',\'' + d[0] + '\')">' + d[1] + ' <span>' + d[2] + '</span></button>';
         }).join('');
+        // Keep the active chip in view in the sideways-scrolling row.
+        var act = chips.querySelector('.mw-chip.active');
+        if (act) {
+            var a = act.getBoundingClientRect();
+            var box = chips.getBoundingClientRect();
+            if (a.left < box.left || a.right > box.right) chips.scrollLeft += a.left - box.left - 16;
+        }
     }
     var level = document.getElementById('mw-level');
     if (level) level.value = mwView.level;
@@ -1398,8 +1725,9 @@ function mwRenderList() {
         var scope = '';
         if (mwView.category !== 'all' || mwView.level !== 'all') {
             var c = mwChipCounts();
-            var where = mwView.category !== 'all' && ALL_CATEGORIES[mwView.category] ? ALL_CATEGORIES[mwView.category].name : (mwView.level === 'a1' ? 'A1' : 'B1');
-            scope = '<div class="mw-scope">Learned <b>' + c.learned + '</b> of ' + c.all + ' in ' + appEscape(where) + ' · ' + c.seen + ' seen</div>';
+            var where = mwView.category !== 'all' && ALL_CATEGORIES[mwView.category] ? ALL_CATEGORIES[mwView.category].name : mwView.level.toUpperCase();
+            scope = '<div class="mw-scope">You know <b>' + (c.known + c.learned) + '</b> of ' + c.all + ' in ' + appEscape(where) +
+                ' · ' + c.known + ' ticked · ' + c['new'] + ' new</div>';
         }
         actions.innerHTML = scope + (list.length ?
             '<button type="button" class="btn btn-primary mw-practice-btn" onclick="mwPracticeList()">▶ Review these ' + list.length + ' as flashcards</button>' : '');
@@ -1408,6 +1736,8 @@ function mwRenderList() {
     if (!list.length) {
         var msg;
         if (mwView.q) msg = 'No word matches "' + appEscape(mwView.q) + '" here.' + (mwView.state !== 'all' ? ' <button type="button" class="link-btn" onclick="mwSet(\'state\',\'all\')">Search all ' + ALL_WORDS.length + ' words</button>' : '');
+        else if (mwView.state === 'known') msg = 'No words ticked as known here yet. <button type="button" class="link-btn" onclick="openTickView(\'new\')">Tick the words you already know</button> — it takes a few minutes and they skip the new-word queue.';
+        else if (mwView.state === 'new') msg = 'No new words left here — every word is known or in your cards. 🎉';
         else if (mwView.state === 'seen' || mwView.state === 'learning') msg = 'No words here yet — study a few in Cards and they show up here, newest first.';
         else if (mwView.state === 'learned' || mwView.state === 'mastered') msg = 'Nothing yet. A word counts as learned once you have recalled it well enough to earn a 7-day gap (usually its 3rd good review).';
         else msg = 'No words match these filters.';
@@ -1432,8 +1762,8 @@ function mwRenderList() {
         if (groupField) {
             var k = mwGroupKey(p, groupField);
             if (k !== lastGroup) {
-                var approx = p && p[groupField + 'Approx'];
-                var label = k === '-' ? (groupField === 'learnedAt' ? 'Not learned yet' : 'Not started') :
+                var approx = p && p[groupField] && p[groupField + 'Approx'];
+                var label = k === '-' ? (groupField === 'learnedAt' ? 'Not learned yet' : 'New') :
                     (k === '?' ? 'Earlier · date unknown' : (approx ? '≈ ' : '') + mwDayHeader(k));
                 html += '<div class="mw-group-header"><span>' + label + '</span><span>' + groupCounts[k] + '</span></div>';
                 lastGroup = k;
@@ -1448,19 +1778,23 @@ function mwRenderList() {
 }
 
 function mwGroupKey(p, field) {
-    if (!p || !p[field]) return '-';
-    if (p[field + 'Unknown']) return '?';
-    return srsStudyDayKey(p[field]);
+    var t = mwSeenTime(p, field);
+    if (!t) return '-';
+    if (p[field] && p[field + 'Unknown']) return '?';
+    return srsStudyDayKey(t);
 }
 
 function mwRowHtml(w, p) {
-    var st = wordState(w.id);
+    var st = mwState(w.id);
     var deClass = 'mw-de';
-    if (w.type === 'noun' && w.gender && w.plural !== w.de) deClass += ' word-de-gender-' + w.gender;
+    var gender = wordGenderColor(w);
+    if (gender) deClass += ' word-de-gender-' + gender;
     var pill = MW_STATE_LABEL[st];
     var meta;
-    if (!p) meta = A1_WORD_IDS[w.id] ? 'A1' : 'B1';
+    if (!p) meta = wordLevel(w);
     else if (mwView.sort === 'lapses') meta = (p.lapses || 0) + '× forgotten';
+    else if (st === 'known' && mwView.sort === 'due') meta = knownChecksEnabled() ? mwNextReviewText(p).replace('next:', 'check:') : 'check: off';
+    else if (st === 'known') meta = 'ticked ' + mwFormatDate(p.knownAt);
     else if (mwView.sort === 'learned' && p.learnedAt) meta = p.learnedAtUnknown ? 'learned (A1 app)' : 'learned ' + mwFormatDate(p.learnedAt, p.learnedAtApprox);
     else meta = mwNextReviewText(p);
     if (wordIsRelearning(w.id)) pill = 'Relearning';
@@ -1474,7 +1808,7 @@ function mwRowHtml(w, p) {
 
 function mwPracticeList() {
     if (!mwLastList.length) return;
-    var label = mwView.range ? mwView.range.label : ({ seen: 'My words', learning: 'Learning', learned: 'Learned words', mastered: 'Mastered words', 'new': 'Not started', all: 'All words' }[mwView.state] || 'My words');
+    var label = mwView.range ? mwView.range.label : ({ seen: 'My words', known: 'Known words', learning: 'Learning', learned: 'Learned words', mastered: 'Mastered words', 'new': 'New words', all: 'All words' }[mwView.state] || 'My words');
     if (mwView.q) label += ' · "' + mwView.q + '"';
     startPracticeSession(mwLastList.map(function(w) { return w.id; }), label);
 }
@@ -1491,17 +1825,20 @@ function openWordSheet(id) {
     wordSheetId = id;
     var p = wordProgress[id];
     var st = wordState(id);
+    var known = wordIsKnown(id);
     var cat = ALL_CATEGORIES[w.category];
-    var html = '<div class="ws-top"><div class="ws-de' + (w.type === 'noun' && w.gender && w.plural !== w.de ? ' word-de-gender-' + w.gender : '') + '">' + appEscape(w.de) + '</div>' +
+    var gender = wordGenderColor(w);
+    var html = '<div class="ws-top"><div class="ws-de' + (gender ? ' word-de-gender-' + gender : '') + '">' + appEscape(w.de) + '</div>' +
         '<button type="button" class="ws-speak" onclick="speakText(WORD_BY_ID[' + id + '].de, \'de-DE\', null)">🔊</button></div>' +
         '<div class="ws-en">' + appEscape(w.en) + '</div>' +
+        (w.note ? '<div class="ws-note">' + appEscape(w.note) + '</div>' : '') +
         '<div class="ws-tags"><span class="word-type-badge type-' + appEscape(w.type) + '">' + appEscape(w.type) + '</span>' +
-        '<span class="ws-tag">' + (A1_WORD_IDS[id] ? 'A1' : 'B1') + '</span>' +
+        '<span class="ws-tag">' + wordLevel(w) + '</span>' +
         (cat ? '<span class="ws-tag">' + cat.emoji + ' ' + appEscape(cat.name) + '</span>' : '') + '</div>';
     if (w.plural) html += '<div class="ws-line">Plural: ' + appEscape(w.plural) + '</div>';
     if (w.conjugation) {
-        html += '<div class="ws-line ws-conj">' + Object.keys(w.conjugation).map(function(k) {
-            return '<span>' + appEscape(k) + ': ' + appEscape(w.conjugation[k]) + '</span>';
+        html += '<div class="ws-line ws-conj">' + conjugationParts(w.conjugation).map(function(part) {
+            return '<span>' + appEscape(part) + '</span>';
         }).join('') + '</div>';
     }
     if (w.example && w.example.de) {
@@ -1509,21 +1846,28 @@ function openWordSheet(id) {
             ' <button type="button" class="link-btn" onclick="speakText(WORD_BY_ID[' + id + '].example.de, \'de-DE\', null)">🔊</button></div>' +
             '<div class="ws-example-en">' + appEscape(w.example.en) + '</div></div>';
     }
+    if (known) {
+        html += '<div class="ws-known-note">✓ Ticked as known ' + appEscape(mwOnDate(p.knownAt)) + '</div>';
+    }
+    var pillSt = known ? 'known' : (wordIsRelearning(id) ? 'relearning' : st);
     html += '<div class="ws-stats">';
-    html += mwStatRow('Status', '<span class="mw-pill mw-pill-' + (wordIsRelearning(id) ? 'relearning' : st) + '">' + (wordIsRelearning(id) ? 'Relearning' : MW_STATE_LABEL[st]) + '</span>');
+    html += mwStatRow('Status', '<span class="mw-pill mw-pill-' + pillSt + '">' + (pillSt === 'relearning' ? 'Relearning' : MW_STATE_LABEL[pillSt]) + '</span>');
     if (p) {
-        html += mwStatRow('First seen', mwFormatDate(p.firstSeen, p.firstSeenApprox, p.firstSeenUnknown));
-        html += mwStatRow('Learned', p.learnedAt ? mwFormatDate(p.learnedAt, p.learnedAtApprox, p.learnedAtUnknown) + (p.source === 'manual' ? ' (marked by you)' : (p.source === 'legacy' ? ' (from the A1 app)' : '')) : 'not yet');
+        if (p.knownAt && !known) html += mwStatRow('Ticked as known', mwFormatDate(p.knownAt) + ' (forgotten since)');
+        if (p.firstSeen || !p.knownAt) html += mwStatRow('First seen', mwFormatDate(p.firstSeen, p.firstSeenApprox, p.firstSeenUnknown));
+        if (!known || p.learnedAt) html += mwStatRow('Learned', p.learnedAt ? mwFormatDate(p.learnedAt, p.learnedAtApprox, p.learnedAtUnknown) + (p.source === 'manual' ? ' (marked by you)' : (p.source === 'legacy' ? ' (from the A1 app)' : '')) : 'not yet');
         html += mwStatRow('Last review', mwFormatDate(p.lastReviewed, p.lastReviewedApprox));
-        html += mwStatRow('Next review', (p.due || 0) <= Date.now() ? 'due now' : mwFormatDate(p.due) + ' (' + mwNextReviewText(p).replace('next: ', '') + ')');
+        if (known && !knownChecksEnabled()) html += mwStatRow('Quick check', 'off (Settings)');
+        else html += mwStatRow(known ? 'Quick check' : 'Next review', (p.due || 0) <= Date.now() ? 'due now' : mwFormatDate(p.due) + ' (' + mwNextReviewText(p).replace('next: ', '') + ')');
         var reps = p.reps || 0;
         html += mwStatRow('History', reps + ' good review' + (reps === 1 ? '' : 's') + ' · forgotten ' + (p.lapses || 0) + '× · gap ' + (p.intervalDays || 0) + ' d');
     }
     html += '</div><div class="ws-actions">';
-    if (st === 'new' || st === 'learning') html += '<button type="button" class="btn btn-known" onclick="wordSheetAction(\'known\')">✓ I know this</button>';
-    if (p && (p.due || 0) > Date.now()) html += '<button type="button" class="btn btn-learning" onclick="wordSheetAction(\'review\')">↺ Review again soon</button>';
+    if (known) html += '<button type="button" class="btn btn-learning" onclick="wordSheetAction(\'unknown\')">Untick — I don\'t know it</button>';
+    else if (st === 'new' || st === 'learning') html += '<button type="button" class="btn btn-known" onclick="wordSheetAction(\'known\')">✓ I know this</button>';
+    if (p && !known && (p.due || 0) > Date.now()) html += '<button type="button" class="btn btn-learning" onclick="wordSheetAction(\'review\')">↺ Review again soon</button>';
     html += '</div>';
-    if (p) html += '<button type="button" class="link-btn ws-reset" onclick="wordSheetAction(\'reset\')">Reset this word to "not started"</button>';
+    if (p) html += '<button type="button" class="link-btn ws-reset" onclick="wordSheetAction(\'reset\')">Reset this word to "new"</button>';
     body.innerHTML = html;
     sheet.classList.add('open');
 }
@@ -1537,13 +1881,14 @@ function wordSheetAction(action) {
     var w = WORD_BY_ID[id];
     if (!w) return;
     if (action === 'known') markWordKnown(id);
+    if (action === 'unknown') wordUnmarkKnown(id);
     if (action === 'review') {
         var gap = wordProgress[id] ? wordProgress[id].intervalDays || 0 : 0;
         if (gap >= 3 && !confirm('Review "' + w.de + '" again soon? Its ' + gap + '-day gap starts over.')) return;
         markWordForReview(id);
     }
     if (action === 'reset') {
-        if (!confirm('Reset "' + w.de + '"? Its review history is cleared and it goes back to "not started".')) return;
+        if (!confirm('Reset "' + w.de + '"? Its review history is cleared and it goes back to "new".')) return;
         resetWord(id);
     }
     updateIntroducedCounter();
@@ -1555,6 +1900,395 @@ function closeWordSheet() {
     var sheet = document.getElementById('word-sheet');
     if (sheet) sheet.classList.remove('open');
     wordSheetId = null;
+}
+
+// ── Tick what you know ──
+// A full-screen sorting list over the whole word list: one tap ticks a word
+// as known (it skips the new-word queue, see wordTickKnown), another tap
+// unticks it. A ticked row stays where it is until the filters change, so
+// a mis-tap is undone by tapping again. Rows are rendered in chunks and a
+// tap only touches its own row, its group header and the counters.
+
+var TICK_VIEW_KEY = 'tick-view';
+var TV_PAGE = 150;
+var tvState = { seg: 'new', level: 'all', category: 'all', core: false, en: true, q: '' };
+var tvList = [];       // words of the current segment + filters, in display order
+var tvGroups = {};     // topic id -> { ids: [...] } for the current list
+var tvShown = 0;
+var tvUndo = null;     // { ids, timer } of the last "Tick all"
+var tvReady = false;
+
+function tvLoadPrefs() {
+    try {
+        var saved = JSON.parse(localStorage.getItem(TICK_VIEW_KEY) || '{}') || {};
+        if (typeof saved.en === 'boolean') tvState.en = saved.en;
+        if (typeof saved.core === 'boolean') tvState.core = saved.core;
+    } catch (e) {}
+}
+
+function tvSavePrefs() {
+    try { localStorage.setItem(TICK_VIEW_KEY, JSON.stringify({ en: tvState.en, core: tvState.core })); } catch (e) {}
+}
+
+function tickViewOpen() {
+    var el = document.getElementById('tick-view');
+    return !!el && el.classList.contains('open');
+}
+
+function openTickView(seg) {
+    var el = document.getElementById('tick-view');
+    if (!el) return;
+    closeWordSheet();
+    if (!tvReady) {
+        tvLoadPrefs();
+        tvBuildShell(el);
+        tvReady = true;
+    }
+    tvState.seg = seg === 'known' ? 'known' : 'new';
+    el.classList.add('open');
+    el.setAttribute('aria-hidden', 'false');
+    tvRender();
+    document.getElementById('tv-body').scrollTop = 0;
+}
+
+// silent: the caller re-renders (switchTab), so My Words isn't redrawn twice.
+function closeTickView(silent) {
+    var el = document.getElementById('tick-view');
+    if (!el || !el.classList.contains('open')) return;
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden', 'true');
+    tvHideToast();
+    if (silent) return;
+    updateIntroducedCounter();
+    if (currentTab === 'words') renderMyWords();
+}
+
+function tvBuildShell(el) {
+    var catOptions = '<option value="all">All topics</option>' + sortedCategoryIds().map(function(id) {
+        return '<option value="' + appEscape(id) + '">' + ALL_CATEGORIES[id].emoji + ' ' + appEscape(ALL_CATEGORIES[id].name) + '</option>';
+    }).join('');
+    var levels = [['all', 'All'], ['a1', 'A1'], ['a2', 'A2'], ['b1', 'B1']];
+    el.innerHTML =
+        '<div class="tv-head">' +
+            '<div class="tv-title-row"><h2 class="tv-title">Tick what you know</h2>' +
+                '<button type="button" class="tv-done" onclick="closeTickView()">Done</button></div>' +
+            '<div class="seg tv-seg" id="tv-seg">' +
+                '<button type="button" data-seg="new">To sort <span class="seg-count" id="tv-count-new"></span></button>' +
+                '<button type="button" data-seg="known">✓ Known <span class="seg-count" id="tv-count-known"></span></button>' +
+            '</div>' +
+            '<div class="tv-progress" id="tv-progress"></div>' +
+            '<div class="mw-stack tv-stack" id="tv-stack"></div>' +
+        '</div>' +
+        '<div class="tv-body" id="tv-body">' +
+            '<p class="tv-intro">Tap every word you already know. Ticked words skip the new-word queue; a few come back for a quick check in 1–4 months.</p>' +
+            '<input type="search" id="tv-search" class="mw-search" placeholder="Search German or English…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">' +
+            '<div class="tv-filters">' +
+                '<div class="tv-levels" id="tv-levels">' + levels.map(function(l) {
+                    return '<button type="button" class="mw-chip" data-level="' + l[0] + '">' + l[1] + '</button>';
+                }).join('') + '</div>' +
+                '<select id="tv-category" aria-label="Topic">' + catOptions + '</select>' +
+            '</div>' +
+            '<div class="tv-toggles">' +
+                '<button type="button" class="tv-toggle" id="tv-core" aria-pressed="false">Core words only</button>' +
+                '<button type="button" class="tv-toggle" id="tv-en" aria-pressed="true">Show English</button>' +
+            '</div>' +
+            '<div class="tv-list" id="tv-list"></div>' +
+        '</div>' +
+        '<div class="tv-toast hidden" id="tv-toast" role="status"><span id="tv-toast-text"></span>' +
+            '<button type="button" onclick="tvUndoLast()">Undo</button></div>';
+
+    document.getElementById('tv-seg').addEventListener('click', function(e) {
+        var b = e.target.closest ? e.target.closest('button[data-seg]') : null;
+        if (!b || b.getAttribute('data-seg') === tvState.seg) return;
+        tvState.seg = b.getAttribute('data-seg');
+        tvRender();
+        document.getElementById('tv-body').scrollTop = 0;
+    });
+    document.getElementById('tv-levels').addEventListener('click', function(e) {
+        var b = e.target.closest ? e.target.closest('button[data-level]') : null;
+        if (!b) return;
+        tvState.level = b.getAttribute('data-level');
+        tvRender();
+    });
+    document.getElementById('tv-category').addEventListener('change', function() {
+        tvState.category = this.value;
+        tvRender();
+    });
+    document.getElementById('tv-core').addEventListener('click', function() {
+        tvState.core = !tvState.core;
+        tvSavePrefs();
+        tvRender();
+    });
+    // English on/off only hides text: no re-render, ticked rows stay put.
+    document.getElementById('tv-en').addEventListener('click', function() {
+        tvState.en = !tvState.en;
+        tvSavePrefs();
+        tvRenderControls();
+    });
+    var search = document.getElementById('tv-search');
+    var searchTimer = null;
+    search.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            tvState.q = search.value;
+            tvRender();
+        }, 150);
+    });
+    search.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') search.blur();
+    });
+    var list = document.getElementById('tv-list');
+    list.addEventListener('click', function(e) {
+        if (!e.target.closest) return;
+        if (e.target.closest('.tv-more')) { tvRenderMore(); return; }
+        var all = e.target.closest('.tv-tick-all');
+        if (all) { tvTickGroup(all.getAttribute('data-g')); return; }
+        var row = e.target.closest('.tv-row');
+        if (!row) return;
+        if (e.target.closest('.tv-reveal')) { row.classList.toggle('revealed'); return; }
+        tvToggleRow(row);
+    });
+    list.addEventListener('keydown', function(e) {
+        var row = e.target;
+        if ((e.key === ' ' || e.key === 'Enter') && row.classList && row.classList.contains('tv-row')) {
+            e.preventDefault();
+            tvToggleRow(row);
+        }
+    });
+}
+
+// Level, topic, core and search -- everything except the segment.
+function tvBaseMatches(w, q) {
+    var s = tvState;
+    if (s.level !== 'all' && wordLevel(w).toLowerCase() !== s.level) return false;
+    if (s.category !== 'all' && w.category !== s.category) return false;
+    if (s.core && w.freq === 2) return false;
+    if (q && mwSearchKey(w).indexOf(q) === -1) return false;
+    return true;
+}
+
+function tvGroupKey(w) {
+    return ALL_CATEGORIES[w.category] ? w.category : '_other';
+}
+
+// To sort = words not started at all; Known = words ticked as known. Grouped
+// by topic (A-Z, like the topic menus), course order within a topic.
+function tvBuildList() {
+    var q = mwNorm(tvState.q);
+    var wantKnown = tvState.seg === 'known';
+    var words = srsOrderNew(ALL_WORDS.filter(function(w) {
+        if (!tvBaseMatches(w, q)) return false;
+        return wantKnown ? wordIsKnown(w.id) : !wordProgress[w.id];
+    }));
+    tvGroups = {};
+    words.forEach(function(w) {
+        var key = tvGroupKey(w);
+        if (!tvGroups[key]) tvGroups[key] = { ids: [] };
+        tvGroups[key].ids.push(w.id);
+    });
+    var order = sortedCategoryIds().filter(function(k) { return !!tvGroups[k]; });
+    if (tvGroups._other) order.push('_other');
+    tvList = [];
+    order.forEach(function(k) {
+        tvGroups[k].ids.forEach(function(id) { tvList.push(WORD_BY_ID[id]); });
+    });
+}
+
+function tvRender() {
+    var listEl = document.getElementById('tv-list');
+    if (!listEl) return;
+    tvBuildList();
+    tvShown = 0;
+    listEl.innerHTML = '';
+    if (!tvList.length) {
+        var msg;
+        if (tvState.q) msg = 'No ' + (tvState.seg === 'known' ? 'ticked' : 'new') + ' word matches "' + appEscape(tvState.q) + '" here.';
+        else if (tvState.seg === 'known') msg = 'Nothing ticked here yet. Switch to <b>To sort</b> and tap the words you know.';
+        else msg = 'Nothing left to sort here 🎉<br>Every word in this selection is known or already in your cards.';
+        listEl.innerHTML = '<div class="plan-empty-state">' + msg + '</div>';
+    } else {
+        tvRenderMore();
+    }
+    tvRenderControls();
+    tvUpdateCounters();
+}
+
+// Appends the next chunk of rows; a topic split across chunks keeps one header.
+function tvRenderMore() {
+    var listEl = document.getElementById('tv-list');
+    var oldMore = listEl.querySelector('.tv-more');
+    if (oldMore) oldMore.parentNode.removeChild(oldMore);
+    var end = Math.min(tvList.length, tvShown + TV_PAGE);
+    var parts = [];
+    for (var i = tvShown; i < end; i++) {
+        var key = tvGroupKey(tvList[i]);
+        if (!parts.length || parts[parts.length - 1].key !== key) parts.push({ key: key, html: '' });
+        parts[parts.length - 1].html += tvRowHtml(tvList[i]);
+    }
+    parts.forEach(function(part) {
+        var group = listEl.querySelector('.tv-group[data-g="' + part.key + '"]');
+        if (group) group.insertAdjacentHTML('beforeend', part.html);
+        else listEl.insertAdjacentHTML('beforeend', '<div class="tv-group" data-g="' + appEscape(part.key) + '">' + tvGroupHeaderHtml(part.key) + part.html + '</div>');
+    });
+    tvShown = end;
+    if (end < tvList.length) {
+        listEl.insertAdjacentHTML('beforeend', '<button type="button" class="mw-more tv-more">Show more (' + end + ' of ' + tvList.length + ')</button>');
+    }
+}
+
+function tvGroupName(key) {
+    var cat = ALL_CATEGORIES[key];
+    return cat ? cat.name : 'Other';
+}
+
+function tvGroupKnown(key) {
+    var g = tvGroups[key];
+    var k = 0;
+    if (g) g.ids.forEach(function(id) { if (wordIsKnown(id)) k++; });
+    return k;
+}
+
+function tvGroupHeaderHtml(key) {
+    var cat = ALL_CATEGORIES[key];
+    var n = tvGroups[key] ? tvGroups[key].ids.length : 0;
+    var k = tvGroupKnown(key);
+    return '<div class="tv-group-header">' +
+        '<span class="tv-group-name">' + (cat ? cat.emoji + ' ' : '') + appEscape(tvGroupName(key)) + '</span>' +
+        '<span class="tv-group-count">' + k + ' of ' + n + ' known</span>' +
+        '<button type="button" class="tv-tick-all' + (k >= n ? ' hidden' : '') + '" data-g="' + appEscape(key) + '">Tick all</button>' +
+    '</div>';
+}
+
+function tvRowHtml(w) {
+    var known = wordIsKnown(w.id);
+    var deClass = 'tv-de';
+    var gender = wordGenderColor(w);
+    if (gender) deClass += ' word-de-gender-' + gender;
+    return '<div class="tv-row' + (known ? ' is-known' : '') + '" data-id="' + w.id + '" role="checkbox" aria-checked="' + known + '" tabindex="0">' +
+        '<span class="tv-tick" aria-hidden="true"></span>' +
+        '<span class="tv-main"><span class="' + deClass + '" lang="de">' + appEscape(w.de) + '</span>' +
+            '<span class="tv-en">' + appEscape(w.en) + '</span></span>' +
+        '<button type="button" class="tv-reveal" tabindex="-1" aria-label="Show English">EN</button>' +
+    '</div>';
+}
+
+function tvRenderControls() {
+    var seg = document.getElementById('tv-seg');
+    if (!seg) return;
+    var btns = seg.querySelectorAll('button[data-seg]');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-seg') === tvState.seg);
+    var lv = document.querySelectorAll('#tv-levels button');
+    for (var j = 0; j < lv.length; j++) lv[j].classList.toggle('active', lv[j].getAttribute('data-level') === tvState.level);
+    document.getElementById('tv-category').value = tvState.category;
+    var core = document.getElementById('tv-core');
+    core.classList.toggle('on', tvState.core);
+    core.setAttribute('aria-pressed', tvState.core ? 'true' : 'false');
+    var en = document.getElementById('tv-en');
+    en.classList.toggle('on', tvState.en);
+    en.setAttribute('aria-pressed', tvState.en ? 'true' : 'false');
+    document.getElementById('tv-list').classList.toggle('tv-hide-en', !tvState.en);
+    var search = document.getElementById('tv-search');
+    if (search.value !== tvState.q) search.value = tvState.q;
+}
+
+// Counts for the current level/topic/core/search filter, both segments.
+function tvUpdateCounters() {
+    var q = mwNorm(tvState.q);
+    var c = { known: 0, learned: 0, learning: 0, 'new': 0, all: 0 };
+    ALL_WORDS.forEach(function(w) {
+        if (!tvBaseMatches(w, q)) return;
+        var st = mwState(w.id);
+        c.all++;
+        if (st === 'mastered') st = 'learned';
+        c[st]++;
+    });
+    var cn = document.getElementById('tv-count-new');
+    if (!cn) return;
+    cn.textContent = c['new'];
+    document.getElementById('tv-count-known').textContent = c.known;
+    var parts = ['<span class="tv-p-known">Known <b>' + c.known + '</b></span>'];
+    if (c.learned) parts.push('<span class="tv-p-learned">Learned <b>' + c.learned + '</b></span>');
+    parts.push('<span class="tv-p-learning">Learning <b>' + c.learning + '</b></span>');
+    parts.push('<span class="tv-p-new">New <b>' + c['new'] + '</b></span>');
+    document.getElementById('tv-progress').innerHTML = parts.join(' · ');
+    var pct = function(n) { return c.all ? (n / c.all * 100) : 0; };
+    document.getElementById('tv-stack').innerHTML =
+        '<span class="mw-stack-known" style="width:' + pct(c.known) + '%"></span>' +
+        '<span class="mw-stack-learned" style="width:' + pct(c.learned) + '%"></span>' +
+        '<span class="mw-stack-learning" style="width:' + pct(c.learning) + '%"></span>';
+}
+
+// Re-reads the state of the given words into their rows and group headers.
+function tvAfterChange(ids) {
+    var listEl = document.getElementById('tv-list');
+    if (!listEl) return;
+    var want = {};
+    var groups = {};
+    ids.forEach(function(id) {
+        want[String(id)] = true;
+        if (WORD_BY_ID[id]) groups[tvGroupKey(WORD_BY_ID[id])] = true;
+    });
+    var rows = ids.length > 20 ? listEl.querySelectorAll('.tv-row') :
+        ids.map(function(id) { return listEl.querySelector('.tv-row[data-id="' + id + '"]'); });
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        if (!row || !want[row.getAttribute('data-id')]) continue;
+        var known = wordIsKnown(+row.getAttribute('data-id'));
+        row.classList.toggle('is-known', known);
+        row.setAttribute('aria-checked', known ? 'true' : 'false');
+    }
+    Object.keys(groups).forEach(function(key) {
+        var header = listEl.querySelector('.tv-group[data-g="' + key + '"] .tv-group-header');
+        if (!header || !tvGroups[key]) return;
+        var k = tvGroupKnown(key);
+        var n = tvGroups[key].ids.length;
+        header.querySelector('.tv-group-count').textContent = k + ' of ' + n + ' known';
+        header.querySelector('.tv-tick-all').classList.toggle('hidden', k >= n);
+    });
+    tvUpdateCounters();
+}
+
+function tvToggleRow(row) {
+    var id = +row.getAttribute('data-id');
+    if (!WORD_BY_ID[id]) return;
+    if (wordIsKnown(id)) wordUnmarkKnown(id);
+    else wordTickKnown(id);
+    tvAfterChange([id]);
+}
+
+function tvTickGroup(key) {
+    var g = tvGroups[key];
+    if (!g) return;
+    var ids = g.ids.filter(function(id) { return !wordIsKnown(id); });
+    if (!ids.length) return;
+    if (!confirm('Tick all ' + ids.length + ' word' + (ids.length === 1 ? '' : 's') + ' in ' + tvGroupName(key) + ' as known?')) return;
+    var done = wordTickKnownMany(ids);
+    tvAfterChange(done);
+    tvShowToast('Ticked ' + done.length, done);
+}
+
+function tvShowToast(text, ids) {
+    var toast = document.getElementById('tv-toast');
+    if (!toast) return;
+    if (tvUndo) clearTimeout(tvUndo.timer);
+    tvUndo = { ids: ids, timer: setTimeout(tvHideToast, 8000) };
+    document.getElementById('tv-toast-text').textContent = text;
+    toast.classList.remove('hidden');
+}
+
+function tvHideToast() {
+    if (tvUndo) clearTimeout(tvUndo.timer);
+    tvUndo = null;
+    var toast = document.getElementById('tv-toast');
+    if (toast) toast.classList.add('hidden');
+}
+
+// Undo of "Tick all": each word goes back to exactly what it was before.
+function tvUndoLast() {
+    if (!tvUndo) return;
+    var ids = tvUndo.ids;
+    tvHideToast();
+    tvAfterChange(wordUnmarkKnownMany(ids));
 }
 
 // ── Settings & backup ───────────────────────────────────────────
@@ -1591,8 +2325,17 @@ function renderSettings() {
             '<b>Never delete the home-screen app to update it</b> — that erases all progress on this phone.</p>' +
         '</div>' +
         '<div class="settings-card">' +
+            '<div class="settings-title">Words</div>' +
+            '<div class="settings-row"><span>Words you know</span><span>' + s.known + ' ticked + ' + (s.learned + s.mastered) + ' learned</span></div>' +
+            '<label class="settings-switch"><span>Check ticked words now and then</span>' +
+                '<span class="toggle-switch"><input type="checkbox" id="known-checks-toggle"' + (knownChecksEnabled() ? ' checked' : '') +
+                ' onchange="setKnownChecks(this.checked)"><span class="toggle-track"><span class="toggle-thumb"></span></span></span></label>' +
+            '<p class="settings-note">On: each ticked word comes back once in Today after 1–4 months as a quick check — a few a day. Off: ticked words never show up in your cards.</p>' +
+            '<button type="button" class="btn btn-known" onclick="openMyWords(); openTickView(\'new\')">✓ Tick the words you already know</button>' +
+        '</div>' +
+        '<div class="settings-card">' +
             '<div class="settings-title">Backup</div>' +
-            '<div class="settings-row"><span>Words seen / learned</span><span>' + s.seen + ' / ' + s.learnedEver + '</span></div>' +
+            '<div class="settings-row"><span>Words seen / you know</span><span>' + s.seen + ' / ' + s.learnedEver + '</span></div>' +
             '<div class="settings-row"><span>Last backup</span><span>' + (last ? mwFormatDate(+last) : 'never') + '</span></div>' +
             '<div class="settings-row"><span>Storage</span><span id="settings-persist">checking…</span></div>' +
             '<button type="button" class="btn btn-good" onclick="exportBackup()">⬇ Export backup file</button>' +
@@ -1601,6 +2344,7 @@ function renderSettings() {
             '<button type="button" class="btn btn-known" onclick="exportWordsCsv()">📄 Export my words (CSV)</button>' +
             '<p class="settings-note">The backup has every word\'s history, your plan ticks, exam scores and the daily log. Your OpenAI key is never included.</p>' +
         '</div>';
+    speechCheckMount(el);
     try {
         if (navigator.storage && navigator.storage.persisted) {
             navigator.storage.persisted().then(function(p) {
@@ -1691,13 +2435,14 @@ function csvCell(v) {
 }
 
 function exportWordsCsv() {
-    var rows = [['german', 'english', 'type', 'level', 'topic', 'status', 'first_seen', 'learned_on', 'last_review', 'next_review', 'good_reviews', 'forgotten']];
+    var rows = [['german', 'english', 'note', 'type', 'level', 'topic', 'status', 'first_seen', 'learned_on', 'last_review', 'next_review', 'good_reviews', 'forgotten', 'known', 'known_on']];
     ALL_WORDS.forEach(function(w) {
         var p = wordProgress[w.id];
         if (!p) return;
         var day = function(ms) { return ms ? srsDayKey(ms) : ''; };
-        rows.push([w.de, w.en, w.type, A1_WORD_IDS[w.id] ? 'A1' : 'B1', ALL_CATEGORIES[w.category] ? ALL_CATEGORIES[w.category].name : w.category,
-            MW_STATE_LABEL[wordState(w.id)], day(p.firstSeen), day(p.learnedAt), day(p.lastReviewed), day(p.due), p.reps || 0, p.lapses || 0]);
+        rows.push([w.de, w.en, w.note || '', w.type, wordLevel(w), ALL_CATEGORIES[w.category] ? ALL_CATEGORIES[w.category].name : w.category,
+            MW_STATE_LABEL[mwState(w.id)], day(p.firstSeen), day(p.learnedAt), day(p.lastReviewed), day(p.due), p.reps || 0, p.lapses || 0,
+            p.known ? 'yes' : '', day(p.knownAt)]);
     });
     var csv = '﻿' + rows.map(function(r) { return r.map(csvCell).join(','); }).join('\n');
     backupSaveFile('my-german-words-' + srsToday() + '.csv', csv, 'text/csv');
@@ -1730,7 +2475,7 @@ function populateTestCategoryFilter() {
     select.appendChild(mine);
     var learned = document.createElement('option');
     learned.value = 'learned';
-    learned.textContent = '✓ Learned words';
+    learned.textContent = '✓ Words you know';
     select.appendChild(learned);
     sortedCategoryIds().forEach(function(catId) {
         var opt = document.createElement('option');
@@ -1817,9 +2562,11 @@ function startTest() {
 
 // The meanings in a gloss: "car / (train) carriage" -> ['car', 'carriage'].
 // Two words sharing one are never offered side by side as answer options.
+// Punctuation and the gap a "(someone)" leaves don't count: "Pardon?" is
+// "Pardon", and "to wake (someone) up" is "wake up".
 function testSenses(en) {
-    return String(en || '').toLowerCase().replace(/\([^)]*\)/g, '').split(/\s*[\/,;]\s*/).map(function(sense) {
-        return sense.replace(/^(to|the|a|an)\s+/, '').trim();
+    return String(en || '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[!?.…]/g, '').split(/\s*[\/,;]\s*/).map(function(sense) {
+        return sense.replace(/\s+/g, ' ').trim().replace(/^(to|the|a|an) /, '');
     }).filter(Boolean);
 }
 
@@ -1904,7 +2651,7 @@ function showTestQuestion() {
 
     updateTestScore();
 
-    if (handsFreeModeActive && testScreenActive()) {
+    if (hfCanRun()) {
         hfRetryCount = 0;
         var session = ++hfSession;
         speakQuestion(q, function() {
@@ -1993,13 +2740,25 @@ function showTestResult() {
 
 // ── Hands-Free Mode ────────────────────────────────────────────
 
+var hfVoiceOff = '';       // why voice answers are off ('' = on); a tap on the note's 🎤 retries
+var hfVoiceTried = false;  // the learner tapped 🎤 despite a "blocked" Speech check
+var hfNeedTap = false;     // iOS refused a start that wasn't a tap: each listen needs a tap
+var hfFromTap = false;     // the current listen was started by a tap
+
 function initHandsFree() {
-    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    document.addEventListener('visibilitychange', hfOnVisibility);
+    var SpeechRecognition = speechRecCtor();
+    // (One recognizer for the whole test; a constructor that throws must not
+    // stop the rest of init.)
+    if (SpeechRecognition) {
+        try { hfRecognition = new SpeechRecognition(); } catch (e) { hfRecognition = null; }
+    }
+    if (!hfRecognition) { speechAdaptRefresh(); return; }
 
     hfSpeechSupported = true;
     var bar = document.getElementById('hands-free-bar');
     bar.classList.remove('hidden');
+    speechAdaptRefresh();
 
     var toggle = document.getElementById('hands-free-toggle');
     toggle.addEventListener('change', function() {
@@ -2011,99 +2770,485 @@ function initHandsFree() {
         if (q && !q.answered && testScreenActive()) showTestQuestion();
     });
 
-    hfRecognition = new SpeechRecognition();
+    // continuous=false: one answer per listen (continuous is unreliable on iOS).
     hfRecognition.continuous = false;
     hfRecognition.interimResults = false;
 
     hfRecognition.onresult = function(event) {
         if (!hfListening) return; // stopped meanwhile (new test, other tab)
+        var transcript = '';
+        try { transcript = event.results[0][0].transcript; } catch (e) {}
+        if (!transcript) return;
         clearTimeout(hfListenTimer);
-        var transcript = event.results[0][0].transcript;
+        speechNoteVoiceWorked();
         hfProcessVoiceInput(transcript);
     };
 
     hfRecognition.onerror = function(event) {
-        if (event.error === 'no-speech' || event.error === 'aborted') return;
+        var code = event && event.error;
+        if (code === 'no-speech' || code === 'aborted') return; // the listen timer moves on
         if (!hfListening) return;
         clearTimeout(hfListenTimer);
-        hfHandleNoMatch();
+        hfMicFailed(code);
     };
 
     hfRecognition.onend = function() {
-        // handled via onresult or timeout
+        // handled via onresult, onerror or the listen timer
     };
 }
 
-// TTS helpers
-
-function speakText(text, lang, onDone) {
-    if (!window.speechSynthesis) { if (onDone) onDone(); return; }
-    if (typeof tracksPauseAudio === 'function') tracksPauseAudio();
-    window.speechSynthesis.cancel();
-    var utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.9;
-
-    var fired = false;
-    var done = function() { if (!fired) { fired = true; if (onDone) onDone(); } };
-    utterance.onend = done;
-    utterance.onerror = done;
-    setTimeout(done, Math.max(2000, text.length * 75 + 800));
-
-    window.speechSynthesis.speak(utterance);
+function hfCanRun() {
+    return handsFreeModeActive && testScreenActive() && document.visibilityState !== 'hidden';
 }
 
+// In the background iOS stops speech and the mic; coming back reads the
+// open question again.
+function hfOnVisibility() {
+    if (!handsFreeModeActive) return;
+    if (document.visibilityState === 'hidden') { hfSession++; stopHFListening(); return; }
+    if (testScreenActive()) testOnEnter(false);
+}
+
+// Voice answers failed in a way another listen won't fix by itself, so no
+// "Bitte nochmal" loop: the question stays open for tapping, and the note's
+// 🎤 button retries from a tap (which is what iOS may want for start()).
+function hfMicFailed(code) {
+    var fromTap = hfFromTap;
+    stopHFListening();
+    if (!testScreenActive()) return;
+    if (code === 'not-allowed' && !fromTap) {
+        hfNeedTap = true;
+        hfShowMicNote('Tap 🎤 to answer by voice — or tap an answer.', true);
+        return;
+    }
+    hfVoiceOff = speechRecError(code, true).text || 'Voice answers stopped working.'; // no text box here: "tap an answer"
+    hfShowMicNote(hfVoiceOff, true);
+}
+
+function hfShowMicNote(text, withButton) {
+    var note = document.getElementById('hf-mic-note');
+    if (!note) {
+        var host = document.getElementById('test-question');
+        if (!text || !host) return;
+        note = document.createElement('div');
+        note.id = 'hf-mic-note';
+        note.className = 'hf-mic-note';
+        host.appendChild(note);
+    }
+    note.innerHTML = !text ? '' : '<div>' + appEscape(text) + '</div>' +
+        (withButton ? '<button type="button" class="btn btn-good hf-mic-btn" onclick="startHFListening(true)">🎤 Answer by voice</button>' : '');
+    note.classList.toggle('hidden', !text);
+    if (text && note.scrollIntoView) note.scrollIntoView({ block: 'nearest' });
+}
+
+// ── Speech core: text-to-speech that holds up on iOS ───────────
+// Every spoken line goes through speechSay(), every recognition start
+// through speechThenListen(). What iOS WebKit (Safari and the home-screen
+// app) does, and how it is handled here:
+// - getVoices() is often empty until something was spoken, and
+//   'voiceschanged' may never fire: the German voice is looked up again for
+//   every line, and utterance.lang is always set, so a line is spoken in the
+//   default German voice even when no voice object is known.
+// - Nothing is heard until speak() was called inside a tap: taps queue one
+//   silent line (speechUnlock) until a line has been seen starting, so lines
+//   started later from timers, network replies or recognition results are
+//   heard too.
+// - cancel() directly followed by speak() can swallow the new line: cancel
+//   only when something is speaking, and start the line SPEECH_GAP_MS later.
+// - onend may never fire (and an utterance nobody references can be
+//   garbage-collected first): the line stays referenced in speechCur, and a
+//   watchdog based on the text length ends it anyway, so no flow hangs.
+// - After the app was in the background the engine can be stuck paused:
+//   resume() before every line and when the app is visible again; speech
+//   stops while the app is hidden.
+// - Speech and media never overlap: speaking pauses the tracks
+//   (tracksPauseAudio) and any <audio>/<video> starting stops speech.
+
+var SPEECH_GAP_MS = 100;      // between cancel() and the next speak()
+var speechCur = null;         // the line in flight (see speechSay)
+var speechStartTimer = null;  // a start waiting out SPEECH_GAP_MS
+var speechCancelAt = 0;       // last cancel(): a speak() right after it waits
+var speechVoice = null;       // best German voice found so far (null: lang only)
+var speechUnlocked = false;   // a line was seen starting: iOS lets later ones through
+var speechUnlockU = null;     // the silent unlock line, kept referenced
+var speechUnlockAt = 0;
+var speechUnlockOver = true;
+
+function speechTtsSupported() {
+    return !!window.speechSynthesis && typeof SpeechSynthesisUtterance !== 'undefined';
+}
+
+function speechGermanVoices() {
+    var all = [];
+    try { all = window.speechSynthesis.getVoices() || []; } catch (e) {}
+    var out = [];
+    for (var i = 0; i < all.length; i++) {
+        if (/^de(?:[-_]|$)/i.test(String(all[i].lang || ''))) out.push(all[i]);
+    }
+    return out;
+}
+
+// Higher is better: de-DE before de-AT/de-CH, enhanced/premium before the
+// compact default, the iOS novelty voices (Eloquence: Grandma, Rocko…) last.
+function speechVoiceScore(v) {
+    var id = String(v.name || '') + ' ' + String(v.voiceURI || '');
+    var score = /^de[-_]de$/i.test(String(v.lang || '')) ? 40 : 20;
+    if (/enhanced|premium|erweitert|neural|natural/i.test(id)) score += 30;
+    if (/compact/i.test(id)) score -= 5;
+    if (/eloquence|\b(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley)\b/i.test(id)) score -= 30;
+    return score;
+}
+
+function speechPickVoice() {
+    var list = speechGermanVoices(), best = null, bestScore = -1000;
+    for (var i = 0; i < list.length; i++) {
+        var sc = speechVoiceScore(list[i]);
+        if (sc > bestScore) { best = list[i]; bestScore = sc; }
+    }
+    if (best) speechVoice = best;
+    return speechVoice;
+}
+
+// Every tap (capture phase, before the tap's own handler) until unlocked.
+// (A touchend that ended a scroll isn't a tap for iOS, so one try is not enough.)
+function speechUnlock() {
+    if (speechUnlocked || !speechTtsSupported()) return;
+    var ss = window.speechSynthesis;
+    try {
+        if (ss.speaking || ss.pending) return;
+        var u = new SpeechSynthesisUtterance(' ');
+        u.lang = 'de-DE';
+        u.volume = 0;
+        u.onstart = function() { speechUnlocked = true; };
+        u.onend = u.onerror = function() { if (speechUnlockU === u) speechUnlockOver = true; };
+        speechUnlockU = u;
+        speechUnlockAt = Date.now();
+        speechUnlockOver = false;
+        ss.speak(u);
+    } catch (e) {}
+}
+
+// The silent unlock line is still queued: a line spoken in the same tap
+// goes after it instead of cancelling it (which would leave the tap).
+function speechUnlockQueued() {
+    return !!speechUnlockU && !speechUnlockOver && Date.now() - speechUnlockAt < 2000;
+}
+
+function speechEngineBusy() {
+    if (!speechTtsSupported()) return false;
+    try { return (window.speechSynthesis.speaking || window.speechSynthesis.pending) && !speechUnlockQueued(); }
+    catch (e) { return false; }
+}
+
+function speechCancel() {
+    speechCancelAt = Date.now();
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+}
+
+// Speaks one line. onDone(how) runs exactly once, always asynchronously:
+// 'end', 'error', 'timeout' (the watchdog stopped waiting for onend),
+// 'stopped' (speechStop() or a newer line: the app's own stop),
+// 'interrupted' (the engine or system cancelled it -- callers move on, as
+// after 'error') or 'none' (no engine / no text).
+// opts: lang ('de-DE'), rate (0.9), pitch, onStart. Returns the line;
+// line.started tells whether the engine was seen speaking it.
+function speechSay(text, opts, onDone) {
+    opts = opts || {};
+    text = String(text === undefined || text === null ? '' : text);
+    var prev = speechCur;
+    speechCur = null;
+    clearTimeout(speechStartTimer);
+    speechStartTimer = null;
+    if (prev) prev.finish('stopped');
+    var line = { started: false, done: false, timer: null, u: null };
+    line.finish = function(how) {
+        if (line.done) return;
+        line.done = true;
+        clearTimeout(line.timer);
+        if (speechCur === line) speechCur = null;
+        if (onDone) setTimeout(function() { onDone(how); }, 0);
+    };
+    if (!speechTtsSupported() || !text.trim()) { line.finish('none'); return line; }
+    var ss = window.speechSynthesis;
+    var u;
+    try {
+        u = new SpeechSynthesisUtterance(text);
+        u.lang = opts.lang || 'de-DE';
+        u.rate = opts.rate || 0.9;
+        if (opts.pitch) u.pitch = opts.pitch;
+        if (/^de/i.test(u.lang) && speechPickVoice()) u.voice = speechVoice;
+    } catch (e) { line.finish('error'); return line; }
+    line.u = u;
+    u.onstart = function() {
+        line.started = true;
+        speechUnlocked = true;
+        if (opts.onStart && !line.done) opts.onStart();
+    };
+    u.onend = function() { line.finish('end'); };
+    // The app's own stops finish the line with 'stopped' before they cancel,
+    // so an 'interrupted'/'canceled' that still reaches an open line came
+    // from the engine or the system (WebKit says 'canceled').
+    u.onerror = function(e) {
+        var code = e && e.error;
+        line.finish(code === 'interrupted' || code === 'canceled' ? 'interrupted' : 'error');
+    };
+    speechCur = line;
+    if (typeof tracksPauseAudio === 'function') tracksPauseAudio();
+
+    var busy = speechEngineBusy();
+    if (busy) speechCancel();
+    var wait = busy || Date.now() - speechCancelAt < SPEECH_GAP_MS;
+    var start = function() {
+        speechStartTimer = null;
+        if (speechCur !== line) return;
+        try { ss.resume(); } catch (e) {}
+        try { ss.speak(u); } catch (e) { line.finish('error'); return; }
+        speechUnlockOver = true; // from now on a busy engine is this app's own speech
+        var began = Date.now();
+        var est = Math.max(2000, Math.round(text.length * 70 / u.rate) + 1200);
+        var check = function() {
+            if (line.done) return;
+            var speaking = false;
+            try { speaking = ss.speaking; } catch (e) {}
+            if (speaking) line.started = speechUnlocked = true;
+            // Still talking (a slower voice than estimated): wait, up to a
+            // cap, as iOS can also report "speaking" forever.
+            if (speaking && Date.now() - began < est * 2 + 4000) { line.timer = setTimeout(check, 400); return; }
+            line.finish('timeout');
+        };
+        line.timer = setTimeout(check, est);
+    };
+    if (wait) speechStartTimer = setTimeout(start, SPEECH_GAP_MS);
+    else start();
+    return line;
+}
+
+// Stops the line in flight (its onDone gets 'stopped') and anything queued.
+function speechStop() {
+    var handedOver = !!speechCur && !speechStartTimer;
+    clearTimeout(speechStartTimer);
+    speechStartTimer = null;
+    var line = speechCur;
+    speechCur = null;
+    if (line) line.finish('stopped');
+    if (handedOver || speechEngineBusy()) speechCancel();
+}
+
+// Recognition must not start while speech holds the audio session (on iOS
+// one of the two breaks): stop speaking and give the engine a moment. From a
+// tap with nothing speaking, cb runs at once, still inside the tap, which
+// iOS may require for SpeechRecognition.start(). cb(inTap) says which it
+// was: a 'not-allowed' after a start outside a tap only means "tap again".
+function speechThenListen(cb, fromTap) {
+    var busy = !!speechCur || !!speechStartTimer || speechEngineBusy();
+    if (busy) speechStop();
+    else if (speechUnlockQueued()) {
+        // Only this tap's silent unlock line: drop it and keep the tap.
+        speechUnlockOver = true;
+        speechCancel();
+    }
+    if (fromTap && !busy) { cb(true); return; }
+    setTimeout(function() { cb(false); }, busy ? 350 : 200);
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('touchend', speechUnlock, true);
+    document.addEventListener('click', speechUnlock, true);
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'hidden') {
+            speechStop();
+            speechCheckMicAbort();
+        } else if (speechTtsSupported()) {
+            try { window.speechSynthesis.resume(); } catch (e) {}
+        }
+    });
+    document.addEventListener('play', function(e) {
+        var t = e.target;
+        if (t && (t.tagName === 'AUDIO' || t.tagName === 'VIDEO')) speechStop();
+    }, true);
+}
+
+function speakText(text, lang, onDone) {
+    speechSay(text, { lang: lang || 'de-DE' }, onDone);
+}
+
+// Hands-free: prompt, then options A-D, then onDone. A chain that was
+// stopped (new question, leaving the tab, app hidden) just ends; a line the
+// system cut off ('interrupted') is passed over like a failed one.
 function speakQuestion(q, onDone) {
     var promptLang = q.direction === 'de_to_en' ? 'de-DE' : 'en-US';
     var optLang    = q.direction === 'de_to_en' ? 'en-US' : 'de-DE';
     var session = hfSession;
-    if (typeof tracksPauseAudio === 'function') tracksPauseAudio();
-
-    // Build chain: prompt → option A → option B → option C → option D → onDone
-    var utterances = [];
-
-    var promptU = new SpeechSynthesisUtterance(q.prompt);
-    promptU.lang = promptLang;
-    promptU.rate = 0.9;
-    utterances.push(promptU);
-
+    var labels = ['Option A', 'Option B', 'Option C', 'Option D'];
+    var lines = [{ text: q.prompt, lang: promptLang }];
     q.options.forEach(function(opt, idx) {
-        var labels = ['Option A', 'Option B', 'Option C', 'Option D'];
-        var u = new SpeechSynthesisUtterance(labels[idx] + ': ' + opt.text);
-        u.lang = optLang;
-        u.rate = 0.9;
-        utterances.push(u);
+        lines.push({ text: labels[idx] + ': ' + opt.text, lang: optLang });
     });
-
-    // Chain via onend with per-utterance timeout fallback (iOS onend unreliable)
-    var currentIdx = 0;
-    var chainFired = false;
-
-    function speakNext() {
-        if (chainFired || session !== hfSession) return;
-        if (currentIdx >= utterances.length) {
-            chainFired = true;
-            if (onDone) onDone();
-            return;
-        }
-        var u = utterances[currentIdx];
-        var uFired = false;
-        var uDone = function() {
-            if (!uFired) {
-                uFired = true;
-                currentIdx++;
-                speakNext();
-            }
-        };
-        u.onend = uDone;
-        u.onerror = uDone;
-        var ms = Math.max(1500, u.text.length * 75 + 600);
-        setTimeout(uDone, ms);
-        window.speechSynthesis.speak(u);
+    hfShowMicNote('');
+    var i = 0;
+    function next(how) {
+        if (session !== hfSession || how === 'stopped') return;
+        if (i >= lines.length) { if (onDone) onDone(); return; }
+        var line = lines[i++];
+        speechSay(line.text, { lang: line.lang }, next);
     }
+    next();
+}
 
-    window.speechSynthesis.cancel();
-    speakNext();
+// ── Speech recognition: errors, device facts, Speech check result ──
+
+// iOS version from the user agent as [major, minor], or null when not iOS.
+// (iOS 26 still says "OS 18_6" there; Safari adds "Version/26".)
+function speechIosVersion() {
+    var ua = navigator.userAgent || '';
+    var m = /(?:iPhone|iPad|iPod).*? OS (\d+)[_.](\d+)/.exec(ua);
+    if (!m && /Macintosh/.test(ua) && navigator.maxTouchPoints > 1) m = /Version\/(\d+)\.(\d+)/.exec(ua);
+    if (!m) return null;
+    var v = [+m[1], +m[2]];
+    var safari = /Version\/(\d+)(?:\.(\d+))?/.exec(ua);
+    if (safari && +safari[1] > v[0]) v = [+safari[1], +(safari[2] || 0)];
+    return v;
+}
+
+function speechIsStandalone() {
+    if (window.navigator.standalone === true) return true;
+    try { return !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); }
+    catch (e) { return false; }
+}
+
+function speechRecCtor() {
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+// A SpeechRecognition error code as one short message with the fix. kind:
+// 'blocked' (a setting turns voice input off), 'no-mic', 'unsupported',
+// 'retry' (another try may work) or 'quiet' (nothing worth saying).
+// tapToAnswer: the screen has answer buttons, no text box (hands-free Test).
+function speechRecError(code, tapToAnswer) {
+    var ios = speechIosVersion();
+    var safari = ios && ios[0] >= 18 ? 'Settings → Apps → Safari' : 'Settings → Safari';
+    var inApp = !!ios && speechIsStandalone();
+    var orType = tapToAnswer ? ' — or tap an answer.' : ' — or type your answer.';
+    var typeAll = tapToAnswer ? 'tap the answers.' : 'type your answers.';
+    var notInApp = 'isn’t available in the home-screen app on this iPhone — open the site in Safari, or ' + typeAll;
+    switch (code) {
+    case 'aborted':
+        return { kind: 'quiet', text: '' };
+    case 'no-speech':
+        return { kind: 'retry', text: 'Nothing was heard. Tap 🎤, then speak right away and close to the phone' + orType };
+    case 'not-allowed':
+        return { kind: 'blocked', text: 'Microphone access is blocked. Allow it in ' + safari + ' → Microphone, then try again' + orType };
+    case 'service-not-allowed':
+        return { kind: 'blocked', text: 'Voice input is switched off. Turn on Settings → General → Keyboard → Enable Dictation (and Siri in Settings → Siri), then try again' +
+            (inApp ? '. If it still fails, voice input ' + notInApp : orType) };
+    case 'audio-capture':
+        return { kind: 'no-mic', text: 'No microphone could be used (another app may be using it). Close that app and try again' + orType };
+    case 'network':
+        return { kind: 'retry', text: 'Voice input needs an internet connection. Check it and try again' + orType };
+    case 'language-not-supported':
+        return { kind: 'blocked', text: 'German voice input isn’t set up. Add a German keyboard in Settings → General → Keyboard → Keyboards' + orType };
+    case 'unsupported':
+        return { kind: 'unsupported', text: 'Voice input ' + (inApp ? notInApp : 'isn’t available in this browser — ' + typeAll) };
+    case 'start-failed':
+        return { kind: 'retry', text: 'The microphone couldn’t start. Tap 🎤 to try again' + orType };
+    case 'no-response':
+        return { kind: 'retry', text: 'Voice input didn’t respond. Try again; if it keeps failing, check Settings → General → Keyboard → Enable Dictation' + orType };
+    }
+    return { kind: 'retry', text: 'Voice input stopped' + (code ? ' (' + code + ')' : '') + '. Try again' + orType };
+}
+
+// localStorage 'speech-check' = { at, tts: 'ok'|'silent'|'unsupported',
+// stt: 'ok'|'unsupported'|'blocked'|'no-mic'|'error', voice, mode, ios }.
+// mode is 'app' (home screen) or 'browser': the two can differ on iOS, so
+// a result only counts in the mode it was taken in.
+var SPEECH_CHECK_KEY = 'speech-check';
+
+function speechRunMode() { return speechIsStandalone() ? 'app' : 'browser'; }
+
+function speechCheckLoad() {
+    try {
+        var r = JSON.parse(localStorage.getItem(SPEECH_CHECK_KEY) || 'null');
+        return r && typeof r === 'object' ? r : null;
+    } catch (e) { return null; }
+}
+
+function speechCheckCurrent() {
+    var r = speechCheckLoad();
+    return r && (!r.mode || r.mode === speechRunMode()) ? r : null;
+}
+
+function speechCheckSave(patch) {
+    var r = speechCheckCurrent() || { tts: null, stt: null, voice: null };
+    for (var k in patch) r[k] = patch[k];
+    var ios = speechIosVersion();
+    r.at = Date.now();
+    r.mode = speechRunMode();
+    r.ios = ios ? ios.join('.') : null;
+    try { localStorage.setItem(SPEECH_CHECK_KEY, JSON.stringify(r)); } catch (e) {}
+    speechAdaptRefresh();
+    return r;
+}
+
+// Voice input didn't work in the Speech check: Speak and exam Sprechen start
+// in typing mode.
+function speechVoiceInputOff() {
+    var r = speechCheckCurrent();
+    return !!r && (r.stt === 'blocked' || r.stt === 'unsupported');
+}
+
+function speechTtsSilent() {
+    var r = speechCheckCurrent();
+    return !!r && r.tts === 'silent';
+}
+
+// Recognition just worked somewhere: an older "blocked" verdict is out of date.
+function speechNoteVoiceWorked() {
+    var r = speechCheckCurrent();
+    if (r && r.stt && r.stt !== 'ok') speechCheckSave({ stt: 'ok' });
+}
+
+var SPEECH_OFF_NOTE = 'Voice input didn’t work in your Speech check, so type your answer (Settings → Speech check to test again).';
+var SPEECH_SILENT_NOTE = '🔇 The German voice was silent in your Speech check — check the silent switch and volume, then test again in ';
+
+function speechHintHtml(text) {
+    return appEscape(text) + '<button type="button" class="link-btn" onclick="speechOpenCheck()">Settings → Speech check</button>.';
+}
+
+function speechOpenCheck() {
+    switchTab('settings');
+    var card = document.getElementById('speech-check-card');
+    if (card && card.scrollIntoView) card.scrollIntoView({ block: 'start' });
+}
+
+// Hints where the Speech check result matters (Test, Scenes). The Speak tab
+// and exam Sprechen read the result whenever they render.
+function speechAdaptRefresh() {
+    var bar = document.getElementById('hands-free-bar');
+    if (bar && bar.parentNode) {
+        var hint = document.getElementById('hf-speech-hint');
+        if (!hint) {
+            hint = document.createElement('div');
+            hint.id = 'hf-speech-hint';
+            hint.className = 'speech-hint hidden';
+            bar.parentNode.insertBefore(hint, bar.nextSibling);
+        }
+        var silent = speechTtsSilent(), off = speechVoiceInputOff();
+        hint.innerHTML = silent ? speechHintHtml(SPEECH_SILENT_NOTE) :
+            (off ? speechHintHtml('⌨️ Voice answers didn’t work in your Speech check — tap the answers (questions are still read aloud). Test again in ') : '');
+        hint.classList.toggle('hidden', !(silent || off) || bar.classList.contains('hidden'));
+    }
+    var scenes = document.getElementById('scenes-content');
+    if (scenes) {
+        var sh = document.getElementById('scenes-speech-hint');
+        if (!sh) {
+            sh = document.createElement('div');
+            sh.id = 'scenes-speech-hint';
+            sh.className = 'speech-hint hidden';
+            scenes.insertBefore(sh, scenes.firstChild);
+        }
+        sh.innerHTML = speechTtsSilent() ? speechHintHtml(SPEECH_SILENT_NOTE) : '';
+        sh.classList.toggle('hidden', !speechTtsSilent());
+    }
 }
 
 // Speech recognition helpers
@@ -2138,33 +3283,55 @@ function matchVoiceToOption(transcript, q) {
     return best; // index into q.options, or null
 }
 
-function startHFListening() {
-    if (!hfSpeechSupported || !handsFreeModeActive || !testScreenActive()) return;
+// fromTap: the note's 🎤 button (a tap; also clears a "voice off" verdict).
+// Otherwise this runs after the question was read, outside any tap.
+function startHFListening(fromTap) {
+    if (!hfSpeechSupported || !hfCanRun()) return;
     var q = testQuestions[testCurrentIndex];
     if (!q || q.answered) return;
+    if (fromTap === true) {
+        hfVoiceOff = '';
+        hfVoiceTried = true;
+    } else {
+        var off = hfVoiceOff || (!hfVoiceTried && speechVoiceInputOff() ? 'Tap an answer — or 🎤 to try voice anyway.' : '');
+        if (off || hfNeedTap) { hfShowMicNote(off || 'Tap 🎤 to answer by voice — or tap an answer.', true); return; }
+    }
     var lang = q.direction === 'de_to_en' ? 'en-US' : 'de-DE';
-    hfRecognition.lang = lang;
-
+    var session = hfSession;
+    hfShowMicNote('');
     var mic = document.getElementById('mic-indicator');
     mic.classList.remove('hidden');
     mic.querySelector('.mic-status').textContent = 'Listening…';
-
     hfListening = true;
-    try { hfRecognition.start(); } catch(e) { /* already started */ }
 
-    clearTimeout(hfListenTimer);
-    hfListenTimer = setTimeout(function() {
-        try { hfRecognition.stop(); } catch(e) {}
-        if (hfListening) hfHandleNoMatch();
-    }, 7000);
+    function go(tries, inTap) {
+        if (session !== hfSession || !hfListening || !hfCanRun() || q.answered) return;
+        hfRecognition.lang = lang;
+        hfFromTap = inTap;
+        try { hfRecognition.start(); }
+        catch (e) {
+            // Usually still closing from the last answer: try again shortly.
+            if (tries < 2) { setTimeout(function() { go(tries + 1, false); }, 400); return; }
+            hfMicFailed('start-failed');
+            return;
+        }
+        clearTimeout(hfListenTimer);
+        hfListenTimer = setTimeout(function() {
+            try { hfRecognition.abort(); } catch (e2) {}
+            if (hfListening) hfHandleNoMatch();
+        }, 7000);
+    }
+    // Not over the voice that just read the question (iOS audio session).
+    speechThenListen(function(inTap) { go(0, inTap); }, fromTap === true);
 }
 
 function stopHFListening() {
     hfListening = false;
     clearTimeout(hfListenTimer);
+    hfShowMicNote('');
     var mic = document.getElementById('mic-indicator');
     if (mic) mic.classList.add('hidden');
-    if (hfRecognition) { try { hfRecognition.stop(); } catch(e) {} }
+    if (hfRecognition) { try { hfRecognition.abort(); } catch(e) {} }
 }
 
 function hfProcessVoiceInput(transcript) {
@@ -2202,10 +3369,260 @@ function hfHandleNoMatch() {
     } else {
         var session = hfSession;
         stopHFListening();
-        speakText('Bitte nochmal', 'de-DE', function() {
-            if (session === hfSession) startHFListening();
-        });
+        // A short gap after the mic before the voice comes back (iOS).
+        setTimeout(function() {
+            if (session !== hfSession || q.answered) return;
+            speakText('Bitte nochmal', 'de-DE', function() {
+                if (session === hfSession) startHFListening();
+            });
+        }, 250);
     }
+}
+
+// ── Speech check (a card in Settings) ──────────────────────────
+// A one-minute test on the phone itself: does the German voice start, end
+// and get heard, and does German voice input work here (home-screen app or
+// Safari)? The result is saved (speechCheckSave) and the app adapts: Speak
+// and exam Sprechen start in typing mode when voice input is off, and Test,
+// Scenes and Speak say so when the voice was silent. Nothing is recorded
+// or sent anywhere: recognition is the phone's own.
+
+var SPEECH_CHECK_LINE = 'Guten Morgen! Das ist ein Test.';
+var speechCheckTts = null;   // { phase: 'speaking'|'ask'|'done', started, how, ms, heard }
+var speechCheckMic = null;   // { phase: 'listening'|'done', text, error, stt, rec, timer, started }
+
+// Called by renderSettings: appends the card and paints it from the saved
+// result plus any test in progress.
+function speechCheckMount(el) {
+    var card = document.createElement('div');
+    card.className = 'settings-card speech-check';
+    card.id = 'speech-check-card';
+    el.appendChild(card);
+    speechCheckPaint();
+}
+
+function settingsOnLeave() {
+    speechCheckMicAbort();
+}
+
+function speechCheckRow(label, value) {
+    return '<div class="settings-row"><span>' + appEscape(label) + '</span><span>' + appEscape(value) + '</span></div>';
+}
+
+function speechCheckWhen(ts) {
+    var d = new Date(ts);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' + d.toTimeString().slice(0, 5);
+}
+
+var SPEECH_TTS_LABEL = { ok: 'works', silent: 'silent', unsupported: 'not available' };
+var SPEECH_STT_LABEL = { ok: 'works', unsupported: 'not available', blocked: 'blocked by a setting', 'no-mic': 'no microphone', error: 'didn’t work' };
+
+function speechCheckPaint() {
+    var card = document.getElementById('speech-check-card');
+    if (!card) return;
+    var tts = speechTtsSupported();
+    var SR = speechRecCtor();
+    var ios = speechIosVersion();
+    var app = speechIsStandalone();
+    var de = tts ? speechGermanVoices() : [];
+    var v = tts ? speechPickVoice() : null;
+    var t = speechCheckTts, m = speechCheckMic;
+    var html = '<div class="settings-title">Speech check</div>' +
+        '<p class="settings-note">Run this once on the iPhone, in the home-screen app: it tests the German voice and the microphone, ' +
+        'and Speak, Exam and Test adapt to the result.</p>' +
+        speechCheckRow('Running as', app ? 'home-screen app' : 'browser tab' + (ios ? ' (the home-screen app can differ: test there too)' : '')) +
+        speechCheckRow('System', ios ? 'iOS ' + ios[0] + '.' + ios[1] + (ios[0] === 18 && ios[1] === 6 && app ? ' or later' : '') : 'not an iPhone') +
+        speechCheckRow('Voice output', tts ? 'available' : 'not available') +
+        speechCheckRow('German voices', !tts ? '—' : (de.length ? String(de.length) : 'none listed yet (iOS lists them after the first test)')) +
+        speechCheckRow('Voice', v ? v.name + ' · ' + v.lang : (tts ? 'default German voice' : '—')) +
+        speechCheckRow('Voice input', SR ? 'available' : 'not available');
+
+    html += '<button type="button" class="btn btn-good" id="speech-check-voice-btn" onclick="speechCheckVoice()"' +
+        (t && t.phase === 'speaking' ? ' disabled' : '') + '>▶ Test German voice</button>';
+    if (t) {
+        var res = '', cls = '';
+        if (t.phase === 'speaking') res = '🔊 Speaking „' + SPEECH_CHECK_LINE + '“ … ' + (t.started ? 'started ✓' : 'waiting for it to start');
+        else if (t.result === 'unsupported') { res = 'This browser has no voice output, so read the texts on screen.'; cls = ' warn'; }
+        else if (!t.started && t.how !== 'end') {
+            res = '🔇 The voice didn’t start (' + (t.how === 'error' ? 'speech error' :
+                t.how === 'interrupted' ? 'the system cut it off — another app may be using the sound' : 'no sound after ' + Math.round(t.ms / 1000) + ' s') +
+                '). Check the silent switch and the volume, and download a German voice in Settings → Accessibility → Spoken Content → Voices → German.';
+            cls = ' warn';
+        } else {
+            res = 'Started ✓ · ' + (t.how === 'end' ? 'ended ✓' :
+                t.how === 'interrupted' ? 'cut off by the system before the end (another app may have taken the sound — test again)' :
+                'no end signal (normal on some iPhones — the app moves on by itself)') +
+                ' · ' + (t.ms / 1000).toFixed(1) + ' s';
+            if (t.phase === 'done') {
+                res += t.heard ? ' · you heard it ✓' : ' · not heard: check the silent switch and volume, then test again.';
+                cls = t.heard ? ' ok' : ' warn';
+            }
+        }
+        html += '<div class="speech-check-result' + cls + '" id="speech-check-voice-result">' + appEscape(res) + '</div>';
+        if (t.phase === 'ask') {
+            html += '<div class="speech-check-ask"><span>Did you hear it?</span>' +
+                '<button type="button" class="btn btn-known" onclick="speechCheckHeard(true)">Yes</button>' +
+                '<button type="button" class="btn btn-learning" onclick="speechCheckHeard(false)">No</button></div>';
+        }
+    }
+
+    var listening = m && m.phase === 'listening';
+    html += '<button type="button" class="btn btn-good" id="speech-check-mic-btn" onclick="speechCheckMicTest()">' +
+        (listening ? '⏹ Stop' : '🎤 Test microphone') + '</button>';
+    if (m) {
+        var mres = '', mcls = '';
+        if (listening) mres = m.text ? '🎤 „' + m.text + '“' : '🎤 Listening… say „Guten Morgen“.';
+        else if (m.stt === 'ok') {
+            mres = '✓ Heard: „' + m.text + '“' + (/guten\s*morgen/i.test(m.text) ? '' : ' (not quite „Guten Morgen“, but voice input works)');
+            mcls = ' ok';
+        } else if (m.stt === 'retap') {
+            mres = 'Tap 🎤 Test microphone once more (the voice was still speaking).';
+        } else {
+            mres = speechRecError(m.error).text;
+            mcls = ' warn';
+        }
+        html += '<div class="speech-check-result' + mcls + '" id="speech-check-mic-result">' + appEscape(mres) + '</div>';
+    }
+
+    var r = speechCheckCurrent();
+    if (r && r.at) {
+        html += '<p class="settings-note" id="speech-check-saved">Saved ' + appEscape(speechCheckWhen(r.at)) +
+            ' · voice: ' + appEscape(SPEECH_TTS_LABEL[r.tts] || 'not tested') +
+            ' · voice input: ' + appEscape(SPEECH_STT_LABEL[r.stt] || 'not tested') +
+            (speechVoiceInputOff() ? ' — Speak and Exam start in typing mode.' : '') + '</p>';
+    }
+    card.innerHTML = html;
+}
+
+function speechCheckVoice() {
+    if (speechCheckTts && speechCheckTts.phase === 'speaking') return;
+    speechCheckMicAbort();
+    if (!speechTtsSupported()) {
+        speechCheckTts = { phase: 'done', result: 'unsupported' };
+        speechCheckSave({ tts: 'unsupported', voice: null });
+        speechCheckPaint();
+        return;
+    }
+    var st = { phase: 'speaking', started: false, t0: Date.now() };
+    speechCheckTts = st;
+    // onstart is not reliable either: also count the engine reporting "speaking".
+    var poll = setInterval(function() {
+        if (st.phase !== 'speaking') { clearInterval(poll); return; }
+        try { if (window.speechSynthesis.speaking && !st.started) { st.started = true; speechCheckPaint(); } } catch (e) {}
+    }, 200);
+    var line = speechSay(SPEECH_CHECK_LINE, {
+        lang: 'de-DE',
+        onStart: function() { if (!st.started) { st.started = true; speechCheckPaint(); } }
+    }, function(how) {
+        clearInterval(poll);
+        if (speechCheckTts !== st) return;
+        if (how === 'stopped') { speechCheckTts = null; speechCheckPaint(); return; } // left Settings, app hidden
+        st.how = how;
+        st.ms = Date.now() - st.t0;
+        st.started = st.started || line.started;
+        var ok = st.started || how === 'end';
+        st.phase = ok ? 'ask' : 'done';
+        var v = speechPickVoice();
+        speechCheckSave({ tts: ok ? 'ok' : 'silent', voice: v ? v.name + ' (' + v.lang + ')' : null });
+        speechCheckPaint();
+    });
+    speechCheckPaint();
+}
+
+function speechCheckHeard(yes) {
+    var st = speechCheckTts;
+    if (!st || st.phase !== 'ask') return;
+    st.phase = 'done';
+    st.heard = !!yes;
+    speechCheckSave({ tts: yes ? 'ok' : 'silent' });
+    speechCheckPaint();
+}
+
+// 🎤 Test microphone (a second tap stops listening).
+function speechCheckMicTest() {
+    var cur = speechCheckMic;
+    if (cur && cur.phase === 'listening') {
+        if (cur.rec) { try { cur.rec.stop(); } catch (e) {} }
+        clearTimeout(cur.timer);
+        cur.timer = setTimeout(function() { speechCheckMicEnd(cur); }, 1500);
+        return;
+    }
+    var SR = speechRecCtor();
+    var st = { phase: 'listening', text: '', error: null, rec: null, timer: null, started: false };
+    speechCheckMic = st;
+    if (!SR) { speechCheckMicEnd(st, 'unsupported'); return; }
+    if (speechCheckTts && speechCheckTts.phase === 'speaking') speechCheckTts = null;
+    speechCheckPaint();
+    speechThenListen(function(inTap) {
+        if (speechCheckMic !== st || st.phase !== 'listening') return;
+        st.inTap = inTap;
+        var rec;
+        try { rec = new SR(); } catch (e) { speechCheckMicEnd(st, 'start-failed'); return; }
+        st.rec = rec;
+        rec.lang = 'de-DE';
+        rec.continuous = false;
+        rec.interimResults = true;
+        rec.onstart = function() { st.started = true; };
+        rec.onaudiostart = function() { st.started = true; };
+        rec.onresult = function(e) {
+            if (speechCheckMic !== st) return;
+            var text = '';
+            var list = (e && e.results) || [];
+            for (var i = 0; i < list.length; i++) {
+                var tr = list[i] && list[i][0] ? String(list[i][0].transcript || '').trim() : '';
+                if (tr) text = text ? text + ' ' + tr : tr;
+            }
+            if (!text) return;
+            st.started = true;
+            st.text = text;
+            var el = document.getElementById('speech-check-mic-result');
+            if (el) el.textContent = '🎤 „' + text + '“';
+        };
+        rec.onerror = function(e) { st.error = (e && e.error) || 'error'; };
+        rec.onend = function() { speechCheckMicEnd(st); };
+        clearTimeout(st.timer);
+        st.timer = setTimeout(function() {
+            try { rec.abort(); } catch (e) {}
+            speechCheckMicEnd(st, st.started ? null : 'no-response');
+        }, 10000);
+        try { rec.start(); } catch (e) { speechCheckMicEnd(st, 'start-failed'); }
+    }, true);
+}
+
+function speechCheckMicEnd(st, err) {
+    if (speechCheckMic !== st || st.phase !== 'listening') return;
+    clearTimeout(st.timer);
+    st.phase = 'done';
+    if (err) st.error = err;
+    if (!st.text && st.error === 'not-allowed' && !st.inTap) {
+        // Started after the voice test had to stop, outside the tap: iOS may
+        // refuse that, so it says nothing about the settings. Not saved.
+        st.stt = 'retap';
+        speechCheckPaint();
+        return;
+    }
+    var stt = 'ok';
+    if (!st.text) {
+        if (!st.error || st.error === 'aborted') st.error = 'no-speech';
+        var kind = speechRecError(st.error).kind;
+        stt = kind === 'blocked' || kind === 'no-mic' || kind === 'unsupported' ? kind : 'error';
+    } else {
+        st.error = null;
+    }
+    st.stt = stt;
+    speechCheckSave({ stt: stt });
+    speechCheckPaint();
+}
+
+// Leaving Settings or the app going to the background: drop a running mic
+// test without saving anything.
+function speechCheckMicAbort() {
+    var st = speechCheckMic;
+    if (!st || st.phase !== 'listening') return;
+    clearTimeout(st.timer);
+    speechCheckMic = null;
+    if (st.rec) { try { st.rec.abort(); } catch (e) {} }
+    speechCheckPaint();
 }
 
 // ── Scenes Screen ──────────────────────────────────────────────
@@ -2225,7 +3642,7 @@ function sceneResetButton(card) {
 function stopConversation() {
     scenePlayId++;
     clearTimeout(sceneGapTimer);
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    speechStop();
     sceneResetButton(currentSpeechCard);
     currentSpeechCard = null;
 }
@@ -2260,22 +3677,13 @@ function playConversation(scenario, btn, card) {
         if (playId !== scenePlayId) return;
         if (lineIndex >= lines.length) { finish(); return; }
 
-        var text = lines[lineIndex].de;
-        var utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'de-DE';
-        utterance.rate = 0.9;
-        var advanced = false;
-        var next = function() {
-            if (advanced || playId !== scenePlayId) return;
-            advanced = true;
+        // speechSay ends a line even when iOS never fires onend (watchdog).
+        speechSay(lines[lineIndex].de, { lang: 'de-DE' }, function(how) {
+            if (playId !== scenePlayId) return;
+            if (how === 'stopped') { stopConversation(); return; } // app hidden, other audio
             lineIndex++;
             sceneGapTimer = setTimeout(speakNext, 800);
-        };
-        utterance.onend = next;
-        utterance.onerror = next;
-        // iOS sometimes never fires onend; the queue keeps lines in order anyway
-        setTimeout(next, Math.max(3000, text.length * 90 + 1500));
-        window.speechSynthesis.speak(utterance);
+        });
     }
 
     speakNext();

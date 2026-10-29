@@ -1462,6 +1462,25 @@ select#test-category-filter {
   margin: 14px 0 6px;
 }
 
+/* Per-season audiobook link (TRACK_BOOKS) under the season header */
+.tracks-book {
+  margin: 0 0 8px;
+}
+
+.tracks-book-link {
+  display: block;
+  color: #a78bfa;
+  font-size: 0.8rem;
+  text-decoration: none;
+  padding: 4px 0;
+}
+
+.tracks-book-hint {
+  font-size: 0.72rem;
+  color: #888;
+  line-height: 1.4;
+}
+
 .tracks-row {
   display: flex;
   align-items: center;
@@ -3479,6 +3498,474 @@ button.cards-counters {
   color: #888;
 }
 
+/* --- My Words: known vs new --- */
+.mw-stack-known, .mw-dot-known { background: #38bdf8; }
+.mw-dot-new { background: #4b5563; }
+.mw-pill-known { background: #38bdf822; color: #7dd3fc; }
+.card-state-known { background: #38bdf822; color: #7dd3fc; }
+
+.mw-tick-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  background: #10b9811a;
+  border: 1px solid #10b981;
+  border-radius: 14px;
+  color: #e0e0e0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mw-tick-entry:active {
+  background: #10b98133;
+}
+
+.mw-tick-entry-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #062e22;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.mw-tick-entry-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mw-tick-entry-text b {
+  color: white;
+  font-size: 0.98rem;
+}
+
+.mw-tick-entry-text span {
+  color: #9ca3af;
+  font-size: 0.78rem;
+}
+
+.mw-tick-entry-chev {
+  flex-shrink: 0;
+  color: #10b981;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.ws-known-note {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  background: #38bdf81a;
+  border: 1px solid #38bdf855;
+  border-radius: 10px;
+  color: #bae6fd;
+  font-size: 0.85rem;
+}
+
+/* --- Tick what you know: full-screen sorting list (openTickView in app.js) --- */
+.tick-view {
+  position: fixed;
+  inset: 0;
+  z-index: 205;
+  display: none;
+  flex-direction: column;
+  background: #1a1a2e;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.tick-view.open {
+  display: flex;
+  animation: tv-in 0.18s ease-out;
+}
+
+@keyframes tv-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The header's colour runs up under the status bar / notch */
+.tv-head {
+  flex-shrink: 0;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) 16px 10px;
+  background: #16213e;
+  border-bottom: 1px solid #2a2a45;
+}
+
+.tv-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+}
+
+.tv-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+.tv-done {
+  flex-shrink: 0;
+  min-width: 76px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 22px;
+  background: #6366f1;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tv-done:active {
+  filter: brightness(0.85);
+}
+
+.tv-seg {
+  margin-top: 4px;
+}
+
+.tv-seg button {
+  min-height: 40px;
+  font-size: 0.9rem;
+}
+
+.tv-progress {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.tv-progress b {
+  color: white;
+}
+
+.tv-p-known b { color: #7dd3fc; }
+.tv-p-learned b { color: #6ee7b7; }
+.tv-p-learning b { color: #fbbf24; }
+
+.tv-stack {
+  height: 6px;
+  margin: 6px 0 0;
+}
+
+.tv-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 12px 16px calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+.tv-intro {
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #bbb;
+}
+
+.tv-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.tv-levels {
+  display: flex;
+  gap: 6px;
+}
+
+.tv-levels .mw-chip {
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.tv-filters select {
+  flex: 1;
+  min-width: 140px;
+  min-height: 36px;
+  background: #16213e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #ddd;
+  font-size: 0.8rem;
+  padding: 6px;
+}
+
+.tv-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0 2px;
+}
+
+.tv-toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 12px 6px 10px;
+  background: #16213e;
+  border: 1px solid #333;
+  border-radius: 18px;
+  color: #bbb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tv-toggle::before {
+  content: '';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  border: 1.5px solid #666;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tv-toggle.on {
+  border-color: #10b981;
+  color: #d1fae5;
+}
+
+.tv-toggle.on::before {
+  content: '✓';
+  background: #10b981;
+  border-color: #10b981;
+  color: #062e22;
+}
+
+.tv-list {
+  padding-top: 4px;
+}
+
+.tv-group-header {
+  position: sticky;
+  top: -12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: 14px 16px 8px;
+  background: #1a1a2e;
+}
+
+.tv-group-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #a78bfa;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.tv-group-count {
+  flex-shrink: 0;
+  color: #888;
+  font-size: 0.72rem;
+}
+
+.tv-tick-all {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 4px 12px;
+  background: none;
+  border: 1px solid #10b981;
+  border-radius: 20px;
+  color: #6ee7b7;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tv-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  margin-bottom: 6px;
+  padding: 8px 10px 8px 12px;
+  background: #16213e;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  /* No content-visibility here: Safari has no scroll anchoring, so rows
+     changing height as they scroll in would make the list jump under a tap. */
+}
+
+.tv-row:active {
+  background: #1b2a4a;
+}
+
+.tv-row.is-known {
+  background: #10b9811a;
+  border-color: #10b98155;
+}
+
+.tv-tick {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #555;
+  border-radius: 50%;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.tv-row.is-known .tv-tick {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.tv-row.is-known .tv-tick::after {
+  content: '✓';
+  color: #062e22;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tv-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tv-de {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.tv-en {
+  color: #999;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.tv-reveal {
+  display: none;
+}
+
+.tv-hide-en .tv-en {
+  display: none;
+}
+
+.tv-hide-en .tv-row.revealed .tv-en {
+  display: block;
+}
+
+.tv-hide-en .tv-reveal {
+  display: block;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 36px;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #888;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tv-hide-en .tv-row.revealed .tv-reveal {
+  border-color: #6366f1;
+  color: #a78bfa;
+}
+
+.tv-toast {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 6px 6px 6px 14px;
+  background: #2a2a45;
+  border: 1px solid #3f3f6a;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  color: white;
+  font-size: 0.9rem;
+}
+
+.tv-toast button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #6366f1;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 0.88rem;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.log-detail-more {
+  display: inline-block;
+  padding: 6px 2px;
+  color: #a78bfa;
+  font-size: 0.75rem;
+}
+
 /* --- Settings --- */
 .settings-content {
   padding: 0 16px 24px;
@@ -3521,6 +4008,88 @@ button.cards-counters {
   font-size: 0.78rem;
   color: #999;
   line-height: 1.45;
+}
+
+/* --- Speech check (Settings) and speech hints (app.js speech section) --- */
+.speech-check-result {
+  font-size: 0.85rem;
+  color: #ccc;
+  line-height: 1.45;
+}
+
+.speech-check-result.ok { color: #10b981; }
+.speech-check-result.warn { color: #f59e0b; }
+
+.speech-check-ask {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #ccc;
+}
+
+.speech-check-ask span {
+  flex: 1 1 auto;
+}
+
+.settings-card .speech-check-ask .btn {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+}
+
+.speech-hint {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+
+/* In a call: the first item of the transcript (scrolls away), with a × */
+.calls-active .speech-hint {
+  position: relative;
+  margin: 0;
+  padding-right: 36px;
+}
+
+.speech-hint-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hf-mic-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  scroll-margin-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #f59e0b;
+}
+
+.hf-mic-note .hf-mic-btn {
+  flex: 0 0 auto;
+  padding: 10px 18px;
+  font-size: 0.9rem;
 }
 
 /* --- Test result: Try Again button keeps its natural size --- */
@@ -4912,3 +5481,34 @@ select#test-category-filter {
 .card-state-learned { background: #34d39922; color: #6ee7b7; }
 .card-state-mastered { background: #10b98144; color: #34d399; }
 .card-state-relearning { background: #ef444422; color: #fca5a5; }
+
+/* ========================================
+   Cards back, usage notes (round 3)
+   ======================================== */
+
+/* Card back: the 🔊 button (12px + 34px from the top) gets its own strip, so a
+   long back that fills or scrolls the card never runs its first line under it */
+#cards-screen .card-back {
+  padding-top: 50px;
+}
+
+/* A word's usage note ("mit Absicht = on purpose"): small, under the translation */
+.card-note {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #c4b5fd;
+  margin: -10px 0 14px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.card-note:empty {
+  display: none;
+}
+
+.ws-note {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #a5b4fc;
+  margin-top: 4px;
+}
